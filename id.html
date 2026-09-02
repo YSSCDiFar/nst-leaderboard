@@ -1,119 +1,393 @@
-<!-- 替換 head 裡的 qrcode 引用為更穩定的 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OPERATOR ID // TACTICAL PASS</title>
+    <!-- 戰術電競字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- LINE LIFF SDK 官方 CDN 與 QRCode 函式庫 -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #05080c;
+            --card-bg: rgba(12, 19, 30, 0.95);
+            --cyan-core: #00f0ff;
+            --cyan-glow: rgba(0, 240, 255, 0.4);
+            --neon-green: #00ff66;
+            --neon-gold: #ffb700;
+            --gold-glow: rgba(255, 183, 0, 0.5);
+            --text-dim: #617d9d;
+            --border: #1a2a3e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: #fff;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 14px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 戰術掃描線背景 */
+        body::before {
+            content: "";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        .id-dossier {
+            width: 100%;
+            max-width: 380px;
+            background: var(--card-bg);
+            border: 1px solid var(--cyan-core);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 25px var(--cyan-glow);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .header .agency {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--cyan-core);
+            letter-spacing: 2px;
+        }
+
+        .operator-hero {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 4px;
+            border: 2px solid var(--cyan-core);
+            object-fit: cover;
+            background: #111b27;
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .op-meta .lbl {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+        }
+
+        .op-meta .name {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+            margin: 2px 0 4px 0;
+        }
+
+        .op-meta .uid {
+            font-size: 0.68rem;
+            color: var(--cyan-core);
+            word-break: break-all;
+        }
+
+        /* 現場報到條碼區 */
+        .checkin-section {
+            background: rgba(0, 240, 255, 0.04);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            padding: 14px;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .checkin-title {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: var(--cyan-core);
+            margin-bottom: 10px;
+        }
+
+        .qr-box {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 130px;
+            height: 130px;
+            padding: 5px;
+            background: #ffffff;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin: 0 auto;
+        }
+
+        .qr-box img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .checkin-hint {
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+
+        /* 個人歷史最佳 PB 戰績卡 */
+        .pb-section {
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .pb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .pb-title {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            color: var(--neon-gold);
+            font-weight: 700;
+        }
+
+        .pb-hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #080d14;
+            border: 1px solid rgba(255, 183, 0, 0.3);
+            border-radius: 6px;
+            padding: 12px 16px;
+        }
+
+        .pb-time {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            line-height: 1;
+        }
+
+        .pb-rank {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--neon-gold);
+            line-height: 1;
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .pb-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .stat-chip {
+            background: #090f18;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.72rem;
+            color: #8fa0b5;
+        }
+        .stat-chip span { color: var(--cyan-core); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="id-dossier">
+        <div class="header">
+            <span class="agency">NEURONSTRIKE // OPERATOR ID</span>
+            <span style="font-size: 0.68rem; color: var(--neon-green);">● ACTIVE STATUS</span>
+        </div>
+
+        <!-- 幹員資訊 -->
+        <div class="operator-hero">
+            <img class="avatar" id="avatarImg" src="https://static.line-scdn.net/line_client/img/default_profile.png" alt="Avatar">
+            <div class="op-meta">
+                <div class="lbl">CALLSIGN // 代號</div>
+                <div class="name" id="dispName">IDENTIFYING...</div>
+                <div class="lbl" style="margin-top: 4px;">OPERATOR REF</div>
+                <div class="uid" id="dispUid">--</div>
+            </div>
+        </div>
+
+        <!-- 現場報到條碼 (櫃台掃碼帶入大螢幕) -->
+        <div class="checkin-section">
+            <div class="checkin-title">SCAN TO DEPLOY // 現場開局掃描碼</div>
+            <div class="qr-box" id="qrcodeBox"></div>
+            <div class="checkin-hint">入場時向店內櫃台出示，自動帶入開局姓名</div>
+        </div>
+
+        <!-- 個人歷史最佳戰績 (Personal Best) -->
+        <div class="pb-section">
+            <div class="pb-header">
+                <span class="pb-title">🏆 ALL-TIME BEST // 個人生涯巔峰</span>
+                <span style="font-size: 0.68rem; color: var(--text-dim);" id="matchCount">MATCHES: 0</span>
+            </div>
+            <div class="pb-hero">
+                <div>
+                    <div style="font-size: 0.65rem; color: var(--text-dim);">BEST CLEAR TIME</div>
+                    <div class="pb-time" id="bestTime">--</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 0.65rem; color: var(--text-dim);">GRADE</div>
+                    <div class="pb-rank" id="bestRank">-</div>
+                </div>
+            </div>
+            <div class="pb-stats">
+                <div class="stat-chip">ALPHA HITS: <span id="statAlpha">-</span></div>
+                <div class="stat-chip">LAST RECORD: <span id="statDate">--</span></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ─── [設定區] ───
-        // 1. 請填入你的真實 LIFF ID
+        // 1. 請填入你在 LINE Developers 建立對應 id.html 的真實 LIFF ID
         const LIFF_ID = "2011351699-ICoDeO6U"; 
         // 2. Firebase 基礎路徑
         const FIREBASE_BASE = "https://nst-killhouse-default-rtdb.firebaseio.com/leaderboard";
 
-        async function initOperatorId() {
-            let operatorName = "OPERATOR_GHOST";
+        // 防爆 QR Code 生成引擎
+        function drawCheckinQR(textData) {
+            const box = document.getElementById("qrcodeBox");
+            if (!box) return;
+            box.innerHTML = "";
 
-            try {
-                // 1. 初始化 LIFF
-                await liff.init({ liffId: LIFF_ID });
-
-                if (liff.isLoggedIn()) {
-                    const profile = await liff.getProfile();
-                    operatorName = profile.displayName || "GUEST_OPERATOR";
-                    
-                    document.getElementById("dispName").innerText = operatorName;
-                    document.getElementById("dispUid").innerText = profile.userId ? (profile.userId.substring(0, 16) + "...") : "ID_UNKNOWN";
-                    if (profile.pictureUrl) {
-                        document.getElementById("avatarImg").src = profile.pictureUrl;
-                    }
-                } else {
-                    // 若在 LINE 外開啟，可直接啟動登入，或先以訪客身分展示
-                    console.warn("[LIFF] 尚未登入，啟用訪客展示模式");
-                    document.getElementById("dispName").innerText = "GUEST_OPERATOR";
-                    document.getElementById("dispUid").innerText = "OFFLINE_MODE";
-                }
-            } catch (err) {
-                console.warn("[LIFF] 初始化失敗，降級為離線卡片:", err);
-                document.getElementById("dispName").innerText = "GUEST_OPERATOR";
-            }
-
-            // 2. 無論 LIFF 有無報錯，強制渲染報到 QR Code (雙引擎防護)
-            renderCheckinQR(operatorName);
-
-            // 3. 查詢歷史 PB
-            fetchPersonalPB(operatorName);
-        }
-
-        // 雙引擎 QR Code 生成邏輯
-        function renderCheckinQR(content) {
-            const qrBox = document.getElementById("qrcodeBox");
-            if (!qrBox) return;
-            qrBox.innerHTML = "";
-
-            // 方案 A：本地 JS 庫繪製
             if (typeof QRCode !== "undefined") {
                 try {
-                    new QRCode(qrBox, {
-                        text: content,
+                    new QRCode(box, {
+                        text: textData,
                         width: 120,
                         height: 120,
                         correctLevel: QRCode.CorrectLevel.M
                     });
                     return;
                 } catch (e) {
-                    console.warn("[QR] JS 生成失敗，切換雲端備用引擎:", e);
+                    console.warn("JS 渲染失敗，切換雲端圖片引擎:", e);
                 }
             }
 
-            // 方案 B：雲端圖片生成 (100% 絕對成功)
-            const fallbackImg = document.createElement("img");
-            fallbackImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(content)}`;
-            fallbackImg.style.width = "120px";
-            fallbackImg.style.height = "120px";
-            qrBox.appendChild(fallbackImg);
+            // 備用方案：雲端生成
+            const img = document.createElement("img");
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(textData)}`;
+            img.style.width = "120px";
+            img.style.height = "120px";
+            box.appendChild(img);
         }
 
-        async function fetchPersonalPB(operatorName) {
+        async function initPage() {
+            let opName = "OPERATOR_GHOST";
+            let opUid = "NST-7701";
+
+            // 先繪製預設 QR Code，確保容器不留白被壓縮
+            drawCheckinQR(opName);
+
+            // 嘗試連線 LINE LIFF，加裝 2.5 秒超時保護
+            try {
+                const liffPromise = liff.init({ liffId: LIFF_ID });
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("TIMEOUT"), 2500));
+
+                await Promise.race([liffPromise, timeoutPromise]);
+
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    opName = profile.displayName || "OPERATOR_VIP";
+                    opUid = profile.userId ? (profile.userId.substring(0, 14) + "...") : "ID_SECURED";
+
+                    if (profile.pictureUrl) {
+                        document.getElementById("avatarImg").src = profile.pictureUrl;
+                    }
+                } else {
+                    opName = "GUEST_OPERATOR";
+                    opUid = "OFFLINE_GUEST";
+                }
+            } catch (err) {
+                console.warn("[LIFF STATUS] 超時或初始化未完成，切入訪客模式:", err);
+                opName = "Operator_" + Math.floor(Math.random() * 899 + 100);
+                opUid = "STANDBY_MODE";
+            }
+
+            // 更新畫面資料並重繪專屬 QR Code
+            document.getElementById("dispName").innerText = opName.toUpperCase();
+            document.getElementById("dispUid").innerText = opUid;
+            drawCheckinQR(opName);
+
+            // 撈取戰績
+            fetchPB(opName);
+        }
+
+        async function fetchPB(name) {
             try {
                 let res = await fetch(`${FIREBASE_BASE}.json`);
-                let rootData = await res.json();
-                if (!rootData) {
+                let data = await res.json();
+                if (!data) {
                     document.getElementById("bestTime").innerText = "NONE";
                     return;
                 }
 
-                let myRecords = [];
-                Object.keys(rootData).forEach(season => {
-                    let sData = rootData[season];
-                    if (typeof sData === "object" && sData !== null) {
-                        Object.values(sData).forEach(r => {
-                            if (r.name && r.name.trim().toLowerCase() === operatorName.trim().toLowerCase()) {
-                                myRecords.push(r);
+                let matches = [];
+                Object.values(data).forEach(season => {
+                    if (typeof season === "object" && season !== null) {
+                        Object.values(season).forEach(r => {
+                            if (r.name && r.name.trim().toLowerCase() === name.trim().toLowerCase()) {
+                                matches.push(r);
                             }
                         });
                     }
                 });
 
-                if (myRecords.length === 0) {
+                if (matches.length > 0) {
+                    matches.sort((a, b) => Number(a.score) - Number(b.score));
+                    const best = matches[0];
+                    document.getElementById("bestTime").innerText = `${Number(best.score).toFixed(2)}s`;
+                    document.getElementById("bestRank").innerText = best.score < 3.5 ? "S" : (best.score < 4.5 ? "A" : "B");
+                    document.getElementById("statAlpha").innerText = `x${best.alpha || 0}`;
+                    document.getElementById("matchCount").innerText = `MATCHES: ${matches.length}`;
+                    if (best.timestamp) {
+                        const d = new Date(best.timestamp);
+                        document.getElementById("statDate").innerText = `${d.getMonth()+1}/${d.getDate()}`;
+                    }
+                } else {
                     document.getElementById("bestTime").innerText = "NONE";
-                    return;
-                }
-
-                myRecords.sort((a, b) => Number(a.score) - Number(b.score));
-                const pb = myRecords[0];
-
-                document.getElementById("bestTime").innerText = `${Number(pb.score).toFixed(2)}s`;
-                document.getElementById("bestRank").innerText = pb.score < 3.5 ? "S" : (pb.score < 4.5 ? "A" : "B");
-                document.getElementById("statAlpha").innerText = `x${pb.alpha || 0}`;
-                document.getElementById("matchCount").innerText = `TOTAL RUNS: ${myRecords.length}`;
-                
-                if (pb.timestamp) {
-                    const d = new Date(pb.timestamp);
-                    document.getElementById("statDate").innerText = `${d.getMonth()+1}/${d.getDate()}`;
                 }
             } catch (e) {
-                console.error("PB 查詢失敗:", e);
+                console.error("PB Load Failed", e);
+                document.getElementById("bestTime").innerText = "OFFLINE";
             }
         }
 
-        window.onload = initOperatorId;
+        window.onload = initPage;
     </script>
+</body>
+</html>
