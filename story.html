@@ -23,9 +23,7 @@
             --gold-glow: rgba(255, 183, 0, 0.5);
             --neon-red: #ff003c;
             --text-dim: #617d9d;
-            --steel-dark: #111722;
-            --steel-plate: #182333;
-            --steel-border: #2c3e55;
+            --steel-dark: #121822;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,7 +35,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 12px;
+            padding: 10px;
             min-height: 100vh;
         }
 
@@ -49,7 +47,7 @@
             background: radial-gradient(circle at top right, #0d1a29, #05080c 80%);
             border: 1px solid rgba(0, 240, 255, 0.3);
             border-radius: 8px;
-            padding: 20px 18px;
+            padding: 16px 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -58,19 +56,18 @@
             box-shadow: 0 0 35px rgba(0, 240, 255, 0.15);
         }
 
-        /* 戰術掃描線效果 */
         .story-wrapper::before {
             content: "";
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
             background-size: 100% 4px;
             pointer-events: none;
-            z-index: 9;
+            z-index: 99;
         }
 
         .header-brand {
             border-bottom: 1px solid rgba(0, 240, 255, 0.2);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -79,21 +76,20 @@
 
         .brand-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--cyan-core);
             letter-spacing: 2px;
             text-shadow: 0 0 10px var(--cyan-glow);
         }
 
         .brand-sub {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-dim);
             letter-spacing: 1px;
         }
 
-        /* 射手代號與核心評級 */
         .hero-section {
-            margin: 8px 0;
+            margin: 6px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -101,7 +97,7 @@
         }
 
         .operator-tag .lbl {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-dim);
             letter-spacing: 1.5px;
         }
@@ -109,7 +105,7 @@
         .operator-tag .name {
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 1.35rem;
+            font-size: 1.3rem;
             color: #fff;
             letter-spacing: 1px;
         }
@@ -118,32 +114,31 @@
             text-align: center;
             background: rgba(255, 183, 0, 0.08);
             border: 1px solid var(--neon-gold);
-            padding: 4px 16px;
+            padding: 3px 14px;
             border-radius: 4px;
             box-shadow: 0 0 15px var(--gold-glow);
         }
 
         .grade-badge .grade {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 900;
             color: var(--neon-gold);
             line-height: 1;
         }
 
-        /* 核心秒數與數據矩陣 */
         .score-display {
             background: rgba(0, 240, 255, 0.03);
             border: 1px dashed rgba(0, 240, 255, 0.2);
             border-radius: 6px;
-            padding: 8px;
+            padding: 6px;
             text-align: center;
             z-index: 10;
         }
 
         .score-val {
             font-family: 'Orbitron', monospace;
-            font-size: 3rem;
+            font-size: 2.8rem;
             font-weight: 900;
             color: var(--neon-green);
             text-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
@@ -153,158 +148,286 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-top: 6px;
+            gap: 5px;
+            margin-top: 4px;
         }
 
         .stat-card {
             background: #090e16;
             border: 1px solid rgba(0, 240, 255, 0.1);
-            padding: 5px 4px;
+            padding: 4px 2px;
             border-radius: 4px;
             text-align: center;
         }
 
-        .stat-card .lbl { font-size: 0.58rem; color: var(--text-dim); }
-        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: bold; color: #fff; margin-top: 2px; }
+        .stat-card .lbl { font-size: 0.55rem; color: var(--text-dim); }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* ─── 1:1 實體雷切鋼靶容器 ─── */
+        /* ─── 1:1 實體不鏽鋼靶幾何架構 (真實外觀復刻) ─── */
         .target-container {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 6px 0;
+            margin: 4px 0;
             z-index: 10;
         }
 
-        .steel-target {
-            width: 200px;
-            height: 240px;
-            background: var(--steel-dark);
-            border: 2px solid var(--steel-border);
-            clip-path: polygon(25% 0%, 75% 0%, 75% 15%, 100% 30%, 100% 100%, 0% 100%, 0% 30%, 25% 15%);
-            display: grid;
-            grid-template-rows: 1.2fr 2.5fr;
-            gap: 4px;
-            padding: 8px 6px;
+        /* 主鋼板本體：金屬拉絲高光質感與外輪廓 */
+        .real-steel-target {
+            width: 220px;
+            height: 330px;
+            background: linear-gradient(135deg, #a8b2be 0%, #d6dde5 35%, #8f9aa6 70%, #b8c3ce 100%);
+            border-radius: 20px 20px 10px 10px;
             position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
-        }
-
-        /* 頭部 (2, 3 號板) */
-        .zone-head-group {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 2px rgba(255,255,255,0.8), inset 0 0 12px rgba(0,0,0,0.4);
             display: flex;
             flex-direction: column;
-            gap: 3px;
             align-items: center;
-            position: relative;
         }
 
-        .plate-head-top {
-            width: 36px;
-            height: 20px;
-            background: var(--steel-plate);
-            border: 1px solid #3b4e68;
-            border-radius: 50% 50% 2px 2px;
-            position: relative;
+        /* 頭部外型切線 */
+        .target-head-silhouette {
+            width: 86px;
+            height: 80px;
+            background: inherit;
+            border-radius: 12px 12px 0 0;
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset 0 2px 2px rgba(255,255,255,0.7);
+            border-top: 1px solid #e0e8f0;
+            border-left: 1px solid #7c8894;
+            border-right: 1px solid #7c8894;
         }
 
-        .plate-head-bot {
-            width: 50px;
-            height: 18px;
-            background: var(--steel-plate);
-            border: 1px solid #3b4e68;
-            border-radius: 2px;
-            position: relative;
-        }
-
-        /* 軀幹 (1, 7 號心胸 + 4, 5, 6, 8 號外圍) */
-        .zone-body-group {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr 1fr;
-            gap: 4px;
-            height: 100%;
-            position: relative;
-        }
-
-        .plate-outer-col {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .plate-flank {
-            flex-grow: 1;
-            background: var(--steel-plate);
-            border: 1px solid #3b4e68;
-            border-radius: 2px;
-            position: relative;
-        }
-
-        .plate-center-col {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            align-items: center;
-            position: relative;
-        }
-
-        .plate-heart-circle {
-            width: 60px;
-            height: 60px;
+        /* 頂部中心懸掛穿孔 */
+        .top-hang-hole {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: var(--steel-plate);
-            border: 1px solid #3b4e68;
-            position: relative;
+            background: #090e14;
+            box-shadow: inset 0 1px 3px #000;
         }
 
-        .plate-abdomen {
-            width: 60px;
-            flex-grow: 1;
-            background: var(--steel-plate);
-            border: 1px solid #3b4e68;
+        /* 頭部兩側雷切長縫隙 */
+        .head-slot-l, .head-slot-r {
+            position: absolute;
+            top: 14px;
+            width: 3px;
+            height: 48px;
+            background: #090e14;
             border-radius: 2px;
-            position: relative;
+            box-shadow: inset 0 1px 2px #000;
+        }
+        .head-slot-l { left: 8px; }
+        .head-slot-r { right: 8px; }
+
+        /* 肩膀兩側斜切雷射減震線 */
+        .shoulder-cut-l, .shoulder-cut-r {
+            position: absolute;
+            top: 10px;
+            width: 3px;
+            height: 24px;
+            background: #090e14;
+            border-radius: 2px;
+        }
+        .shoulder-cut-l { left: 45px; transform: rotate(-35deg); }
+        .shoulder-cut-r { right: 45px; transform: rotate(35deg); }
+
+        /* 實體 1~8 號鋼靶活動掛板（深邃雷切凹槽 + 髮絲紋板面） */
+        .plate-hinged {
+            background: linear-gradient(135deg, #b0bac5 0%, #e2eaf2 50%, #9aa6b3 100%);
+            border: 2px solid #080c12; /* 雷切大縫隙 */
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.9), 0 0 3px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Share Tech Mono', sans-serif;
+            font-weight: 900;
+            color: #2b3846; /* 鋼板雷射雕刻字色 */
+            position: absolute;
+            cursor: pointer;
         }
 
-        /* ─── 真實動態彈著點 (Bullet Impact Holes) ─── */
+        /* 板頂懸掛鉸鏈孔細節 (Hinges) */
+        .plate-hinged::before, .plate-hinged::after {
+            content: "";
+            position: absolute;
+            top: -4px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #05080c;
+            border: 1px solid #758391;
+        }
+        .plate-hinged::before { left: 22%; }
+        .plate-hinged::after { right: 22%; }
+
+        /* [2 號] 頭頂圓板 */
+        #plt-2 {
+            width: 48px;
+            height: 46px;
+            border-radius: 50%;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+        }
+        #plt-2::before { left: 28%; }
+        #plt-2::after { right: 28%; }
+
+        /* [3 號] 頸部橫向矩形板 */
+        #plt-3 {
+            width: 68px;
+            height: 28px;
+            border-radius: 4px;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.05rem;
+        }
+
+        /* [1 號] 胸口中心大圓板 (Alpha Heart) */
+        #plt-1 {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.4rem;
+        }
+        #plt-1::before { left: 28%; }
+        #plt-1::after { right: 28%; }
+
+        /* [4 號 / 5 號] 兩側垂直長板 */
+        #plt-4 {
+            width: 36px;
+            height: 86px;
+            border-radius: 5px;
+            top: 36px;
+            left: 10px;
+            font-size: 1.1rem;
+        }
+        #plt-5 {
+            width: 36px;
+            height: 86px;
+            border-radius: 5px;
+            top: 36px;
+            right: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* [6 號 / 7 號 / 8 號] 下腹三塊矩形板 */
+        #plt-6 {
+            width: 40px;
+            height: 52px;
+            border-radius: 4px;
+            top: 150px;
+            left: 20px;
+            font-size: 1.1rem;
+        }
+        #plt-7 {
+            width: 44px;
+            height: 56px;
+            border-radius: 4px;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.1rem;
+        }
+        #plt-8 {
+            width: 40px;
+            height: 52px;
+            border-radius: 4px;
+            top: 150px;
+            right: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* 底部 IDPA 鏤空雷射雕刻字樣 */
+        .target-idpa-stencil {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            color: #0b1016;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+        }
+
+        /* 底部底座螺栓固定點 */
+        .bottom-screws {
+            position: absolute;
+            bottom: 6px;
+            width: 70%;
+            display: flex;
+            justify-content: space-around;
+        }
+        .screw-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #475361;
+            border: 1px solid #728294;
+            box-shadow: inset 0 1px 1px #000;
+            position: relative;
+        }
+        .screw-dot::after {
+            content: "+";
+            position: absolute;
+            top: -5px;
+            left: 1px;
+            font-size: 8px;
+            color: #1a232c;
+        }
+
+        /* ─── 動態實體彈著孔 ─── */
         .bullet-hole {
             position: absolute;
-            width: 10px;
-            height: 10px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #555 10%, #111 60%, #000 100%);
-            box-shadow: 0 0 6px rgba(0, 255, 102, 0.8), inset 0 0 2px #000;
+            background: radial-gradient(circle at 35% 35%, #444 10%, #111 60%, #000 100%);
+            box-shadow: 0 0 6px rgba(0, 255, 102, 0.9), inset 0 0 2px #000;
             border: 1.5px solid var(--neon-green);
             transform: translate(-50%, -50%);
             z-index: 20;
         }
 
         .bullet-hole.charlie-hole {
-            box-shadow: 0 0 6px rgba(0, 240, 255, 0.8), inset 0 0 2px #000;
+            box-shadow: 0 0 6px rgba(0, 240, 255, 0.9), inset 0 0 2px #000;
             border-color: var(--cyan-core);
         }
 
         .footer-stamp {
             border-top: 1px solid rgba(0, 240, 255, 0.2);
-            padding-top: 6px;
+            padding-top: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.62rem;
+            font-size: 0.58rem;
             color: var(--text-dim);
             z-index: 10;
         }
 
-        /* ─── 操作與分享區 ─── */
+        /* 操作與分享列 */
         .action-area {
             width: 100%;
             max-width: 390px;
-            margin-top: 10px;
+            margin-top: 8px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn-webshare {
@@ -312,9 +435,9 @@
             background: linear-gradient(90deg, #00f0ff, #00ffaa);
             color: #000;
             border: none;
-            padding: 14px;
+            padding: 13px;
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             border-radius: 6px;
@@ -327,13 +450,12 @@
         }
 
         .tip-box {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             color: var(--text-dim);
             text-align: center;
-            line-height: 1.4;
         }
 
-        /* 生成彈窗預覽 (解決 LINE 內建瀏覽器無法調用原生選單的問題) */
+        /* 預覽與長按存圖彈窗 */
         .preview-modal {
             display: none;
             position: fixed;
@@ -387,7 +509,7 @@
         </div>
 
         <div class="score-display">
-            <div style="font-size: 0.62rem; color: var(--text-dim); letter-spacing: 2px;">FINAL SCORE TIME</div>
+            <div style="font-size: 0.6rem; color: var(--text-dim); letter-spacing: 2px;">FINAL SCORE TIME</div>
             <div class="score-val" id="dispScore">0.00s</div>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -405,35 +527,51 @@
             </div>
         </div>
 
-        <!-- 1:1 實體雷切鋼靶與彈著孔 -->
+        <!-- 1:1 實體 IDPA 鋼靶容器 -->
         <div class="target-container">
-            <div class="steel-target">
-                <!-- 頭部 2, 3 號板 -->
-                <div class="zone-head-group">
-                    <div class="plate-head-top" id="plt-2"></div>
-                    <div class="plate-head-bot" id="plt-3"></div>
+            <div class="real-steel-target">
+                <!-- 頭部結構與懸掛孔 -->
+                <div class="target-head-silhouette">
+                    <div class="top-hang-hole"></div>
+                    <div class="head-slot-l"></div>
+                    <div class="head-slot-r"></div>
+                    <!-- [2 號] 頭部圓形活動板 -->
+                    <div class="plate-hinged" id="plt-2">2</div>
                 </div>
-                <!-- 軀幹 1, 7 號心胸 + 4, 5, 6, 8 號外圍板 -->
-                <div class="zone-body-group">
-                    <div class="plate-outer-col">
-                        <div class="plate-flank" id="plt-4"></div>
-                        <div class="plate-flank" id="plt-6"></div>
-                    </div>
-                    <div class="plate-center-col">
-                        <div class="plate-heart-circle" id="plt-1"></div>
-                        <div class="plate-abdomen" id="plt-7"></div>
-                    </div>
-                    <div class="plate-outer-col">
-                        <div class="plate-flank" id="plt-5"></div>
-                        <div class="plate-flank" id="plt-8"></div>
-                    </div>
+
+                <!-- 肩部斜切減震槽 -->
+                <div class="shoulder-cut-l"></div>
+                <div class="shoulder-cut-r"></div>
+
+                <!-- [3 號] 頸部橫向矩形板 -->
+                <div class="plate-hinged" id="plt-3">3</div>
+
+                <!-- [1 號] 心胸中心大圓板 -->
+                <div class="plate-hinged" id="plt-1">1</div>
+
+                <!-- [4 號 / 5 號] 兩側外圍垂直板 -->
+                <div class="plate-hinged" id="plt-4">4</div>
+                <div class="plate-hinged" id="plt-5">5</div>
+
+                <!-- [6 號 / 7 號 / 8 號] 下腹矩形板 -->
+                <div class="plate-hinged" id="plt-6">6</div>
+                <div class="plate-hinged" id="plt-7">7</div>
+                <div class="plate-hinged" id="plt-8">8</div>
+
+                <!-- 底部 IDPA 鏤空字樣 -->
+                <div class="target-idpa-stencil">IDPA</div>
+
+                <!-- 底座固定螺栓細節 -->
+                <div class="bottom-screws">
+                    <div class="screw-dot"></div>
+                    <div class="screw-dot"></div>
                 </div>
             </div>
         </div>
 
         <div class="footer-stamp">
             <span id="dispDate">2026.09.02 // TACTICAL LAB</span>
-            <span>IDPA ACCREDITED</span>
+            <span>IDPA ACCREDITED STEEL</span>
         </div>
     </div>
 
@@ -443,7 +581,7 @@
             <span>📸</span> 產生高畫質限動卡 (SAVE & SHARE)
         </button>
         <div class="tip-box">
-            點擊後「長按圖片」即可直接存入相簿或發送至 IG 限動 / Threads！
+            點擊後長按圖片，即可直接儲存相簿或發送至 IG 限動！
         </div>
     </div>
 
@@ -476,14 +614,14 @@
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
-        // ─── 3. 真實動態彈著點生成函式 ───
+        // ─── 3. 動態彈著孔生成函式 ───
         function spawnBulletHole(plateElement, isCharlie = false) {
             if (!plateElement) return;
             const hole = document.createElement("div");
             hole.className = "bullet-hole" + (isCharlie ? " charlie-hole" : "");
 
-            // 在靶板範圍內產生帶有微小偏差的自然散佈座標
-            const padding = 20; // 邊緣保留
+            // 確保彈孔落在板內並產生天然散佈
+            const padding = 20;
             const randomX = Math.floor(Math.random() * (100 - padding * 2)) + padding;
             const randomY = Math.floor(Math.random() * (100 - padding * 2)) + padding;
 
@@ -492,27 +630,29 @@
             plateElement.appendChild(hole);
         }
 
-        // 依據命中數在對應分區打出具體彈著點 (支援同區重複射擊)
-        const heartPlate = document.getElementById("plt-1"); // 心臟大圓
-        const headTop = document.getElementById("plt-2");    // 頭部上頂
-        const headBot = document.getElementById("plt-3");    // 頭部下板
-        const leftFlank = document.getElementById("plt-4");  // 左側外圍
-        const rightFlank = document.getElementById("plt-5"); // 右側外圍
-        const abdomen = document.getElementById("plt-7");   // 下腹
+        // 抓取 1~8 號活動鋼板
+        const p1 = document.getElementById("plt-1"); // 心臟大圓 (Alpha)
+        const p2 = document.getElementById("plt-2"); // 頭頂圓 (Alpha Head)
+        const p3 = document.getElementById("plt-3"); // 頸部板
+        const p4 = document.getElementById("plt-4"); // 左側外圍
+        const p5 = document.getElementById("plt-5"); // 右側外圍
+        const p6 = document.getElementById("plt-6"); // 左下腹
+        const p7 = document.getElementById("plt-7"); // 中下腹
+        const p8 = document.getElementById("plt-8"); // 右下腹
 
-        // 繪製 Alpha 彈孔
+        // 依據 Alpha 獎勵發數在核心 1、2、7 號板產生彈著群 (Grouping)
         for (let i = 0; i < alpha; i++) {
-            if (i === 0) spawnBulletHole(heartPlate); // 第 1 發心臟中心
-            else if (i === 1) spawnBulletHole(headTop); // 第 2 發頭部
-            else if (i === 2) spawnBulletHole(heartPlate); // 第 3 發再度命中胸口 (同區重複散佈)
-            else spawnBulletHole(abdomen);
+            if (i === 0) spawnBulletHole(p1); // 第 1 發心臟中心 (1號)
+            else if (i === 1) spawnBulletHole(p2); // 第 2 發爆頭 (2號)
+            else if (i === 2) spawnBulletHole(p1); // 第 3 發再度命中胸口 (1號重複散佈)
+            else spawnBulletHole(p7); // 第 4 發命中下腹 (7號)
         }
 
-        // 繪製 Charlie 彈孔 (外圍散佈)
-        spawnBulletHole(leftFlank, true);
-        spawnBulletHole(rightFlank, true);
+        // 外圍 Charlie 散佈（命中兩側或邊緣板）
+        spawnBulletHole(p4, true);
+        spawnBulletHole(p5, true);
 
-        // ─── 4. 一鍵生成高畫質限動圖 (相容 LINE 內建瀏覽器) ───
+        // ─── 4. 一鍵生成高畫質限動圖 ───
         async function handleGenerateShare() {
             const btn = document.getElementById("btnShare");
             const originalText = btn.innerHTML;
@@ -529,7 +669,7 @@
 
                 const dataUrl = canvas.toDataURL("image/png");
 
-                // 若在支援原生分享的外部獨立瀏覽器中，先嘗試呼叫系統分享
+                // 若在外部獨立瀏覽器中，先嘗試喚起原生分享
                 if (navigator.share && !navigator.userAgent.includes("Line")) {
                     canvas.toBlob(async (blob) => {
                         const file = new File([blob], `NST_AAR_${name}.png`, { type: "image/png" });
@@ -550,7 +690,7 @@
                         btn.disabled = false;
                     });
                 } else {
-                    // LINE 內建環境：直接彈出高清圖片供射手「長按儲存/分享」
+                    // LINE 內建瀏覽器直接彈出預覽供長按保存
                     showPreviewModal(dataUrl);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
