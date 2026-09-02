@@ -23,9 +23,9 @@
             --gold-glow: rgba(255, 183, 0, 0.5);
             --neon-red: #ff003c;
             --text-dim: #617d9d;
-            --steel-dark: #121822;
-            --steel-plate: #1a2536;
-            --steel-border: #2a3d56;
+            --steel-dark: #111722;
+            --steel-plate: #182333;
+            --steel-border: #2c3e55;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -93,7 +93,7 @@
 
         /* 射手代號與核心評級 */
         .hero-section {
-            margin: 10px 0;
+            margin: 8px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -109,7 +109,7 @@
         .operator-tag .name {
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             color: #fff;
             letter-spacing: 1px;
         }
@@ -136,14 +136,14 @@
             background: rgba(0, 240, 255, 0.03);
             border: 1px dashed rgba(0, 240, 255, 0.2);
             border-radius: 6px;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             z-index: 10;
         }
 
         .score-val {
             font-family: 'Orbitron', monospace;
-            font-size: 3.2rem;
+            font-size: 3rem;
             font-weight: 900;
             color: var(--neon-green);
             text-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
@@ -154,33 +154,33 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 6px;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .stat-card {
             background: #090e16;
             border: 1px solid rgba(0, 240, 255, 0.1);
-            padding: 6px 4px;
+            padding: 5px 4px;
             border-radius: 4px;
             text-align: center;
         }
 
-        .stat-card .lbl { font-size: 0.6rem; color: var(--text-dim); }
-        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.95rem; font-weight: bold; color: #fff; margin-top: 2px; }
+        .stat-card .lbl { font-size: 0.58rem; color: var(--text-dim); }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* ─── 1:1 實體雷切鋼靶可視化 (2-2-4 分區架構) ─── */
+        /* ─── 1:1 實體雷切鋼靶容器 ─── */
         .target-container {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 10px 0;
+            margin: 6px 0;
             z-index: 10;
         }
 
         .steel-target {
-            width: 180px;
-            height: 220px;
+            width: 200px;
+            height: 240px;
             background: var(--steel-dark);
             border: 2px solid var(--steel-border);
             clip-path: polygon(25% 0%, 75% 0%, 75% 15%, 100% 30%, 100% 100%, 0% 100%, 0% 30%, 25% 15%);
@@ -198,22 +198,25 @@
             flex-direction: column;
             gap: 3px;
             align-items: center;
+            position: relative;
         }
 
         .plate-head-top {
-            width: 32px;
-            height: 18px;
+            width: 36px;
+            height: 20px;
             background: var(--steel-plate);
             border: 1px solid #3b4e68;
             border-radius: 50% 50% 2px 2px;
+            position: relative;
         }
 
         .plate-head-bot {
-            width: 44px;
-            height: 16px;
+            width: 50px;
+            height: 18px;
             background: var(--steel-plate);
             border: 1px solid #3b4e68;
             border-radius: 2px;
+            position: relative;
         }
 
         /* 軀幹 (1, 7 號心胸 + 4, 5, 6, 8 號外圍) */
@@ -222,6 +225,7 @@
             grid-template-columns: 1fr 1.6fr 1fr;
             gap: 4px;
             height: 100%;
+            position: relative;
         }
 
         .plate-outer-col {
@@ -235,6 +239,7 @@
             background: var(--steel-plate);
             border: 1px solid #3b4e68;
             border-radius: 2px;
+            position: relative;
         }
 
         .plate-center-col {
@@ -242,40 +247,48 @@
             flex-direction: column;
             gap: 4px;
             align-items: center;
+            position: relative;
         }
 
         .plate-heart-circle {
-            width: 52px;
-            height: 52px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: var(--steel-plate);
             border: 1px solid #3b4e68;
+            position: relative;
         }
 
         .plate-abdomen {
-            width: 54px;
+            width: 60px;
             flex-grow: 1;
             background: var(--steel-plate);
             border: 1px solid #3b4e68;
             border-radius: 2px;
+            position: relative;
         }
 
-        /* 命中發光動畫類別 */
-        .plate-hit-alpha {
-            background: rgba(0, 255, 102, 0.45) !important;
-            border-color: var(--neon-green) !important;
-            box-shadow: 0 0 15px var(--neon-green);
+        /* ─── 真實動態彈著點 (Bullet Impact Holes) ─── */
+        .bullet-hole {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #555 10%, #111 60%, #000 100%);
+            box-shadow: 0 0 6px rgba(0, 255, 102, 0.8), inset 0 0 2px #000;
+            border: 1.5px solid var(--neon-green);
+            transform: translate(-50%, -50%);
+            z-index: 20;
         }
 
-        .plate-hit-charlie {
-            background: rgba(0, 240, 255, 0.35) !important;
-            border-color: var(--cyan-core) !important;
-            box-shadow: 0 0 12px var(--cyan-glow);
+        .bullet-hole.charlie-hole {
+            box-shadow: 0 0 6px rgba(0, 240, 255, 0.8), inset 0 0 2px #000;
+            border-color: var(--cyan-core);
         }
 
         .footer-stamp {
             border-top: 1px solid rgba(0, 240, 255, 0.2);
-            padding-top: 8px;
+            padding-top: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -284,11 +297,14 @@
             z-index: 10;
         }
 
-        /* ─── Web Share 專屬原生轉發按鈕 ─── */
+        /* ─── 操作與分享區 ─── */
         .action-area {
             width: 100%;
             max-width: 390px;
-            margin-top: 12px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .btn-webshare {
@@ -296,9 +312,9 @@
             background: linear-gradient(90deg, #00f0ff, #00ffaa);
             color: #000;
             border: none;
-            padding: 15px;
+            padding: 14px;
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             border-radius: 6px;
@@ -308,17 +324,49 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s;
         }
 
-        .btn-webshare:active {
-            transform: scale(0.98);
+        .tip-box {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* 生成彈窗預覽 (解決 LINE 內建瀏覽器無法調用原生選單的問題) */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .preview-modal img {
+            max-width: 85%;
+            max-height: 75vh;
+            border-radius: 6px;
+            border: 1px solid var(--cyan-core);
+            box-shadow: 0 0 25px var(--cyan-glow);
+        }
+
+        .modal-hint {
+            color: var(--neon-gold);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-top: 14px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- 9:16 IG 限動截圖目標容器 -->
+    <!-- 9:16 IG 限動畫布 -->
     <div class="story-wrapper" id="storyCaptureArea">
         <div class="header-brand">
             <div>
@@ -339,7 +387,7 @@
         </div>
 
         <div class="score-display">
-            <div style="font-size: 0.65rem; color: var(--text-dim); letter-spacing: 2px;">FINAL SCORE TIME</div>
+            <div style="font-size: 0.62rem; color: var(--text-dim); letter-spacing: 2px;">FINAL SCORE TIME</div>
             <div class="score-val" id="dispScore">0.00s</div>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -357,7 +405,7 @@
             </div>
         </div>
 
-        <!-- 1:1 實體雷切鋼靶圖 -->
+        <!-- 1:1 實體雷切鋼靶與彈著孔 -->
         <div class="target-container">
             <div class="steel-target">
                 <!-- 頭部 2, 3 號板 -->
@@ -389,15 +437,25 @@
         </div>
     </div>
 
-    <!-- 呼叫 Web Share 原生轉發面板的按鈕 -->
+    <!-- 底部操作列 -->
     <div class="action-area">
-        <button class="btn-webshare" id="btnShare" onclick="handleNativeShare()">
-            <span>⚡</span> 分享至 IG 限動 / Threads / LINE
+        <button class="btn-webshare" id="btnShare" onclick="handleGenerateShare()">
+            <span>📸</span> 產生高畫質限動卡 (SAVE & SHARE)
         </button>
+        <div class="tip-box">
+            點擊後「長按圖片」即可直接存入相簿或發送至 IG 限動 / Threads！
+        </div>
+    </div>
+
+    <!-- 預覽長按存圖彈窗 -->
+    <div class="preview-modal" id="previewModal" onclick="closeModal()">
+        <img id="generatedImg" src="" alt="Tactical Report">
+        <div class="modal-hint">👆 長按上方圖片 ➜ 加入「照片」或「分享」</div>
+        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px;">(點擊任意空白處關閉)</div>
     </div>
 
     <script>
-        // 1. 從 URL 抓取戰情報表參數
+        // 1. 抓取參數
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || "Operator_Ghost";
         const score = parseFloat(params.get('score')) || 3.20;
@@ -418,72 +476,102 @@
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
-        // 3. 模擬 1:1 實體鋼靶著彈亮燈特效
-        if (alpha > 0) {
-            document.getElementById("plt-1").classList.add("plate-hit-alpha"); // 心胸大圓
-            if (alpha >= 2) document.getElementById("plt-2").classList.add("plate-hit-alpha"); // 頭部
-            if (alpha >= 3) document.getElementById("plt-7").classList.add("plate-hit-alpha"); // 下腹
-        }
-        document.getElementById("plt-4").classList.add("plate-hit-charlie");
-        document.getElementById("plt-5").classList.add("plate-hit-charlie");
+        // ─── 3. 真實動態彈著點生成函式 ───
+        function spawnBulletHole(plateElement, isCharlie = false) {
+            if (!plateElement) return;
+            const hole = document.createElement("div");
+            hole.className = "bullet-hole" + (isCharlie ? " charlie-hole" : "");
 
-        // 4. 核心 Web Share API 原生轉發邏輯
-        async function handleNativeShare() {
+            // 在靶板範圍內產生帶有微小偏差的自然散佈座標
+            const padding = 20; // 邊緣保留
+            const randomX = Math.floor(Math.random() * (100 - padding * 2)) + padding;
+            const randomY = Math.floor(Math.random() * (100 - padding * 2)) + padding;
+
+            hole.style.left = randomX + "%";
+            hole.style.top = randomY + "%";
+            plateElement.appendChild(hole);
+        }
+
+        // 依據命中數在對應分區打出具體彈著點 (支援同區重複射擊)
+        const heartPlate = document.getElementById("plt-1"); // 心臟大圓
+        const headTop = document.getElementById("plt-2");    // 頭部上頂
+        const headBot = document.getElementById("plt-3");    // 頭部下板
+        const leftFlank = document.getElementById("plt-4");  // 左側外圍
+        const rightFlank = document.getElementById("plt-5"); // 右側外圍
+        const abdomen = document.getElementById("plt-7");   // 下腹
+
+        // 繪製 Alpha 彈孔
+        for (let i = 0; i < alpha; i++) {
+            if (i === 0) spawnBulletHole(heartPlate); // 第 1 發心臟中心
+            else if (i === 1) spawnBulletHole(headTop); // 第 2 發頭部
+            else if (i === 2) spawnBulletHole(heartPlate); // 第 3 發再度命中胸口 (同區重複散佈)
+            else spawnBulletHole(abdomen);
+        }
+
+        // 繪製 Charlie 彈孔 (外圍散佈)
+        spawnBulletHole(leftFlank, true);
+        spawnBulletHole(rightFlank, true);
+
+        // ─── 4. 一鍵生成高畫質限動圖 (相容 LINE 內建瀏覽器) ───
+        async function handleGenerateShare() {
             const btn = document.getElementById("btnShare");
             const originalText = btn.innerHTML;
-            btn.innerHTML = "<span>⏳</span> 正在生成高清戰術圖...";
+            btn.innerHTML = "<span>⏳</span> 正在產生戰術圖卡...";
             btn.disabled = true;
 
             try {
                 const captureElement = document.getElementById("storyCaptureArea");
-                
-                // 使用 html2canvas 以 3 倍超採樣繪製 9:16 高清圖
                 const canvas = await html2canvas(captureElement, {
                     scale: 3,
                     backgroundColor: "#05080c",
                     useCORS: true
                 });
 
-                // 轉為 Blob 二進位檔案以供原生分享
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], `NST_AAR_${name}_${Date.now()}.png`, { type: "image/png" });
+                const dataUrl = canvas.toDataURL("image/png");
 
-                    // 檢查瀏覽器是否支援 Web Share 檔案分享 (iOS Safari / Android Chrome 最佳支援)
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: "NEURONSTRIKE 戰術射擊戰報",
-                                text: `特戰幹員 [${name}] 在 GhostSteel 達成 ${score.toFixed(2)}s (${rank} 級)！快來挑戰！`
-                            });
-                        } catch (err) {
-                            if (err.name !== "AbortError") {
-                                fallbackDownload(canvas);
-                            }
+                // 若在支援原生分享的外部獨立瀏覽器中，先嘗試呼叫系統分享
+                if (navigator.share && !navigator.userAgent.includes("Line")) {
+                    canvas.toBlob(async (blob) => {
+                        const file = new File([blob], `NST_AAR_${name}.png`, { type: "image/png" });
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            try {
+                                await navigator.share({
+                                    files: [file],
+                                    title: "NEURONSTRIKE 戰術射擊戰報",
+                                    text: `特戰幹員 [${name}] 在 GhostSteel 達成 ${score.toFixed(2)}s！`
+                                });
+                                btn.innerHTML = originalText;
+                                btn.disabled = false;
+                                return;
+                            } catch (e) {}
                         }
-                    } else {
-                        // 若為不支援原生分享的桌面瀏覽器，降級為直接下載
-                        fallbackDownload(canvas);
-                    }
-
+                        showPreviewModal(dataUrl);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+                } else {
+                    // LINE 內建環境：直接彈出高清圖片供射手「長按儲存/分享」
+                    showPreviewModal(dataUrl);
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                }, "image/png");
-
-            } catch (error) {
-                console.error("分享生成失敗:", error);
-                alert("圖片生成異常，請直接手動截圖保存！");
+                }
+            } catch (err) {
+                console.error("生成失敗:", err);
+                alert("生成異常，請直接手動截圖！");
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         }
 
-        // 備用下載函式
-        function fallbackDownload(canvas) {
-            const link = document.createElement("a");
-            link.download = `NST_AAR_${name}_${Date.now()}.png`;
-            link.href = canvas.toDataURL("image/png");
-            link.click();
+        function showPreviewModal(imgSrc) {
+            const modal = document.getElementById("previewModal");
+            const img = document.getElementById("generatedImg");
+            img.src = imgSrc;
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("previewModal").style.display = "none";
         }
     </script>
 </body>
