@@ -3,269 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NST Tactical After-Action Report</title>
+    <title>NEURONSTRIKE // AFTER-ACTION TACTICAL REPORT</title>
+    <!-- 引入專業戰術電競字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: #05080c;
+            background-color: #03060a;
             color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Consolas", monospace;
+            font-family: 'Share Tech Mono', monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 12px;
         }
-        .canvas-container {
+        .canvas-wrapper {
             width: 100%;
-            max-width: 380px;
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2);
-            border-radius: 12px;
+            max-width: 400px;
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.25), 0 0 10px rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #1a2a3e;
+            border: 1px solid #1f3652;
+            background: #000;
         }
         canvas {
             width: 100%;
             height: auto;
             display: block;
         }
-        .action-box {
+        .action-container {
             width: 100%;
-            max-width: 380px;
-            margin-top: 15px;
-            text-align: center;
+            max-width: 400px;
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .btn-download {
+        .btn-save {
             width: 100%;
-            background: #00d2ff;
+            background: linear-gradient(135deg, #00f0ff 0%, #0088cc 100%);
             color: #000;
             border: none;
-            padding: 14px;
-            font-size: 1rem;
+            padding: 15px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.05rem;
             font-weight: 900;
-            border-radius: 8px;
+            letter-spacing: 2px;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-            letter-spacing: 1px;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transition: all 0.2s;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
         }
-        .btn-download:active { transform: scale(0.98); }
-        .tip-text {
-            font-size: 0.75rem;
-            color: #708090;
-            margin-top: 10px;
+        .btn-save:active { transform: scale(0.98); filter: brightness(1.2); }
+        .hint {
+            text-align: center;
+            font-size: 0.72rem;
+            color: #5b738e;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
-    <div class="canvas-container">
-        <!-- 畫布設定為標準 IG 限動比例 1080 x 1920 (9:16) -->
+    <div class="canvas-wrapper">
+        <!-- 畫布設定為標準 IG 限動 9:16 高清規格 1080 x 1920 -->
         <canvas id="storyCanvas" width="1080" height="1920"></canvas>
     </div>
 
-    <div class="action-box">
-        <button class="btn-download" onclick="downloadImage()">💾 儲存限動圖卡 (SAVE IMAGE)</button>
-        <div class="tip-text">點擊按鈕或直接「長按上方圖卡」存入相簿，直上 IG 限動！</div>
+    <div class="action-container">
+        <button class="btn-save" onclick="downloadStoryImage()">💾 儲存特戰限動卡 (SAVE DOSSIER)</button>
+        <div class="hint">長按上方圖卡直接存入相簿，直出 Instagram 限動與 Threads！</div>
     </div>
 
     <script>
-        // 1. 解析 URL 傳入的戰術數據
-        function getMatchData() {
-            const params = new URLSearchParams(window.location.search);
+        // 1. 解析網址傳入之擊靶參數
+        function parseParams() {
+            const p = new URLSearchParams(window.location.search);
             return {
-                name: params.get("name") || "OPERATOR_GHOST",
-                score: parseFloat(params.get("score")) || 3.85,
-                raw: parseFloat(params.get("raw")) || 4.20,
-                alpha: parseInt(params.get("alpha")) || 3,
-                penalty: parseFloat(params.get("penalty")) || 0.0,
-                rank: params.get("rank") || "S"
+                name: (p.get("name") || "OPERATOR_GHOST").toUpperCase(),
+                score: parseFloat(p.get("score")) || 3.85,
+                raw: parseFloat(p.get("raw")) || 4.20,
+                alpha: parseInt(p.get("alpha")) || 3,
+                penalty: parseFloat(p.get("penalty")) || 0.0,
+                rank: p.get("rank") || "S"
             };
         }
 
-        // 2. 渲染 1080x1920 賽博龐克直式圖卡
-        function drawStoryCard(data) {
+        // 2. 核心 1080x1920 戰術渲染引擎
+        function renderTacticalDossier(data) {
             const canvas = document.getElementById("storyCanvas");
             const ctx = canvas.getContext("2d");
 
-            // --- 背景與深色漸層 ---
-            const bgGrad = ctx.createLinearGradient(0, 0, 0, 1920);
-            bgGrad.addColorStop(0, "#080c14");
-            bgGrad.addColorStop(0.5, "#0d1522");
-            bgGrad.addColorStop(1, "#05070a");
+            // --- 背景與深邃星雲漸層 ---
+            const bgGrad = ctx.createRadialGradient(540, 960, 100, 540, 960, 1000);
+            bgGrad.addColorStop(0, "#0b1524");
+            bgGrad.addColorStop(0.6, "#060b13");
+            bgGrad.addColorStop(1, "#020407");
             ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, 1080, 1920);
 
-            // --- 戰術網格裝飾 ---
-            ctx.strokeStyle = "rgba(0, 210, 255, 0.04)";
+            // --- 戰術網格與十字刻度 ---
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.04)";
             ctx.lineWidth = 2;
-            for (let x = 0; x < 1080; x += 60) {
+            for (let x = 60; x < 1080; x += 60) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1920); ctx.stroke();
             }
-            for (let y = 0; y < 1920; y += 60) {
+            for (let y = 60; y < 1920; y += 60) {
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke();
             }
 
-            // --- 外框科幻四角標記 ---
-            ctx.strokeStyle = "#00d2ff";
-            ctx.lineWidth = 6;
-            // 左上角
-            ctx.beginPath(); ctx.moveTo(60, 120); ctx.lineTo(60, 60); ctx.lineTo(120, 60); ctx.stroke();
-            // 右上角
-            ctx.beginPath(); ctx.moveTo(960, 60); ctx.lineTo(1020, 60); ctx.lineTo(1020, 120); ctx.stroke();
-            // 左下角
-            ctx.beginPath(); ctx.moveTo(60, 1800); ctx.lineTo(60, 1860); ctx.lineTo(120, 1860); ctx.stroke();
-            // 右下角
-            ctx.beginPath(); ctx.moveTo(960, 1860); ctx.lineTo(1020, 1860); ctx.lineTo(1020, 1800); ctx.stroke();
+            // --- 外圍裝甲外框與四角 HUD 導航錨點 ---
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.5)";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(50, 50, 980, 1820);
 
-            // --- 頂部場館 Header ---
-            ctx.fillStyle = "#708090";
-            ctx.font = "bold 32px 'Courier New', monospace";
-            ctx.fillText("NEURONSTRIKE TACTICAL // KILL HOUSE", 100, 160);
+            // 角落強化重裝角標
+            ctx.strokeStyle = "#00f0ff";
+            ctx.lineWidth = 8;
+            const drawCorner = (x, y, dx, dy) => {
+                ctx.beginPath();
+                ctx.moveTo(x, y + dy * 50);
+                ctx.lineTo(x, y);
+                ctx.lineTo(x + dx * 50, y);
+                ctx.stroke();
+            };
+            drawCorner(50, 50, 1, 1);
+            drawCorner(1030, 50, -1, 1);
+            drawCorner(50, 1870, 1, -1);
+            drawCorner(1030, 1870, -1, -1);
 
-            ctx.fillStyle = "#00d2ff";
-            ctx.font = "900 68px -apple-system, sans-serif";
-            ctx.fillText("AFTER-ACTION REPORT", 100, 240);
+            // --- 頂部 HEADER: 機密戰術公文標記 ---
+            ctx.fillStyle = "#ff003c";
+            ctx.fillRect(90, 85, 240, 32);
+            ctx.fillStyle = "#000";
+            ctx.font = "900 18px 'Chakra Petch', sans-serif";
+            ctx.fillText("TOP SECRET // CQB AAR", 105, 108);
 
-            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-            ctx.font = "28px monospace";
-            const today = new Date();
-            ctx.fillText(`DATE: ${today.toISOString().split('T')[0]}  STATION: SECTOR-01`, 100, 290);
+            ctx.fillStyle = "rgba(0, 240, 255, 0.6)";
+            ctx.font = "20px 'Share Tech Mono'";
+            ctx.fillText("SYS.VER // GHOSTSTEEL 2026.4", 710, 108);
 
-            // --- 射手稱號欄位 ---
-            ctx.fillStyle = "rgba(16, 25, 38, 0.85)";
-            ctx.strokeStyle = "#1f3654";
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.roundRect(100, 360, 880, 140, 12);
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.fillStyle = "#8fa0b5";
-            ctx.font = "bold 26px monospace";
-            ctx.fillText("OPERATOR DESIGNATION", 140, 410);
-
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "900 52px -apple-system, sans-serif";
-            ctx.fillText(data.name.toUpperCase(), 140, 470);
-
-            // --- 核心評級 (Rank) 與 最終秒數 ---
-            ctx.fillStyle = "#0c121c";
-            ctx.beginPath();
-            ctx.roundRect(100, 540, 880, 480, 16);
-            ctx.fill();
-            ctx.strokeStyle = "rgba(0, 210, 255, 0.3)";
-            ctx.stroke();
-
-            ctx.fillStyle = "#8fa0b5";
-            ctx.font = "bold 30px monospace";
-            ctx.fillText("FINAL RECORDED TIME", 150, 620);
-
-            ctx.fillStyle = "#00ff66";
-            ctx.font = "900 135px 'Courier New', monospace";
-            ctx.shadowColor = "rgba(0, 255, 102, 0.4)";
-            ctx.shadowBlur = 25;
-            ctx.fillText(`${data.score.toFixed(2)}s`, 150, 760);
-            ctx.shadowBlur = 0; // 重置光暈
-
-            // 戰術階級徽章 (S/A/B)
-            ctx.fillStyle = "#ffb700";
-            ctx.font = "900 160px -apple-system, sans-serif";
-            ctx.shadowColor = "rgba(255, 183, 0, 0.5)";
-            ctx.shadowBlur = 30;
-            ctx.fillText(data.rank, 800, 760);
+            ctx.fillStyle = "#00f0ff";
+            ctx.font = "900 58px 'Orbitron', sans-serif";
+            ctx.shadowColor = "rgba(0, 240, 255, 0.6)";
+            ctx.shadowBlur = 18;
+            ctx.fillText("NEURONSTRIKE", 90, 185);
             ctx.shadowBlur = 0;
 
-            ctx.fillStyle = "#708090";
-            ctx.font = "bold 28px monospace";
-            ctx.fillText(`GRADE CLASSIFICATION`, 720, 820);
+            ctx.fillStyle = "#e2f1ff";
+            ctx.font = "700 28px 'Chakra Petch', sans-serif";
+            ctx.fillText("KILL HOUSE TACTICAL EVALUATION DOSSIER", 90, 230);
 
-            // --- 分項數據卡 (Raw / Alpha / Penalty) ---
-            const stats = [
-                { label: "RAW TIME", val: `${data.raw.toFixed(2)}s`, color: "#00d2ff" },
-                { label: "ALPHA ZONE", val: `x${data.alpha}`, color: "#00ff66" },
-                { label: "PENALTY", val: `+${data.penalty.toFixed(1)}s`, color: "#ff3344" }
+            // 橫向刻度尺裝飾線
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.3)";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(90, 260); ctx.lineTo(990, 260); ctx.stroke();
+            for (let rx = 90; rx <= 990; rx += 30) {
+                ctx.beginPath(); ctx.moveTo(rx, 260); ctx.lineTo(rx, (rx % 90 === 0) ? 275 : 268); ctx.stroke();
+            }
+
+            // --- 射手稱號面板 (Operator Bar) ---
+            ctx.fillStyle = "rgba(10, 20, 34, 0.85)";
+            ctx.fillRect(90, 310, 900, 150);
+            ctx.strokeStyle = "#1b3350";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(90, 310, 900, 150);
+
+            // 科技裝飾條
+            ctx.fillStyle = "#00f0ff";
+            ctx.fillRect(90, 310, 8, 150);
+
+            ctx.fillStyle = "#617d9d";
+            ctx.font = "600 24px 'Chakra Petch'";
+            ctx.fillText("CALLSIGN // 射手作戰代號", 130, 355);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "900 54px 'Orbitron', sans-serif";
+            ctx.fillText(data.name, 130, 425);
+
+            // --- 核心成績與戰術階級 (Main Grade Arena) ---
+            ctx.fillStyle = "rgba(8, 16, 26, 0.9)";
+            ctx.fillRect(90, 490, 900, 420);
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.25)";
+            ctx.strokeRect(90, 490, 900, 420);
+
+            // 背景斜紋微裝飾
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.02)";
+            ctx.lineWidth = 4;
+            for (let sx = 90; sx < 990; sx += 40) {
+                ctx.beginPath(); ctx.moveTo(sx, 490); ctx.lineTo(sx + 100, 910); ctx.stroke();
+            }
+
+            ctx.fillStyle = "#708ba8";
+            ctx.font = "600 24px 'Chakra Petch'";
+            ctx.fillText("FINAL RECORDED CLEARANCE TIME", 130, 545);
+
+            // 最終秒數 (極致發光綠)
+            ctx.fillStyle = "#00ff66";
+            ctx.font = "900 120px 'Orbitron', monospace";
+            ctx.shadowColor = "rgba(0, 255, 102, 0.5)";
+            ctx.shadowBlur = 30;
+            ctx.fillText(`${data.score.toFixed(2)}s`, 125, 685);
+            ctx.shadowBlur = 0;
+
+            // 評級徽章 (金光 / 戰術階級)
+            ctx.fillStyle = "rgba(255, 183, 0, 0.08)";
+            ctx.fillRect(720, 520, 240, 220);
+            ctx.strokeStyle = "rgba(255, 183, 0, 0.4)";
+            ctx.strokeRect(720, 520, 240, 220);
+
+            ctx.fillStyle = "#ffb700";
+            ctx.font = "900 150px 'Orbitron', sans-serif";
+            ctx.shadowColor = "rgba(255, 183, 0, 0.6)";
+            ctx.shadowBlur = 25;
+            ctx.textAlign = "center";
+            ctx.fillText(data.rank, 840, 680);
+            ctx.shadowBlur = 0;
+
+            ctx.font = "700 22px 'Chakra Petch'";
+            ctx.fillStyle = "#ffd566";
+            ctx.fillText("TIER RATING", 840, 725);
+            ctx.textAlign = "start";
+
+            // --- 細項戰術指標卡 (3 聯排) ---
+            const indicators = [
+                { label: "RAW TIME (淨秒)", val: `${data.raw.toFixed(2)}s`, color: "#00f0ff" },
+                { label: "ALPHA HITS (A區)", val: `x${data.alpha}`, color: "#00ff66" },
+                { label: "PENALTY (懲罰)", val: `+${data.penalty.toFixed(1)}s`, color: "#ff003c" }
             ];
 
-            stats.forEach((s, idx) => {
-                let bx = 100 + idx * 305;
-                ctx.fillStyle = "#0d1624";
-                ctx.strokeStyle = "#1a2c42";
+            indicators.forEach((ind, i) => {
+                let bx = 90 + i * 315;
+                ctx.fillStyle = "rgba(12, 22, 36, 0.75)";
+                ctx.fillRect(bx, 760, 270, 125);
+                ctx.strokeStyle = "#1b3350";
                 ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.roundRect(bx, 1060, 270, 180, 10);
-                ctx.fill();
-                ctx.stroke();
+                ctx.strokeRect(bx, 760, 270, 125);
 
-                ctx.fillStyle = "#708090";
-                ctx.font = "bold 24px monospace";
-                ctx.fillText(s.label, bx + 25, 1115);
+                ctx.fillStyle = "#617d9d";
+                ctx.font = "700 20px 'Chakra Petch'";
+                ctx.fillText(ind.label, bx + 20, 800);
 
-                ctx.fillStyle = s.color;
-                ctx.font = "900 48px 'Courier New', monospace";
-                ctx.fillText(s.val, bx + 25, 1190);
+                ctx.fillStyle = ind.color;
+                ctx.font = "900 44px 'Orbitron', monospace";
+                ctx.fillText(ind.val, bx + 20, 860);
             });
 
-            // --- IDPA 人形靶 Silhouette 剪影 ---
-            drawTargetSilhouette(ctx, 540, 1470);
+            // --- 戰術靶面與彈著散佈可視化 (IDPA Armor Silhouette) ---
+            ctx.fillStyle = "rgba(8, 16, 26, 0.9)";
+            ctx.fillRect(90, 940, 900, 750);
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.25)";
+            ctx.strokeRect(90, 940, 900, 750);
 
-            // --- 底部浮水印與社群 Tag ---
-            ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-            ctx.font = "bold 26px monospace";
+            ctx.fillStyle = "#00f0ff";
+            ctx.font = "700 24px 'Chakra Petch'";
+            ctx.fillText("IMPACT DISPERSION TELEMETRY // 彈著遙測分析", 130, 995);
+
+            // 繪製 IDPA 戰術半身靶板
+            drawMilitaryTarget(ctx, 540, 1340, data.alpha);
+
+            // --- 底部 BRANDING FOOTER ---
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.font = "600 22px 'Share Tech Mono'";
             ctx.textAlign = "center";
-            ctx.fillText("@NEURONSTRIKE_TACTICAL  //  #GHOSTSTEEL", 540, 1820);
+            ctx.fillText("@NEURONSTRIKE_TACTICAL  //  #GHOSTSTEEL2026", 540, 1750);
+
+            ctx.fillStyle = "#506780";
+            ctx.font = "18px 'Share Tech Mono'";
+            const dateStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            ctx.fillText(`AAR HASH: 0x${Math.random().toString(16).substring(2, 10).toUpperCase()}  TIMESTAMP: ${dateStr}`, 540, 1790);
             ctx.textAlign = "start";
         }
 
-        // 繪製 IDPA 戰術靶剪影
-        function drawTargetSilhouette(ctx, cx, cy) {
+        // --- 繪製高等級 IDPA 戰術鋼靶圖形與隨機彈著光斑 ---
+        function drawMilitaryTarget(ctx, cx, cy, alphaCount) {
             ctx.save();
             ctx.translate(cx, cy);
 
-            // 靶體
-            ctx.fillStyle = "#15202e";
-            ctx.strokeStyle = "#253b54";
+            // 1. 靶板剪影本體 (暗金屬材質)
+            ctx.fillStyle = "#111b27";
+            ctx.strokeStyle = "#274363";
             ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.moveTo(-100, -110);
-            ctx.lineTo(100, -110);
-            ctx.lineTo(100, -40);
-            ctx.lineTo(160, 0);
-            ctx.lineTo(160, 180);
-            ctx.lineTo(-160, 180);
-            ctx.lineTo(-160, 0);
-            ctx.lineTo(-100, -40);
+            ctx.moveTo(-130, -220);
+            ctx.lineTo(130, -220);
+            ctx.lineTo(130, -100);
+            ctx.lineTo(210, -40);
+            ctx.lineTo(210, 260);
+            ctx.lineTo(-210, 260);
+            ctx.lineTo(-210, -40);
+            ctx.lineTo(-130, -100);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            // Head (A-Zone)
-            ctx.strokeStyle = "#ffb700";
-            ctx.lineWidth = 3;
-            ctx.strokeRect(-50, -95, 100, 60);
+            // 2. Charlie 軀幹外框
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.2)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-160, 0, 320, 230);
 
-            // Body (A-Zone 圓心)
-            ctx.strokeStyle = "#00ff66";
+            // 3. Alpha 區域 (頭部 A 區 + 心胸 A 區)
+            // 頭部 A 區 (Head Box)
+            ctx.strokeStyle = "rgba(255, 183, 0, 0.8)";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-65, -195, 130, 85);
+            ctx.fillStyle = "rgba(255, 183, 0, 0.05)";
+            ctx.fillRect(-65, -195, 130, 85);
+
+            // 心胸 A 區 (Body Center 8" Circle)
+            ctx.strokeStyle = "rgba(0, 255, 102, 0.8)";
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(0, 70, 65, 0, Math.PI * 2);
+            ctx.arc(0, 100, 95, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.fillStyle = "rgba(0, 255, 102, 0.05)";
+            ctx.fill();
+
+            // 4. 雷達掃描同心圓與準星十字絲
+            ctx.strokeStyle = "rgba(0, 240, 255, 0.15)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(0, 100, 180, 0, Math.PI * 2);
+            ctx.moveTo(-240, 100); ctx.lineTo(240, 100);
+            ctx.moveTo(0, -240); ctx.lineTo(0, 280);
+            ctx.stroke();
+
+            // 5. 繪製真實彈著光點 (動態著彈視覺)
+            const seed = alphaCount > 0 ? alphaCount : 3;
+            for (let i = 0; i < seed; i++) {
+                // 模擬集中在 A 區中心
+                let hx = (Math.sin(i * 1.7) * 45);
+                let hy = 100 + (Math.cos(i * 2.3) * 45);
+
+                // 外圍光暈
+                let g = ctx.createRadialGradient(hx, hy, 2, hx, hy, 20);
+                g.addColorStop(0, "#00ff66");
+                g.addColorStop(0.3, "rgba(0, 255, 102, 0.6)");
+                g.addColorStop(1, "transparent");
+                ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(hx, hy, 20, 0, Math.PI * 2); ctx.fill();
+
+                // 核心穿孔亮點
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath(); ctx.arc(hx, hy, 4, 0, Math.PI * 2); ctx.fill();
+            }
 
             ctx.restore();
         }
 
-        // 3. 一鍵下載圖片
-        function downloadImage() {
+        // 3. 一鍵下載生成圖片
+        function downloadStoryImage() {
             const canvas = document.getElementById("storyCanvas");
             const image = canvas.toDataURL("image/png");
-            const link = document.createElement("a");
-            link.download = `NST_Report_${Date.now()}.png`;
-            link.href = image;
-            link.click();
+            const a = document.createElement("a");
+            a.download = `NST_AAR_${Date.now()}.png`;
+            a.href = image;
+            a.click();
         }
 
-        // 初始化繪製
+        // 等待字體載入完成後繪製，確保字體完美呈現
         window.onload = () => {
-            const matchData = getMatchData();
-            drawStoryCard(matchData);
+            const data = parseParams();
+            document.fonts.ready.then(() => {
+                renderTacticalDossier(data);
+            });
         };
     </script>
 </body>
