@@ -1,211 +1,102 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NST // TACTICAL LEADERBOARD</title>
-  <style>
-    :root {
-      --bg-dark: #05080e;
-      --card-bg: #0d1522;
-      --card-border: #1a2a40;
-      --neon-cyan: #00f0ff;
-      --neon-amber: #f59e0b;
-      --neon-purple: #c084fc;
-      --text-white: #f1f5f9;
-      --text-gray: #64748b;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-white); padding: 16px; min-height: 100vh; }
-
-    /* Cyberpunk HUD Grid Overlay */
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
-                  linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-      background-size: 24px 24px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .container { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
-
-    /* Header */
-    .header {
-      background: linear-gradient(135deg, #101c2e 0%, #080d14 100%);
-      border: 1px solid var(--card-border);
-      border-left: 4px solid var(--neon-cyan);
-      padding: 16px;
-      border-radius: 6px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.08);
-    }
-    .badge { display: inline-block; font-size: 10px; font-weight: bold; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 2px 6px; border-radius: 2px; margin-bottom: 6px; letter-spacing: 1px; }
-    .header h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; }
-    .header p { font-size: 11px; color: var(--text-gray); margin-top: 2px; }
-
-    /* Tabs */
-    .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      color: var(--text-gray);
-      font-weight: bold;
-      font-size: 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .tab-btn.active {
-      background: rgba(0, 240, 255, 0.12);
-      border-color: var(--neon-cyan);
-      color: var(--neon-cyan);
-    }
-
-    /* Top 1 Hero Card */
-    .hero-rank {
-      background: linear-gradient(180deg, #182638 0%, #0d1522 100%);
-      border: 1px solid var(--neon-amber);
-      border-radius: 6px;
-      padding: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-    }
-    .hero-rank::after {
-      content: "TOP OPERATOR";
-      position: absolute;
-      top: 6px; right: 8px;
-      font-size: 9px; font-weight: 800; color: var(--neon-amber);
-      letter-spacing: 1px;
-    }
-    .rank-num-gold { font-size: 26px; font-weight: 900; color: var(--neon-amber); width: 40px; }
-    .operator-name { font-size: 16px; font-weight: 700; color: var(--text-white); }
-    .operator-meta { font-size: 11px; color: var(--text-gray); }
-    .score-time { font-size: 22px; font-weight: 900; color: var(--neon-cyan); text-align: right; }
-    .tier-badge { font-size: 10px; font-weight: bold; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 1px 6px; border-radius: 2px; }
-
-    /* Rank List */
-    .rank-list { display: flex; flex-direction: column; gap: 8px; }
-    .rank-item {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 4px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .rank-num { font-size: 16px; font-weight: 800; color: var(--text-gray); width: 34px; }
-    .rank-item:nth-child(1) .rank-num { color: #e2e8f0; }
-    .rank-item:nth-child(2) .rank-num { color: #d97706; }
-
-    /* Action Footer */
-    .footer-action {
-      margin-top: 18px;
-      text-align: center;
-    }
-    .btn-action {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(90deg, #00f0ff 0%, #00a3ff 100%);
-      color: #05080e;
-      font-weight: 800;
-      font-size: 14px;
-      text-decoration: none;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NST 戰術射擊即時天梯榜</title>
+    <!-- LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0e14;
+            --card-bg: #121820;
+            --neon-blue: #00d2ff;
+            --neon-gold: #ffb700;
+            --text-main: #f0f4f8;
+            --border: #22354c;
+        }
+        body {
+            margin: 0; padding: 15px;
+            background: var(--bg-dark); color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+        }
+        .header {
+            text-align: center; padding-bottom: 15px;
+            border-bottom: 1px solid var(--border); margin-bottom: 15px;
+        }
+        h2 { margin: 0; color: var(--neon-blue); letter-spacing: 2px; }
+        .refresh-tag { font-size: 0.75rem; color: #708090; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--border); }
+        th { color: var(--neon-blue); font-size: 0.85rem; }
+        tr:nth-child(1) td { color: var(--neon-gold); font-weight: bold; font-size: 1.1rem; }
+        .score { font-weight: 900; color: #00ff66; }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Header -->
     <div class="header">
-      <div class="badge">◈ GHOSTSTEEL REALTIME MATRIX</div>
-      <h1>TACTICAL LEADERBOARD</h1>
-      <p>今日最速紀錄即時連線更新・全場毫米計時</p>
+        <h2>NST TACTICAL LEADERBOARD</h2>
+        <div class="refresh-tag" id="status">即時同步連線中...</div>
     </div>
 
-    <!-- Time Period Filter Tabs -->
-    <div class="tabs">
-      <div class="tab-btn active" onclick="switchTab('today')">今日即時榜</div>
-      <div class="tab-btn" onclick="switchTab('month')">本月總天梯</div>
-      <div class="tab-btn" onclick="switchTab('hall')">S級名人堂</div>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>名次</th>
+                <th>射手 (Operator)</th>
+                <th>成績 (Time)</th>
+                <th>Alpha</th>
+            </tr>
+        </thead>
+        <tbody id="boardData">
+            <tr><td colspan="4">資料讀取中...</td></tr>
+        </tbody>
+    </table>
 
-    <!-- Hero Card (Rank 1) -->
-    <div class="hero-rank">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div class="rank-num-gold">#1</div>
-        <div>
-          <div class="operator-name" id="hero-name">Ghost-07</div>
-          <div class="operator-meta" id="hero-meta">莫三比克 3 靶科目</div>
-        </div>
-      </div>
-      <div>
-        <div class="score-time" id="hero-time">1.42s</div>
-        <div style="text-align: right;"><span class="tier-badge">TIER S+</span></div>
-      </div>
-    </div>
+    <script>
+        // 替換成你的 Firebase 資料庫 URL
+        const FIREBASE_URL = "https://你的Firebase專案名稱-default-rtdb.firebaseio.com/leaderboard.json";
 
-    <!-- Rank List -->
-    <div class="rank-list" id="rank-container">
-      <!-- Dynamic Rows Inserted by JavaScript -->
-    </div>
+        async function fetchLeaderboard() {
+            try {
+                let res = await fetch(FIREBASE_URL);
+                let data = await res.json();
+                
+                if (!data) {
+                    document.getElementById("boardData").innerHTML = "<tr><td colspan='4'>目前尚無射擊成績</td></tr>";
+                    return;
+                }
 
-    <!-- Call to Action -->
-    <div class="footer-action">
-      <a href="https://line.me/R/oaMessage/@829rztkv/?即時預約" class="btn-action">⚡ 挑戰極限・立即進場刷榜</a>
-    </div>
-  </div>
+                // 將 Firebase 物件轉換為陣列並排序 (秒數越少名次越前面)
+                let records = Object.values(data);
+                records.sort((a, b) => a.score - b.score);
 
-  <script>
-    // Sample Realtime Dataset (Will be replaced with your Firebase/API fetch)
-    const leaderboardData = [
-      { rank: 2, name: "CyberViper", time: "1.68s", stage: "雙響切角", tier: "TIER A+" },
-      { rank: 3, name: "Alex_K", time: "1.89s", stage: "莫三比克", tier: "TIER A" },
-      { rank: 4, name: "Neo_Strike", time: "2.04s", stage: "莫三比克", tier: "TIER B+" },
-      { rank: 5, name: "Shadow_RD", time: "2.15s", stage: "雙響切角", tier: "TIER B" }
-    ];
+                let html = "";
+                records.forEach((r, idx) => {
+                    let rankBadge = idx === 0 ? "🥇 1" : (idx === 1 ? "🥈 2" : (idx === 2 ? "🥉 3" : idx + 1));
+                    html += `<tr>
+                        <td>${rankBadge}</td>
+                        <td>${r.name || 'Anonymous'}</td>
+                        <td class="score">${parseFloat(r.score).toFixed(2)}s</td>
+                        <td>${r.alpha || 0}</td>
+                    </tr>`;
+                });
 
-    function renderLeaderboard() {
-      const container = document.getElementById("rank-container");
-      container.innerHTML = leaderboardData.map(item => `
-        <div class="rank-item">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="rank-num">#${item.rank}</div>
-            <div>
-              <div style="font-weight: 700; font-size: 14px;">${item.name}</div>
-              <div style="font-size: 10px; color: var(--text-gray);">${item.stage}</div>
-            </div>
-          </div>
-          <div>
-            <div style="font-size: 16px; font-weight: 800; color: #38bdf8; text-align: right;">${item.time}</div>
-            <div style="font-size: 9px; color: #94a3b8; text-align: right;">${item.tier}</div>
-          </div>
-        </div>
-      `).join('');
-    }
+                document.getElementById("boardData").innerHTML = html;
+                document.getElementById("status").innerText = "最後更新: " + new Date().toLocaleTimeString();
+            } catch (err) {
+                console.error("載入失敗:", err);
+                document.getElementById("status").innerText = "載入失敗，請確認網路連線";
+            }
+        }
 
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      // In production, fetch specific tab API endpoint
-      renderLeaderboard();
-    }
-
-    window.onload = renderLeaderboard;
-  </script>
+        // 初始化
+        window.onload = () => {
+            fetchLeaderboard();
+            // 每 10 秒自動重新整理天梯榜
+            setInterval(fetchLeaderboard, 10000);
+        };
+    </script>
 </body>
 </html>
