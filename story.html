@@ -18,15 +18,17 @@
             --panel-bg: #06090e;
             --cyan-core: #00d8e6;
             --cyan-dim: #10323d;
+            --cyan-glow: rgba(0, 216, 230, 0.35);
             --neon-green: #00e65c;
             --neon-gold: #e6a800;
             --gold-dim: #382c0e;
+            --gold-glow: rgba(230, 168, 0, 0.4);
             --neon-red: #e62237;
             --text-main: #c4d1de;
             --text-dim: #4d6073;
             --tac-black: #05080c;
             --tac-plate: #0c1219;
-            --tac-border: #141f2b;
+            --tac-border: #1d2d40;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -178,7 +180,7 @@
             z-index: 10;
         }
 
-        /* 軀幹本體 (消光碳黑底板) */
+        /* 軀幹本體 (帶兩側外邊框) */
         .target-torso {
             width: 180px;
             height: 220px;
@@ -240,19 +242,21 @@
             z-index: 2;
         }
 
+        /* [2 號] 頭頂圓板 */
         #plt-2 {
             width: 34px; height: 34px; border-radius: 50%;
             top: 8px; left: 50%; transform: translateX(-50%);
             font-size: 0.82rem;
         }
 
+        /* [3 號] 領口橫板 */
         #plt-3 {
             width: 56px; height: 18px; border-radius: 3px;
             top: 14px; left: 50%; transform: translateX(-50%);
             font-size: 0.78rem;
         }
 
-        /* 1 號心胸圓板 (微弱琥珀金點綴) */
+        /* [1 號] 心胸圓板 (精準置中於 3 與 7 之間) */
         #plt-1 {
             width: 56px; height: 56px; border-radius: 50%;
             top: 64px; left: 50%; transform: translateX(-50%);
@@ -261,6 +265,7 @@
             color: #bfa048;
         }
 
+        /* [4 號 / 5 號] 兩側垂直板 (頂線切齊 3 號底線) */
         #plt-4 {
             width: 26px; height: 74px; border-radius: 3px;
             top: 32px; left: 7px; font-size: 0.82rem;
@@ -270,6 +275,7 @@
             top: 32px; right: 7px; font-size: 0.82rem;
         }
 
+        /* [6 號 / 7 號 / 8 號] 下腹板 */
         #plt-6 {
             width: 32px; height: 42px; border-radius: 3px;
             top: 146px; left: 16px; font-size: 0.82rem;
@@ -332,13 +338,13 @@
             z-index: 10;
         }
 
-        /* 底部操作列 */
+        /* ─── 底部操作列 (雙按鈕閉環結構) ─── */
         .action-area {
             width: 360px;
             margin-top: 6px;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
         }
 
         .btn-webshare {
@@ -357,10 +363,37 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
+            transition: all 0.2s;
         }
 
         .btn-webshare:active {
             background: #0d1b26;
+        }
+
+        /* 🏆 查看天梯榜專用按鈕 */
+        .btn-leaderboard {
+            width: 100%;
+            background: rgba(8, 14, 22, 0.9);
+            color: var(--neon-gold);
+            border: 1px solid #382c0e;
+            padding: 11px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-leaderboard:active {
+            background: #141a12;
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 12px var(--gold-glow);
         }
 
         .preview-modal {
@@ -434,28 +467,35 @@
             </div>
         </div>
 
-        <!-- 鋼靶展示區 -->
+        <!-- 鋼靶展示區 (1:1 幾何比例) -->
         <div class="target-container">
             <div class="target-torso">
                 <div class="target-head">
                     <div class="top-hang-hole"></div>
+                    <!-- [2 號] 頭頂圓板 -->
                     <div class="tac-plate" id="plt-2">2</div>
                 </div>
 
                 <div class="shoulder-line-l"></div>
                 <div class="shoulder-line-r"></div>
 
+                <!-- [3 號] 領口橫板 -->
                 <div class="tac-plate" id="plt-3">3</div>
+
+                <!-- [1 號] 心胸主力大圓板 -->
                 <div class="tac-plate" id="plt-1">1</div>
 
+                <!-- [4 號 / 5 號] 兩側垂直板 (頂線切齊 3 號底線) -->
                 <div class="tac-plate" id="plt-4">4</div>
                 <div class="tac-plate" id="plt-5">5</div>
 
+                <!-- [6 號 / 7 號 / 8 號] 下腹板 -->
                 <div class="tac-plate" id="plt-6">6</div>
                 <div class="tac-plate" id="plt-7">7</div>
                 <div class="tac-plate" id="plt-8">8</div>
             </div>
 
+            <!-- 獨立懸浮品牌銘牌 -->
             <div class="brand-pedestal">
                 <span class="tag-p1">NEURONSTRIKE</span>
                 <span class="tag-p2">TACTICAL</span>
@@ -468,13 +508,18 @@
         </div>
     </div>
 
-    <!-- 底部操作列 -->
+    <!-- 底部操作列 (雙戰術按鈕閉環) -->
     <div class="action-area">
         <button class="btn-webshare" id="btnShare" onclick="handleGenerateShare()">
             <span>📸</span> 產生高畫質限動卡 (SAVE & SHARE)
         </button>
+
+        <button class="btn-leaderboard" id="btnLeaderboard" onclick="goToLeaderboard()">
+            <span>🏆</span> 查看今日天梯排位 (LEADERBOARD)
+        </button>
+
         <div style="font-size: 0.62rem; color: var(--text-dim); text-align: center;">
-            點擊後長按圖片，即可直接儲存相簿或發送至 IG 限動！
+            長按戰報圖即可發送至 IG 限動 / 點擊天梯榜查看即時名次
         </div>
     </div>
 
@@ -486,6 +531,7 @@
     </div>
 
     <script>
+        // 1. 抓取 URL 戰報參數
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || "OPERATOR_GHOST";
         const score = parseFloat(params.get('score')) || 3.20;
@@ -505,6 +551,7 @@
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
+        // 2. 動態彈著孔生成 (支援同區重複射擊)
         function spawnBulletHole(plateElement, isCharlie) {
             if (!plateElement) return;
             const hole = document.createElement("div");
@@ -531,6 +578,7 @@
         spawnBulletHole(p4, true);
         spawnBulletHole(p5, true);
 
+        // 3. 高畫質限動卡截圖與彈窗邏輯
         async function handleGenerateShare() {
             if (typeof html2canvas === "undefined") {
                 alert("截圖引擎載入中，請稍候重試或手動截圖！");
@@ -569,6 +617,11 @@
 
         function closeModal() {
             document.getElementById("previewModal").style.display = "none";
+        }
+
+        // 4. 閉環跳轉天梯榜
+        function goToLeaderboard() {
+            window.location.href = `index.html?highlight=${encodeURIComponent(name)}`;
         }
     </script>
 </body>
