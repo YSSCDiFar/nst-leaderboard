@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>NEURONSTRIKE // CQB MASTER DASHBOARD</title>
+    <!-- 戰術電競字體 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <!-- QR Code 生成庫 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- 引入 Firebase Web SDK (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #030508;
+            --panel-bg: rgba(9, 14, 22, 0.95);
+            --cyan-core: #00d8e6;
+            --cyan-glow: rgba(0, 216, 230, 0.4);
+            --neon-green: #00e65c;
+            --neon-gold: #e6a800;
+            --neon-red: #e62237;
+            --text-dim: #506477;
+            --border-line: #162433;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-base);
+            color: #dce7f2;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 16px;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 2.2fr 1fr;
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-line);
+            padding-bottom: 12px;
+        }
+
+        .brand-text h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: var(--cyan-core);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--cyan-glow);
+            margin-bottom: 5px;
+        }
+
+        .ip-config {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ip-config input {
+            background: #0a0f16;
+            color: var(--neon-gold);
+            border: 1px solid #1f384d;
+            padding: 4px 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            border-radius: 3px;
+            width: 280px;
+        }
+
+        .btn-action {
+            background: #0d1b26;
+            color: var(--cyan-core);
+            border: 1px solid #1f4247;
+            padding: 10px 18px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--cyan-core);
+            color: #000;
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        .operator-bay {
+            margin-top: 15px;
+            background: #06090e;
+            border: 1px dashed var(--border-line);
+            border-radius: 6px;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .operator-bay.scan-active {
+            border-color: var(--neon-green);
+            background: rgba(0, 230, 92, 0.05);
+            box-shadow: 0 0 20px rgba(0, 230, 92, 0.2);
+        }
+
+        .bay-info .lbl { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 2px; }
+        .bay-info .callsign { font-family: 'Chakra Petch', sans-serif; font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 1px; }
+
+        .bay-status { text-align: right; font-size: 0.75rem; color: var(--text-dim); }
+        .bay-status .indicator { font-size: 0.9rem; font-weight: bold; color: var(--neon-gold); }
+
+        .timer-stage { text-align: center; margin: 20px 0; }
+        .status-msg { font-family: 'Chakra Petch', sans-serif; font-size: 1.1rem; font-weight: 700; letter-spacing: 3px; color: var(--text-dim); }
+        .timer-display { font-family: 'Orbitron', monospace; font-size: 6.5rem; font-weight: 900; color: var(--cyan-core); text-shadow: 0 0 35px var(--cyan-glow); line-height: 1; margin: 10px 0; }
+
+        .grid-targets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px; }
+        .target-card { background: #070c12; border: 1px solid #14202b; padding: 14px 10px; border-radius: 6px; text-align: center; transition: all 0.2s; }
+        .target-card.cleared { border-color: var(--neon-green); background: rgba(0, 230, 92, 0.05); box-shadow: 0 0 15px rgba(0, 230, 92, 0.3); }
+        .target-card .tgt-name { font-size: 0.75rem; color: var(--text-dim); }
+        .target-card .hit-zone { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; font-weight: bold; margin-top: 4px; color: #fff; }
+
+        .rank-showcase { text-align: center; background: #06090e; border: 1px solid var(--border-line); padding: 15px; border-radius: 6px; margin: 15px 0; }
+        .rank-badge { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; font-weight: 900; color: var(--neon-gold); text-shadow: 0 0 20px rgba(230, 168, 0, 0.4); line-height: 1; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #101a24; }
+        th { color: var(--cyan-core); font-family: 'Chakra Petch', sans-serif; }
+        .new-entry { background: rgba(0, 230, 92, 0.15) !important; color: var(--neon-green) !important; font-weight: bold; }
+
+        .qr-section {
+            display: none;
+            text-align: center;
+            background: #06090e;
+            border: 1px solid var(--cyan-core);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: auto;
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        #qrcode {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px;
+            background: #fff;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左側核心戰情室 -->
+    <div class="panel">
+        <div class="top-bar">
+            <div class="brand-text">
+                <h1>NEURONSTRIKE CQB</h1>
+                <div class="ip-config">
+                    [雲端部署網址]:
+                    <!-- 已經自動填寫你專屬的 GitHub Pages 網址 -->
+                    <input type="text" id="serverIp" value="https://ysscdifar.github.io/nst-leaderboard" title="填入 GitHub Pages 網址">
+                </div>
+            </div>
+            <button class="btn-action" onclick="connectSerial()">⚡ 連接 MASTER 主控</button>
+        </div>
+
+        <div class="operator-bay" id="operatorBay">
+            <div class="bay-info">
+                <div class="lbl">ACTIVE OPERATOR // 執勤幹員</div>
+                <div class="callsign" id="dispOperator">OPERATOR_TEST</div>
+            </div>
+            <div class="bay-status">
+                <div class="indicator" id="scanPrompt">● 按 [空白鍵] 或掃碼開局</div>
+                <div id="dispPb" style="font-size: 0.7rem; color: var(--text-dim); margin-top: 3px;">Firebase 同步待命</div>
+            </div>
+        </div>
+
+        <div class="timer-stage">
+            <div class="status-msg" id="statusText">STANDBY FOR BREACH</div>
+            <div class="timer-display" id="liveTimer">0.00s</div>
+        </div>
+
+        <div>
+            <div style="font-size: 0.7rem; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 8px;">GHOSTSTEEL 8-ZONE ARBITRATION MONITOR</div>
+            <div class="grid-targets" id="targetGrid">
+                <div class="target-card" id="tgt-1"><div class="tgt-name">TARGET #1</div><div class="hit-zone">-</div></div>
+                <div class="target-card" id="tgt-2"><div class="tgt-name">TARGET #2</div><div class="hit-zone">-</div></div>
+                <div class="target-card" id="tgt-3"><div class="tgt-name">TARGET #3</div><div class="hit-zone">-</div></div>
+                <div class="target-card" id="tgt-4"><div class="tgt-name">TARGET #4</div><div class="hit-zone">-</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右側天梯榜與戰報 QR 碼 -->
+    <div class="panel">
+        <div>
+            <div style="font-family: 'Orbitron'; font-size: 1.1rem; color: var(--neon-gold); letter-spacing: 1px;">TODAY'S LEADERBOARD (CLOUD)</div>
+            <div class="rank-showcase">
+                <div style="font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1.5px;">LAST RUN TACTICAL RANK</div>
+                <div class="rank-badge" id="lastRank">-</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr><th>#</th><th>射手代號</th><th>秒數</th><th>階級</th></tr>
+                </thead>
+                <tbody id="leaderboardBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 結算 QR Code 專區 -->
+        <div class="qr-section" id="qrModal">
+            <div style="font-size: 0.75rem; color: var(--cyan-core); font-weight: bold;">AFTER-ACTION REPORT READY</div>
+            <div id="qrcode"></div>
+            <div style="font-size: 0.62rem; color: var(--text-dim);">手機掃描取得 1:1 戰報與 IG 限動卡</div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // Firebase 專屬金鑰設定
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyArJJA38NiEyQs1spfNSBDTOne_INJ7d5k",
+            authDomain: "nst-killhouse.firebaseapp.com",
+            databaseURL: "https://nst-killhouse-default-rtdb.firebaseio.com",
+            projectId: "nst-killhouse",
+            storageBucket: "nst-killhouse.firebasestorage.app",
+            messagingSenderId: "637304240805",
+            appId: "1:637304240805:web:37a2b7cdfdc9fb46596b4c",
+            measurementId: "G-CTE2CJWSHB"
+        };
+
+        let db;
+        if (firebaseConfig.databaseURL) {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            console.log("Firebase 引擎已啟動！");
+        }
+
+        // ─── 1. Firebase 雲端天梯即時監聽與渲染 ───
+        let activeBoardData = [];
+
+        function renderLeaderboard(highlightName = "") {
+            const tbody = document.getElementById("leaderboardBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            
+            // 依成績小到大排序
+            activeBoardData.sort((a, b) => a.score - b.score);
+
+            activeBoardData.slice(0, 6).forEach((item, index) => {
+                const tr = document.createElement("tr");
+                if (item.name === highlightName) tr.className = "new-entry";
+
+                let rankColor = item.rank === 'S' ? 'var(--neon-gold)' : (item.rank === 'A' ? 'var(--cyan-core)' : '#fff');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.name}</td>
+                    <td>${item.score.toFixed(2)}s</td>
+                    <td style="color:${rankColor}; font-weight:bold;">${item.rank}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        window.addEventListener("DOMContentLoaded", () => {
+            if (db) {
+                db.ref('GhostSteel/Leaderboard').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    activeBoardData = [];
+                    if (data) {
+                        for (let key in data) {
+                            activeBoardData.push(data[key]);
+                        }
+                    }
+                    renderLeaderboard();
+                });
+            }
+        });
+
+        // ─── 2. 條碼槍與鍵盤全域監聽 ───
+        let scanBuffer = "";
+        let lastInputTime = Date.now();
+        let activeOperatorName = "OPERATOR_TEST";
+        let isRunningSim = false;
+
+        window.addEventListener("keydown", (e) => {
+            if (document.activeElement.id === "serverIp") return;
+
+            if (e.code === "Space") {
+                e.preventDefault();
+                if (!isRunningSim) fireSimulation();
+                return;
+            }
+
+            const now = Date.now();
+            if (now - lastInputTime > 120) scanBuffer = "";
+            lastInputTime = now;
+
+            if (e.key === "Enter") {
+                if (scanBuffer.trim().length > 1) {
+                    parseScannerData(scanBuffer.trim());
+                }
+                scanBuffer = "";
+            } else if (e.key.length === 1) {
+                scanBuffer += e.key;
+            }
+        });
+
+        function parseScannerData(codeStr) {
+            let finalName = codeStr;
+            try {
+                if (codeStr.includes("name=")) {
+                    const tempUrl = codeStr.startsWith("http") ? codeStr : "http://dummy/?" + codeStr;
+                    const urlObj = new URL(tempUrl);
+                    finalName = urlObj.searchParams.get("name") || codeStr;
+                }
+            } catch (err) {
+                finalName = codeStr;
+            }
+            activeOperatorName = finalName.toUpperCase();
+            const bayUI = document.getElementById("operatorBay");
+            if (bayUI) bayUI.classList.add("scan-active");
+            document.getElementById("dispOperator").innerText = activeOperatorName;
+            document.getElementById("scanPrompt").innerText = "● 幹員驗證完成 (READY)";
+            document.getElementById("scanPrompt").style.color = "var(--neon-green)";
+        }
+
+        // ─── 3. 模擬流程 ───
+        let activeTimers = [];
+        function fireSimulation() {
+            isRunningSim = true;
+            activeTimers.forEach(t => clearTimeout(t));
+            activeTimers = [];
+
+            dispatchSystemEvent({ event: "start" });
+            
+            activeTimers.push(setTimeout(() => dispatchSystemEvent({ event: "hit", target: 1, zone: "A", time: 380 }), 700));
+            activeTimers.push(setTimeout(() => dispatchSystemEvent({ event: "hit", target: 2, zone: "B", time: 550 }), 1300));
+            activeTimers.push(setTimeout(() => dispatchSystemEvent({ event: "hit", target: 3, zone: "A", time: 420 }), 1900));
+            activeTimers.push(setTimeout(() => dispatchSystemEvent({ event: "hit", target: 4, zone: "C", time: 610 }), 2500));
+            
+            activeTimers.push(setTimeout(() => {
+                const randomSec = parseFloat((Math.random() * (3.6 - 2.4) + 2.4).toFixed(2));
+                const calcRank = randomSec < 3.0 ? "S" : (randomSec < 4.0 ? "A" : "B");
+                dispatchSystemEvent({
+                    event: "game_over",
+                    raw: randomSec + 0.6,
+                    score: randomSec,
+                    alpha: 3,
+                    penalty: 0,
+                    rank: calcRank
+                });
+                isRunningSim = false;
+            }, 3100));
+        }
+
+        // ─── 4. 戰情狀態機與 Firebase 推播 ───
+        let liveStopwatch = null;
+        let runStartTime = 0;
+        let qrGenerator = null; 
+
+        function dispatchSystemEvent(payload) {
+            if (payload.event === "start") {
+                document.getElementById("statusText").innerText = "BREACH IN PROGRESS";
+                document.getElementById("statusText").style.color = "var(--neon-green)";
+                document.getElementById("qrModal").style.display = "none";
+                document.querySelectorAll(".target-card").forEach(el => {
+                    el.classList.remove("cleared");
+                    el.querySelector(".hit-zone").innerText = "-";
+                });
+                
+                runStartTime = performance.now();
+                if (liveStopwatch) clearInterval(liveStopwatch);
+                liveStopwatch = setInterval(() => {
+                    let sec = ((performance.now() - runStartTime) / 1000).toFixed(2);
+                    document.getElementById("liveTimer").innerText = `${sec}s`;
+                }, 30);
+            }
+            else if (payload.event === "hit") {
+                let tgtCard = document.getElementById(`tgt-${payload.target}`);
+                if (tgtCard) {
+                    tgtCard.classList.add("cleared");
+                    tgtCard.querySelector(".hit-zone").innerText = `ZONE ${payload.zone} (${payload.time}ms)`;
+                }
+            }
+            else if (payload.event === "game_over") {
+                if (liveStopwatch) clearInterval(liveStopwatch);
+                document.getElementById("statusText").innerText = "ROOM CLEARED";
+                document.getElementById("statusText").style.color = "var(--cyan-core)";
+                document.getElementById("liveTimer").innerText = `${payload.score.toFixed(2)}s`;
+                document.getElementById("lastRank").innerText = payload.rank;
+
+                // 核心：發送完整的 JSON 成績至 Firebase
+                if (db) {
+                    db.ref('GhostSteel/Leaderboard').push({
+                        name: activeOperatorName,
+                        score: payload.score,
+                        rank: payload.rank,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+
+                // QR Code 網址生成
+                document.getElementById("qrModal").style.display = "block";
+                
+                let serverIp = document.getElementById("serverIp").value.trim();
+                // 防呆，確保網址有協定前綴
+                if (!serverIp.startsWith("http")) serverIp = "https://" + serverIp;
+                // 去除結尾可能的斜線
+                serverIp = serverIp.replace(/\/$/, "");
+                
+                const finalUrl = `${serverIp}/story.html?name=${encodeURIComponent(activeOperatorName)}&score=${payload.score}&raw=${payload.raw}&alpha=${payload.alpha}&penalty=${payload.penalty}&rank=${payload.rank}`;
+                const qrBox = document.getElementById("qrcode");
+
+                if (typeof QRCode !== "undefined") {
+                    try {
+                        if (!qrGenerator) {
+                            qrBox.innerHTML = "";
+                            qrGenerator = new QRCode(qrBox, {
+                                text: finalUrl,
+                                width: 180,
+                                height: 180,
+                                correctLevel: QRCode.CorrectLevel.L
+                            });
+                        } else {
+                            qrGenerator.makeCode(finalUrl);
+                        }
+                    } catch(err) {
+                        qrBox.innerHTML = `<div style="color:#000; font-size:10px;">QR CODE ERROR</div>`;
+                    }
+                }
+            }
+        }
+
+        // Web Serial 連線模組 (與 Master 對接)[cite: 2]
+        let hardwarePort, hardwareReader;
+        async function connectSerial() {
+            if (!navigator.serial) {
+                alert("目前瀏覽器不支援 Web Serial API，請使用 Chrome 或 Edge 進行連線！");
+                return;
+            }
+            try {
+                hardwarePort = await navigator.serial.requestPort();
+                await hardwarePort.open({ baudRate: 115200 });
+                const decoderStream = new TextDecoderStream();
+                hardwarePort.readable.pipeTo(decoderStream.writable);
+                hardwareReader = decoderStream.readable.getReader();
+                while (true) {
+                    const { value, done } = await hardwareReader.read();
+                    if (done) break;
+                    let dataLines = value.split("\n");
+                    for (let lineStr of dataLines) {
+                        try { dispatchSystemEvent(JSON.parse(lineStr.trim())); } catch(e) {}
+                    }
+                }
+            } catch (err) { console.warn("串列埠未連接或已中斷:", err); }
+        }
+    </script>
+</body>
+</html>
