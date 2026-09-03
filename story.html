@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NEURONSTRIKE // TACTICAL AAR REPORT</title>
-    <!-- 戰術電競字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
-    <!-- html2canvas 截圖引擎 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <style>
@@ -40,20 +37,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* 增加底部 60px 的安全距離，確保按鈕絕對不會被遮擋 */
             padding: 16px 8px 60px 8px;
             min-height: 100vh;
-            overflow-y: auto; /* 強制允許上下滑動 */
+            overflow-y: auto;
         }
 
-        /* 戰術 9:16 極致消光暗黑畫布 */
         .story-wrapper {
             width: 360px;
             height: 640px;
             background: radial-gradient(circle at 50% 20%, #070c12 0%, #020406 80%);
             border: 1px solid #162433;
             border-radius: 8px;
-            padding: 14px 14px 10px 14px;
+            padding: 16px 14px 12px 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -62,7 +57,6 @@
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
         }
 
-        /* 軍規網格紋理遮罩 */
         .story-wrapper::before {
             content: "";
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -75,7 +69,7 @@
 
         .header-brand {
             border-bottom: 1px solid #101a24;
-            padding-bottom: 4px;
+            padding-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -84,36 +78,27 @@
 
         .brand-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.95rem;
+            font-size: 1rem;
             color: var(--cyan-core);
             letter-spacing: 2px;
             opacity: 0.9;
         }
 
-        .brand-sub {
-            font-size: 0.55rem;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-        }
+        .brand-sub { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 1px; }
 
         .hero-section {
-            margin: 2px 0;
+            margin: 4px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
         }
 
-        .operator-tag .lbl {
-            font-size: 0.52rem;
-            color: var(--text-dim);
-            letter-spacing: 1.5px;
-        }
-
+        .operator-tag .lbl { font-size: 0.52rem; color: var(--text-dim); letter-spacing: 1.5px; }
         .operator-tag .name {
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             color: #dce7f2;
             letter-spacing: 1px;
         }
@@ -122,31 +107,30 @@
             text-align: center;
             background: #090e14;
             border: 1px solid var(--gold-dim);
-            padding: 2px 10px;
+            padding: 3px 12px;
             border-radius: 4px;
         }
 
         .grade-badge .grade {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 900;
             color: var(--neon-gold);
             line-height: 1;
         }
 
-        /* 核心計時面板 (消光下沉設計) */
         .score-display {
             background: #04070a;
             border: 1px solid #101a24;
             border-radius: 5px;
-            padding: 5px;
+            padding: 6px;
             text-align: center;
             z-index: 10;
         }
 
         .score-val {
             font-family: 'Orbitron', monospace;
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             font-weight: 900;
             color: var(--neon-green);
             text-shadow: 0 0 10px rgba(0, 230, 92, 0.25);
@@ -156,20 +140,20 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            margin-top: 3px;
+            gap: 5px;
+            margin-top: 4px;
         }
 
         .stat-card {
             background: #06090d;
             border: 1px solid #0f1822;
-            padding: 3px 2px;
+            padding: 4px 2px;
             border-radius: 3px;
             text-align: center;
         }
 
         .stat-card .lbl { font-size: 0.48rem; color: var(--text-dim); }
-        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.74rem; font-weight: bold; color: #adbccc; margin-top: 1px; }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.76rem; font-weight: bold; color: #adbccc; margin-top: 1px; }
 
         /* ─── 鋼靶展示區 (消光黑鋼結構) ─── */
         .target-container {
@@ -177,12 +161,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 38px 0 2px 0;
+            margin: 40px 0 6px 0;
             position: relative;
             z-index: 10;
         }
 
-        /* 軀幹本體 (帶兩側外邊框) */
         .target-torso {
             width: 180px;
             height: 220px;
@@ -193,7 +176,6 @@
             box-shadow: inset 0 0 20px #000;
         }
 
-        /* 頭部輪廓 */
         .target-head {
             width: 68px;
             height: 48px;
@@ -230,7 +212,6 @@
         .shoulder-line-l { left: 42px; transform: rotate(-35deg); }
         .shoulder-line-r { right: 42px; transform: rotate(35deg); }
 
-        /* 1~8 號活動鋼板 (啞光深灰板面) */
         .tac-plate {
             background: var(--tac-plate);
             border: 1px solid #1d3345;
@@ -244,55 +225,15 @@
             z-index: 2;
         }
 
-        /* [2 號] 頭頂圓板 */
-        #plt-2 {
-            width: 34px; height: 34px; border-radius: 50%;
-            top: 8px; left: 50%; transform: translateX(-50%);
-            font-size: 0.82rem;
-        }
+        #plt-2 { width: 34px; height: 34px; border-radius: 50%; top: 8px; left: 50%; transform: translateX(-50%); font-size: 0.82rem; }
+        #plt-3 { width: 56px; height: 18px; border-radius: 3px; top: 14px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; }
+        #plt-1 { width: 56px; height: 56px; border-radius: 50%; top: 64px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; border-color: #594719; color: #bfa048; }
+        #plt-4 { width: 26px; height: 74px; border-radius: 3px; top: 32px; left: 7px; font-size: 0.82rem; }
+        #plt-5 { width: 26px; height: 74px; border-radius: 3px; top: 32px; right: 7px; font-size: 0.82rem; }
+        #plt-6 { width: 32px; height: 42px; border-radius: 3px; top: 146px; left: 16px; font-size: 0.82rem; }
+        #plt-7 { width: 36px; height: 46px; border-radius: 3px; top: 152px; left: 50%; transform: translateX(-50%); font-size: 0.88rem; }
+        #plt-8 { width: 32px; height: 42px; border-radius: 3px; top: 146px; right: 16px; font-size: 0.82rem; }
 
-        /* [3 號] 領口橫板 */
-        #plt-3 {
-            width: 56px; height: 18px; border-radius: 3px;
-            top: 14px; left: 50%; transform: translateX(-50%);
-            font-size: 0.78rem;
-        }
-
-        /* [1 號] 心胸圓板 (精準置中於 3 與 7 之間) */
-        #plt-1 {
-            width: 56px; height: 56px; border-radius: 50%;
-            top: 64px; left: 50%; transform: translateX(-50%);
-            font-size: 1.1rem;
-            border-color: #594719;
-            color: #bfa048;
-        }
-
-        /* [4 號 / 5 號] 兩側垂直板 (頂線切齊 3 號底線) */
-        #plt-4 {
-            width: 26px; height: 74px; border-radius: 3px;
-            top: 32px; left: 7px; font-size: 0.82rem;
-        }
-        #plt-5 {
-            width: 26px; height: 74px; border-radius: 3px;
-            top: 32px; right: 7px; font-size: 0.82rem;
-        }
-
-        /* [6 號 / 7 號 / 8 號] 下腹板 */
-        #plt-6 {
-            width: 32px; height: 42px; border-radius: 3px;
-            top: 146px; left: 16px; font-size: 0.82rem;
-        }
-        #plt-7 {
-            width: 36px; height: 46px; border-radius: 3px;
-            top: 152px; left: 50%; transform: translateX(-50%);
-            font-size: 0.88rem;
-        }
-        #plt-8 {
-            width: 32px; height: 42px; border-radius: 3px;
-            top: 146px; right: 16px; font-size: 0.82rem;
-        }
-
-        /* ─── 戰術啞光銘牌 ─── */
         .brand-pedestal {
             margin-top: 10px;
             padding: 3px 10px;
@@ -311,7 +252,6 @@
         .brand-pedestal .tag-p1 { color: #5a829e; }
         .brand-pedestal .tag-p2 { color: #9c8038; }
 
-        /* ─── 戰術發光彈著點 ─── */
         .bullet-hole {
             position: absolute;
             width: 7px; height: 7px;
@@ -331,19 +271,18 @@
 
         .footer-stamp {
             border-top: 1px solid #101a24;
-            padding-top: 4px;
+            padding-top: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.5rem;
+            font-size: 0.52rem;
             color: var(--text-dim);
             z-index: 10;
         }
 
-        /* ─── 底部操作列 (雙按鈕閉環結構) ─── */
         .action-area {
             width: 360px;
-            margin-top: 6px;
+            margin-top: 8px;
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -367,12 +306,8 @@
             gap: 8px;
             transition: all 0.2s;
         }
+        .btn-webshare:active { background: #0d1b26; }
 
-        .btn-webshare:active {
-            background: #0d1b26;
-        }
-
-        /* 🏆 查看天梯榜專用按鈕 */
         .btn-leaderboard {
             width: 100%;
             background: rgba(8, 14, 22, 0.9);
@@ -391,7 +326,6 @@
             gap: 8px;
             transition: all 0.2s;
         }
-
         .btn-leaderboard:active {
             background: #141a12;
             border-color: var(--neon-gold);
@@ -430,7 +364,6 @@
 </head>
 <body>
 
-    <!-- 9:16 IG 限動畫布 -->
     <div class="story-wrapper" id="storyCaptureArea">
         <div class="header-brand">
             <div>
@@ -469,35 +402,22 @@
             </div>
         </div>
 
-        <!-- 鋼靶展示區 (1:1 幾何比例) -->
         <div class="target-container">
             <div class="target-torso">
                 <div class="target-head">
                     <div class="top-hang-hole"></div>
-                    <!-- [2 號] 頭頂圓板 -->
                     <div class="tac-plate" id="plt-2">2</div>
                 </div>
-
                 <div class="shoulder-line-l"></div>
                 <div class="shoulder-line-r"></div>
-
-                <!-- [3 號] 領口橫板 -->
                 <div class="tac-plate" id="plt-3">3</div>
-
-                <!-- [1 號] 心胸主力大圓板 -->
                 <div class="tac-plate" id="plt-1">1</div>
-
-                <!-- [4 號 / 5 號] 兩側垂直板 (頂線切齊 3 號底線) -->
                 <div class="tac-plate" id="plt-4">4</div>
                 <div class="tac-plate" id="plt-5">5</div>
-
-                <!-- [6 號 / 7 號 / 8 號] 下腹板 -->
                 <div class="tac-plate" id="plt-6">6</div>
                 <div class="tac-plate" id="plt-7">7</div>
                 <div class="tac-plate" id="plt-8">8</div>
             </div>
-
-            <!-- 獨立懸浮品牌銘牌 -->
             <div class="brand-pedestal">
                 <span class="tag-p1">NEURONSTRIKE</span>
                 <span class="tag-p2">TACTICAL</span>
@@ -505,12 +425,11 @@
         </div>
 
         <div class="footer-stamp">
-            <span id="dispDate">2026.09.02 // TACTICAL LAB</span>
+            <span id="dispDate">2026.09.03 // TACTICAL LAB</span>
             <span>IDPA ACCREDITED STEEL</span>
         </div>
     </div>
 
-    <!-- 底部操作列 (雙戰術按鈕閉環) -->
     <div class="action-area">
         <button class="btn-webshare" id="btnShare" onclick="handleGenerateShare()">
             <span>📸</span> 產生高畫質限動卡 (SAVE & SHARE)
@@ -525,7 +444,6 @@
         </div>
     </div>
 
-    <!-- 預覽彈窗 -->
     <div class="preview-modal" id="previewModal" onclick="closeModal()">
         <img id="generatedImg" src="" alt="Tactical Report">
         <div class="modal-hint">👆 長按上方圖片 ➜ 加入「照片」或「分享」</div>
@@ -533,7 +451,6 @@
     </div>
 
     <script>
-        // 1. 抓取 URL 戰報參數
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || "OPERATOR_GHOST";
         const score = parseFloat(params.get('score')) || 3.20;
@@ -553,7 +470,6 @@
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
-        // 2. 動態彈著孔生成 (支援同區重複射擊)
         function spawnBulletHole(plateElement, isCharlie) {
             if (!plateElement) return;
             const hole = document.createElement("div");
@@ -580,7 +496,6 @@
         spawnBulletHole(p4, true);
         spawnBulletHole(p5, true);
 
-        // 3. 高畫質限動卡截圖與彈窗邏輯
         async function handleGenerateShare() {
             if (typeof html2canvas === "undefined") {
                 alert("截圖引擎載入中，請稍候重試或手動截圖！");
@@ -621,7 +536,6 @@
             document.getElementById("previewModal").style.display = "none";
         }
 
-        // 4. 閉環跳轉天梯榜
         function goToLeaderboard() {
             window.location.href = `index.html?highlight=${encodeURIComponent(name)}`;
         }
