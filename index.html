@@ -9,8 +9,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
-    <!-- LINE LIFF SDK 官方 CDN -->
+    <!-- LINE LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <!-- Firebase Web SDK (v8 穩定版) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
@@ -78,167 +82,73 @@
             align-items: center;
             justify-content: space-between;
         }
-        .profile-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .profile-info { display: flex; align-items: center; gap: 10px; }
         .profile-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             border: 2px solid var(--cyan-core);
             box-shadow: 0 0 8px var(--cyan-glow);
-            object-fit: cover;
-            background: #111b27;
+            object-fit: cover; background: #111b27;
         }
-        .profile-text .title {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-        }
-        .profile-text .name {
-            font-family: 'Chakra Petch', sans-serif;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #fff;
-        }
-        .my-rank-tag {
-            text-align: right;
-        }
-        .my-rank-tag .rank-label {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-        }
-        .my-rank-tag .rank-val {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: var(--neon-gold);
-            font-weight: 900;
-        }
+        .profile-text .title { font-size: 0.65rem; color: var(--text-dim); }
+        .profile-text .name { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 0.95rem; color: #fff; }
+        .my-rank-tag { text-align: right; }
+        .my-rank-tag .rank-label { font-size: 0.65rem; color: var(--text-dim); }
+        .my-rank-tag .rank-val { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--neon-gold); font-weight: 900; }
 
-        /* --- 戰術三段切換標籤 (Tabs) --- */
+        /* 戰術三段切換標籤 (Tabs) */
         .tab-group {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;
         }
         .tab-btn {
-            background: #0d1522;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 10px 4px;
-            font-family: 'Chakra Petch', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.25s;
+            background: #0d1522; border: 1px solid var(--border); color: var(--text-dim);
+            padding: 10px 4px; font-family: 'Chakra Petch', sans-serif; font-weight: 700;
+            font-size: 0.85rem; letter-spacing: 1px; text-align: center;
+            cursor: pointer; border-radius: 4px; transition: all 0.25s;
         }
         .tab-btn.active {
-            background: rgba(0, 240, 255, 0.15);
-            border-color: var(--cyan-core);
-            color: var(--cyan-core);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            background: rgba(0, 240, 255, 0.15); border-color: var(--cyan-core);
+            color: var(--cyan-core); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
         }
         .tab-btn.apex-tab.active {
-            background: rgba(255, 183, 0, 0.15);
-            border-color: var(--neon-gold);
-            color: var(--neon-gold);
-            box-shadow: 0 0 15px var(--gold-glow);
+            background: rgba(255, 183, 0, 0.15); border-color: var(--neon-gold);
+            color: var(--neon-gold); box-shadow: 0 0 15px var(--gold-glow);
         }
 
-        /* --- 巔峰傳奇特寫展示區 (Apex Legend Stage) --- */
+        /* 巔峰傳奇特寫展示區 (Apex Legend Stage) */
         .apex-hero-card {
             background: radial-gradient(circle at top right, rgba(255, 183, 0, 0.15), rgba(10, 16, 26, 0.95) 70%);
-            border: 1px solid var(--neon-gold);
-            border-radius: 6px;
-            padding: 14px;
-            margin-bottom: 12px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 0 25px rgba(255, 183, 0, 0.2);
-            animation: glowPulse 2.5s infinite;
+            border: 1px solid var(--neon-gold); border-radius: 6px; padding: 14px; margin-bottom: 12px;
+            text-align: center; position: relative;
+            box-shadow: 0 0 25px rgba(255, 183, 0, 0.2); animation: glowPulse 2.5s infinite;
         }
         @keyframes glowPulse {
             0%, 100% { border-color: rgba(255, 183, 0, 0.6); }
             50% { border-color: rgba(255, 183, 0, 1); box-shadow: 0 0 30px rgba(255, 183, 0, 0.35); }
         }
-        .apex-title {
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            color: var(--neon-gold);
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-        .apex-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.35rem;
-            font-weight: 900;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-        .apex-time {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.8rem;
-            font-weight: 900;
-            color: var(--neon-green);
-            text-shadow: 0 0 20px rgba(0, 255, 102, 0.5);
-            line-height: 1;
-        }
-        .apex-meta {
-            font-size: 0.75rem;
-            color: #8da4be;
-            margin-top: 6px;
-        }
+        .apex-title { font-family: 'Chakra Petch', sans-serif; font-size: 0.75rem; letter-spacing: 3px; color: var(--neon-gold); font-weight: 700; margin-bottom: 2px; }
+        .apex-name { font-family: 'Orbitron', sans-serif; font-size: 1.35rem; font-weight: 900; color: #ffffff; margin-bottom: 4px; }
+        .apex-time { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 20px rgba(0, 255, 102, 0.5); line-height: 1; }
+        .apex-meta { font-size: 0.75rem; color: #8da4be; margin-top: 6px; }
 
         /* 排行榜表格容器 */
-        .table-container {
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 9px 8px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 0.85rem;
-        }
-        th {
-            font-family: 'Chakra Petch', sans-serif;
-            color: var(--cyan-core);
-            font-size: 0.78rem;
-            letter-spacing: 1px;
-            background: #091019;
-            border-bottom: 1px solid var(--border);
-        }
-        .score {
-            font-family: 'Orbitron', monospace;
-            font-weight: 900;
-            color: var(--neon-green);
-        }
+        .table-container { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; z-index: 100; position: relative; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 9px 8px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 0.85rem; }
+        th { font-family: 'Chakra Petch', sans-serif; color: var(--cyan-core); font-size: 0.78rem; letter-spacing: 1px; background: #091019; border-bottom: 1px solid var(--border); }
+        .score { font-family: 'Orbitron', monospace; font-weight: 900; color: var(--neon-green); }
 
-        /* 金銀銅牌階級效果 */
+        /* 金銀銅牌效果 */
         tr:nth-child(1) td { color: var(--neon-gold); font-weight: bold; }
         tr:nth-child(2) td { color: #d0e0f0; }
         tr:nth-child(3) td { color: #cd7f32; }
 
-        /* 本人高亮行 */
-        tr.my-record {
-            background: rgba(0, 240, 255, 0.08) !important;
-            border-left: 3px solid var(--cyan-core);
+        /* 本人或跳轉高亮行 */
+        tr.my-record, tr.highlight-row {
+            background: rgba(0, 240, 255, 0.15) !important;
+            border-left: 3px solid var(--neon-green);
         }
-        tr.my-record td {
-            color: #fff !important;
-            font-weight: bold;
+        tr.my-record td, tr.highlight-row td {
+            color: #fff !important; font-weight: bold;
         }
     </style>
 </head>
@@ -246,7 +156,7 @@
 
     <div class="header">
         <h2>NEURONSTRIKE // LEADERBOARD</h2>
-        <div class="status-tag" id="statusTag">即時連線中...</div>
+        <div class="status-tag" id="statusTag">連線準備中...</div>
     </div>
 
     <!-- LINE 身分個人 HUD -->
@@ -264,22 +174,19 @@
         </div>
     </div>
 
-    <!-- 戰術切換分頁: 當日 / 每月 / 巔峰 -->
     <div class="tab-group">
         <div class="tab-btn active" id="tabDaily" onclick="switchView('daily')">⚡ 當日戰況</div>
         <div class="tab-btn" id="tabMonthly" onclick="switchView('monthly')">📅 每月天梯</div>
         <div class="tab-btn apex-tab" id="tabApex" onclick="switchView('apex')">🏆 巔峰傳奇</div>
     </div>
 
-    <!-- 巔峰特寫看板 (切換到「巔峰傳奇」或有頂級成績時呈現) -->
-    <div class="apex-hero-card" id="apexHero">
+    <div class="apex-hero-card" id="apexHero" style="display: none;">
         <div class="apex-title">⚡ ALL-TIME APEX LEGEND // 最速傳奇 ⚡</div>
         <div class="apex-name" id="apexName">OPERATOR_GHOST</div>
         <div class="apex-time" id="apexTime">0.00s</div>
-        <div class="apex-meta" id="apexMeta">A-ZONE: -  //  ESTABLISHED: --</div>
+        <div class="apex-meta" id="apexMeta">GRADE: -  //  ESTABLISHED: --</div>
     </div>
 
-    <!-- 排名表格 -->
     <div class="table-container">
         <table>
             <thead>
@@ -287,7 +194,7 @@
                     <th style="width: 15%;">#</th>
                     <th style="width: 45%;">OPERATOR</th>
                     <th style="width: 25%;">TIME</th>
-                    <th style="width: 15%;">ALPHA</th>
+                    <th style="width: 15%;">GRADE</th>
                 </tr>
             </thead>
             <tbody id="boardData">
@@ -297,15 +204,33 @@
     </div>
 
     <script>
-        // ─── [設定區] ───
-        const FIREBASE_URL = "https://nst-killhouse-default-rtdb.firebaseio.com/leaderboard.json";
-        const LIFF_ID = "2011351699-1AubGp3r";
+        // ==========================================
+        // 1. Firebase 核心設定
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyArJJA38NiEyQs1spfNSBDTOne_INJ7d5k",
+            authDomain: "nst-killhouse.firebaseapp.com",
+            databaseURL: "https://nst-killhouse-default-rtdb.firebaseio.com",
+            projectId: "nst-killhouse",
+            storageBucket: "nst-killhouse.firebasestorage.app",
+            messagingSenderId: "637304240805",
+            appId: "1:637304240805:web:37a2b7cdfdc9fb46596b4c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
+        // ==========================================
+        // 2. 系統變數與 LINE LIFF
+        // ==========================================
+        const LIFF_ID = "2011351699-1AubGp3r";
         let currentLineUser = null;
         let allRecordsCache = [];
-        let currentTab = "daily"; // 預設展示「當日戰況」
+        let currentTab = "daily"; 
+        
+        // 抓取網址中的 highlight 參數 (從手機戰報點過來時)
+        const urlParams = new URLSearchParams(window.location.search);
+        const highlightTarget = urlParams.get('highlight');
 
-        // 1. 初始化 LINE LIFF 身分
         async function initLineLiff() {
             try {
                 await liff.init({ liffId: LIFF_ID });
@@ -321,29 +246,35 @@
                     document.getElementById("operatorCard").style.display = "flex";
                 }
             } catch (err) {
-                console.warn("[LIFF] 訪客或非 LINE 模式:", err);
+                console.warn("[LIFF] 訪客或非 LINE 模式運行");
             }
         }
 
-        // 2. 從 Firebase 獲取所有紀錄
-        async function loadLeaderboardData() {
-            try {
-                let res = await fetch(FIREBASE_URL);
-                let data = await res.json();
+        // ==========================================
+        // 3. 啟動 Firebase 零延遲監聽引擎
+        // ==========================================
+        function startLiveSync() {
+            document.getElementById("statusTag").innerText = "連線成功 // 監聽雲端訊號中...";
+            document.getElementById("statusTag").style.color = "var(--neon-green)";
+
+            // 監聽大螢幕寫入的 GhostSteel/Leaderboard 節點
+            db.ref('GhostSteel/Leaderboard').on('value', (snapshot) => {
+                const data = snapshot.val();
                 if (!data) {
                     allRecordsCache = [];
                 } else {
                     allRecordsCache = Object.values(data);
                 }
                 renderView();
-                document.getElementById("statusTag").innerText = "即時同步 // " + new Date().toLocaleTimeString();
-            } catch (e) {
-                console.error("載入失敗:", e);
-                document.getElementById("statusTag").innerText = "連線異常";
-            }
+                
+                // 新資料到達時，狀態列產生呼吸燈回饋
+                const tag = document.getElementById("statusTag");
+                tag.innerText = "資料已同步 // " + new Date().toLocaleTimeString();
+                tag.style.textShadow = "0 0 10px rgba(0, 255, 102, 0.8)";
+                setTimeout(() => tag.style.textShadow = "none", 1000);
+            });
         }
 
-        // 3. 切換視圖
         function switchView(tabType) {
             currentTab = tabType;
             document.getElementById("tabDaily").className = "tab-btn" + (tabType === 'daily' ? ' active' : '');
@@ -352,10 +283,12 @@
             renderView();
         }
 
+        // ==========================================
         // 4. 核心過濾與渲染引擎
+        // ==========================================
         function renderView() {
             if (allRecordsCache.length === 0) {
-                document.getElementById("boardData").innerHTML = "<tr><td colspan='4' style='padding: 20px;'>目前尚無射擊戰報</td></tr>";
+                document.getElementById("boardData").innerHTML = "<tr><td colspan='4' style='padding: 20px;'>尚無戰術數據</td></tr>";
                 document.getElementById("apexHero").style.display = "none";
                 return;
             }
@@ -369,9 +302,8 @@
             if (apexRecord) {
                 document.getElementById("apexName").innerText = (apexRecord.name || 'ANONYMOUS').toUpperCase();
                 document.getElementById("apexTime").innerText = `${Number(apexRecord.score).toFixed(2)}s`;
-                const dateStr = apexRecord.timestamp ? new Date(apexRecord.timestamp).toLocaleDateString() : "--";
-                document.getElementById("apexMeta").innerText = `ALPHA: x${apexRecord.alpha || 0}  //  ESTABLISHED: ${dateStr}`;
-                // 只有在「巔峰傳奇」或當日有第一名時展示
+                const dateStr = apexRecord.timestamp ? new Date(apexRecord.timestamp).toLocaleDateString() : "雲端認證";
+                document.getElementById("apexMeta").innerText = `GRADE: ${apexRecord.rank || 'S'}  //  ESTABLISHED: ${dateStr}`;
                 document.getElementById("apexHero").style.display = (currentTab === 'apex') ? "block" : "none";
             }
 
@@ -382,7 +314,6 @@
             } else if (currentTab === "monthly") {
                 filtered = allRecordsCache.filter(r => (r.timestamp || 0) >= startOfMonth);
             } else if (currentTab === "apex") {
-                // 巔峰傳奇：每位射手只保留個人的最速成績 (Personal Best)
                 const pbMap = new Map();
                 allRecordsCache.forEach(r => {
                     const name = r.name || 'Anonymous';
@@ -412,32 +343,41 @@
                 let scoreNum = Number(r.score);
                 let displayScore = !isNaN(scoreNum) ? scoreNum.toFixed(2) + "s" : "--";
                 let opName = r.name || 'Anonymous';
+                
+                // 判斷是否為本人 (LIFF登入) 或 從戰報網址點擊過來的高亮目標
                 let isMe = currentLineUser && (opName.trim() === currentLineUser.name.trim());
+                let isHighlight = highlightTarget && (opName.trim().toUpperCase() === highlightTarget.toUpperCase());
 
                 if (isMe && myRank === "--") {
                     myRank = `#${idx + 1}`;
                 }
 
-                html += `<tr class="${isMe ? 'my-record' : ''}">
+                html += `<tr class="${(isMe || isHighlight) ? 'highlight-row' : ''}">
                     <td>${rankBadge}</td>
                     <td style="text-align: left; padding-left: 10px;">
                         ${isMe ? '👤 ' : ''}${opName}
                     </td>
                     <td class="score">${displayScore}</td>
-                    <td>${r.alpha !== undefined ? r.alpha : 0}</td>
+                    <td style="font-weight:bold; color: ${r.rank === 'S' ? 'var(--neon-gold)' : (r.rank === 'A' ? 'var(--cyan-core)' : '#fff')}">${r.rank || '-'}</td>
                 </tr>`;
             });
 
             tbody.innerHTML = html;
-            if (currentLineUser) {
-                document.getElementById("userBestRank").innerText = myRank;
+            if (currentLineUser) document.getElementById("userBestRank").innerText = myRank;
+
+            // 若有跳轉高亮目標，自動捲動至該列
+            if (highlightTarget) {
+                setTimeout(() => {
+                    const targetRow = document.querySelector('.highlight-row');
+                    if (targetRow) targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
             }
         }
 
+        // 初始化執行
         window.onload = async () => {
             await initLineLiff();
-            await loadLeaderboardData();
-            setInterval(loadLeaderboardData, 10000); // 10秒自動輪詢同步
+            startLiveSync();
         };
     </script>
 </body>
