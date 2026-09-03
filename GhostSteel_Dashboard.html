@@ -419,13 +419,17 @@
                 document.getElementById("liveTimer").innerText = `${payload.score.toFixed(2)}s`;
                 document.getElementById("lastRank").innerText = payload.rank;
 
-                // 核心：發送完整的 JSON 成績至 Firebase
+                // 核心：發送帶有防偽金鑰的成績至 Firebase
                 if (db) {
-                    db.ref('GhostSteel/Leaderboard').push({
+                    db.ref('leaderboard/S1').push({
                         name: activeOperatorName,
                         score: payload.score,
+                        alpha: payload.alpha || 0,
                         rank: payload.rank,
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        secret: 'NST_VIP_2026_TACTICAL' // 💯 帶上實體店面專屬金鑰
+                    }).catch(error => {
+                        console.error("寫入被拒絕，請檢查金鑰或秒數是否合理：", error);
                     });
                 }
 
