@@ -258,7 +258,7 @@
             document.getElementById("statusTag").style.color = "var(--neon-green)";
 
             // 監聽大螢幕寫入的 GhostSteel/Leaderboard 節點
-            db.ref('GhostSteel/Leaderboard').on('value', (snapshot) => {
+            db.ref('leaderboard/S1').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
                     allRecordsCache = [];
