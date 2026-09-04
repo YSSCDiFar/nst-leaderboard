@@ -844,38 +844,42 @@
             selectPlan('都會新手神經重置包', 499, 60, defaultCard);
         }
 
-        // ─── 4. LINE LIFF 授權 ───
-        async function initLiffAuth() {
-            try {
-                const liffPromise = liff.init({ liffId: LIFF_ID });
-                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("TIMEOUT"), 2500));
-                await Promise.race([liffPromise, timeoutPromise]);
+        // ─── 4. 強化版 LINE LIFF 身份授權 ───
+async function initLiffAuth() {
+    try {
+        // 將超時放寬至 5 秒，避免行動網路延遲誤判
+        const liffPromise = liff.init({ liffId: LIFF_ID });
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("TIMEOUT"), 5000));
+        await Promise.race([liffPromise, timeoutPromise]);
 
-                if (liff.isLoggedIn()) {
-                    const profile = await liff.getProfile();
-                    currentOperator.name = (profile.displayName || "VIP 特戰員").trim();
-                    currentOperator.uid = profile.userId || "ID_SECURED";
-
-                    document.getElementById("dispOpName").innerText = currentOperator.name;
-                    document.getElementById("dispOpUid").innerText = currentOperator.uid.substring(0, 14) + "...";
-                    if (profile.pictureUrl) {
-                        document.getElementById("opAvatar").src = profile.pictureUrl;
-                    }
-                } else {
-                    fallbackGuest();
-                }
-            } catch (err) {
-                console.warn("[LIFF STATUS] 切入訪客模式:", err);
-                fallbackGuest();
-            }
+        // 若尚未登入，且不在 LINE 內，自動引導跳轉 LINE 登入授權
+        if (!liff.isLoggedIn()) {
+            console.warn("[LIFF] 尚未登入，自動發起登入導引...");
+            // 如果希望外部瀏覽器自動跳出 LINE 登入頁，解開下一行註解：
+            // liff.login();
+            fallbackGuest();
+            return;
         }
 
-        function fallbackGuest() {
-            currentOperator.name = "射手_" + Math.floor(Math.random() * 899 + 100);
-            currentOperator.uid = "GUEST_USER";
-            document.getElementById("dispOpName").innerText = currentOperator.name;
-            document.getElementById("dispOpUid").innerText = "LINE 訪客模式";
+        // 已登入狀態，順利抓取射手呼號與頭貼
+        const profile = await liff.getProfile();
+        currentOperator.name = (profile.displayName || "VIP 特戰員").trim();
+        currentOperator.uid = profile.userId || "ID_SECURED";
+
+        document.getElementById("dispOpName").innerText = currentOperator.name;
+        document.getElementById("dispOpUid").innerText = currentOperator.uid.substring(0, 14) + "...";
+        if (profile.pictureUrl) {
+            document.getElementById("opAvatar").src = profile.pictureUrl;
         }
+        
+        // 成功辨識後即時刷新預約確認按鈕狀態
+        validateForm();
+
+    } catch (err) {
+        console.warn("[LIFF STATUS] 初始化異常或超時，切入訪客模式:", err);
+        fallbackGuest();
+    }
+}
 
         // ─── 5. 表單檢查 ───
         function validateForm() {
