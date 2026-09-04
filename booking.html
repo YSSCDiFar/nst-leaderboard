@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEURONSTRIKE // 戰術線上預約系統</title>
+    <!-- 現代清晰字體與戰術電競英文字型 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Orbitron:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- LINE LIFF SDK 與 QRCode 引擎 -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <!-- Firebase SDK (相容既有 v8 規範) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0c1017;
+            --surface-card: #151c28;
+            --surface-sub: #1c2637;
+            --primary-cyan: #00bcd4;
+            --primary-cyan-hover: #26c6da;
+            --accent-green: #00c853;
+            --accent-gold: #ffb300;
+            --border-subtle: #253347;
+            --text-title: #f0f4f8;
+            --text-body: #a9b9cb;
+            --text-muted: #5e738d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-title);
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 14px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .booking-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .header .agency {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--primary-cyan);
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        /* 幹員身分識別條 */
+        .operator-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--surface-sub);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            border: 1px solid var(--primary-cyan);
+            object-fit: cover;
+            background: #090e15;
+        }
+
+        .op-meta .lbl {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .op-meta .name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .op-meta .uid {
+            font-size: 0.7rem;
+            color: var(--primary-cyan);
+            word-break: break-all;
+        }
+
+        /* 標題與標籤 */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+        }
+
+        .schedule-badge {
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(0, 188, 212, 0.12);
+            color: var(--primary-cyan);
+            border: 1px solid rgba(0, 188, 212, 0.4);
+            font-weight: 600;
+        }
+
+        /* ─── 現代日曆選擇器 ─── */
+        .calendar-box {
+            background: var(--surface-sub);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 18px;
+        }
+
+        .cal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .cal-month-text {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .cal-nav-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .cal-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-title);
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Chakra Petch', sans-serif;
+            transition: all 0.15s;
+        }
+
+        .cal-btn:hover:not(:disabled) {
+            border-color: var(--primary-cyan);
+            color: var(--primary-cyan);
+        }
+
+        .cal-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .cal-grid-header, .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .cal-grid-header span {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            padding-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .cal-day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-body);
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.12s;
+        }
+
+        .cal-day-cell:hover:not(.disabled) {
+            background: rgba(0, 188, 212, 0.15);
+            color: #fff;
+        }
+
+        .cal-day-cell.active {
+            background: var(--primary-cyan) !important;
+            color: #000 !important;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(0, 188, 212, 0.4);
+        }
+
+        .cal-day-cell.today {
+            border: 1px solid var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .cal-day-cell.disabled {
+            opacity: 0.22;
+            cursor: not-allowed;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        /* 靶道選擇 */
+        .lanes-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .lane-btn {
+            background: var(--surface-sub);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+            padding: 8px 0;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+
+        .lane-btn.active {
+            border-color: var(--primary-cyan);
+            color: #000;
+            background: var(--primary-cyan);
+        }
+
+        /* 整點時段選單 */
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            padding: 6px;
+            background: var(--surface-sub);
+            border-radius: 8px;
+        }
+
+        .slot-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-body);
+            padding: 10px 0;
+            font-family: 'Chakra Petch', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.12s;
+        }
+
+        .slot-btn.active {
+            border-color: var(--accent-green);
+            color: #000;
+            background: var(--accent-green);
+            font-weight: 800;
+        }
+
+        /* 體驗方案卡片 */
+        .plans-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .plan-card {
+            background: var(--surface-sub);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .plan-card:hover {
+            border-color: var(--primary-cyan);
+        }
+
+        .plan-card.active {
+            border-color: var(--primary-cyan);
+            background: rgba(0, 188, 212, 0.08);
+        }
+
+        .plan-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .plan-desc {
+            font-size: 0.72rem;
+            color: var(--text-body);
+            margin-top: 2px;
+        }
+
+        .plan-price {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .plan-card.b2b-card {
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        .input-notes {
+            width: 100%;
+            background: var(--surface-sub);
+            color: #fff;
+            border: 1px solid var(--border-subtle);
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            outline: none;
+            resize: none;
+            height: 60px;
+        }
+
+        .input-notes:focus {
+            border-color: var(--primary-cyan);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary-cyan);
+            color: #000;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--primary-cyan-hover);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            background: var(--surface-sub);
+            color: var(--text-muted);
+        }
+
+        /* 預約完成彈窗 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 12, 18, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: var(--surface-card);
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 24px 20px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-green);
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .modal-summary {
+            background: var(--surface-sub);
+            border-radius: 8px;
+            padding: 14px;
+            margin: 16px 0;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.65;
+            color: var(--text-body);
+        }
+
+        .modal-summary b { color: #fff; }
+
+        .qr-box {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 140px;
+            height: 140px;
+            padding: 8px;
+            background: #fff;
+            border-radius: 8px;
+            margin: 6px auto;
+        }
+
+        .modal-btn {
+            width: 100%;
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="booking-card">
+        <div class="header">
+            <span class="agency">NEURONSTRIKE TACTICAL</span>
+            <span style="font-size: 0.75rem; color: var(--accent-green); font-weight: bold;">● 系統線上</span>
+        </div>
+
+        <!-- 幹員識別條 (LIFF 自動帶入) -->
+        <div class="operator-bar">
+            <img class="avatar" id="opAvatar" src="https://static.line-scdn.net/line_client/img/default_profile.png" alt="Avatar">
+            <div class="op-meta">
+                <div class="lbl">預約幹員呼號</div>
+                <div class="name" id="dispOpName">IDENTIFYING...</div>
+                <div class="uid" id="dispOpUid">--</div>
+            </div>
+        </div>
+
+        <!-- 1. 日曆選擇器 -->
+        <div class="form-group">
+            <div class="section-header">
+                <span class="section-label">1. 選擇預約日期</span>
+                <span class="schedule-badge" id="dayTypeBadge">平日 (最晚 23:00)</span>
+            </div>
+            
+            <div class="calendar-box">
+                <div class="cal-nav">
+                    <span class="cal-month-text" id="calMonthLabel">載入中...</span>
+                    <div class="cal-nav-btns">
+                        <button type="button" class="cal-btn" id="btnPrevMonth" onclick="changeMonth(-1)">◀ 上月</button>
+                        <button type="button" class="cal-btn" id="btnNextMonth" onclick="changeMonth(1)">下月 ▶</button>
+                    </div>
+                </div>
+                <div class="cal-grid-header">
+                    <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+                </div>
+                <div class="cal-grid" id="calendarDays">
+                    <!-- 由 JavaScript 動態生成月份日曆 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 指定靶道 (4 條實體靶道，時間基準 60 分鐘) -->
+        <div class="form-group">
+            <div class="section-header">
+                <span class="section-label">2. 預約靶道 (每次 60 分鐘)</span>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">4 道獨立計時</span>
+            </div>
+            <div class="lanes-grid" id="lanesContainer">
+                <button type="button" class="lane-btn active" onclick="selectLane('AUTO', this)">AUTO</button>
+                <button type="button" class="lane-btn" onclick="selectLane('1', this)">LANE 1</button>
+                <button type="button" class="lane-btn" onclick="selectLane('2', this)">LANE 2</button>
+                <button type="button" class="lane-btn" onclick="selectLane('3', this)">LANE 3</button>
+                <button type="button" class="lane-btn" onclick="selectLane('4', this)">LANE 4</button>
+            </div>
+        </div>
+
+        <!-- 3. 整點時段選單 (平日最晚 23:00 / 假日最晚 24:00) -->
+        <div class="form-group">
+            <div class="section-header">
+                <span class="section-label">3. 抵達時段 (純整點 / 每次 60 分鐘)</span>
+                <span style="font-size: 0.72rem; color: var(--primary-cyan);" id="slotHintText">平日最晚 23:00</span>
+            </div>
+            <div class="slots-grid" id="slotsContainer">
+                <!-- 由 JavaScript 動態生成整點按鈕 -->
+            </div>
+        </div>
+
+        <!-- 4. 體驗方案 (包場價格依平假日自動過濾) -->
+        <div class="form-group">
+            <div class="section-header">
+                <span class="section-label">4. 選擇體驗方案</span>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">標準價目體系</span>
+            </div>
+            <div class="plans-list" id="plansContainer">
+                <div class="plan-card active" data-type="STANDARD" onclick="selectPlan('都會新手神經重置包', 499, 60, this)">
+                    <div>
+                        <div class="plan-title">都會新手神經重置包</div>
+                        <div class="plan-desc">1hr / 附手槍+護具面罩+100發BB彈+1對1教官</div>
+                    </div>
+                    <div class="plan-price">$499</div>
+                </div>
+
+                <div class="plan-card" data-type="STANDARD" onclick="selectPlan('都會雙人戰術解壓包', 899, 60, this)">
+                    <div>
+                        <div class="plan-title">都會雙人戰術解壓包</div>
+                        <div class="plan-desc">1hr / 雙人共用1靶道、各1槍、共200發BB彈</div>
+                    </div>
+                    <div class="plan-price">$899</div>
+                </div>
+
+                <div class="plan-card" data-type="STANDARD" onclick="selectPlan('BYOG 自主靶道訓練', 250, 60, this)">
+                    <div>
+                        <div class="plan-title">BYOG 自主靶道訓練</div>
+                        <div class="plan-desc">1hr / 自備槍枝訓練 (初速限 1.0J 內)</div>
+                    </div>
+                    <div class="plan-price">$250</div>
+                </div>
+
+                <div class="plan-card" data-type="STANDARD" onclick="selectPlan('[VIP] NST 月卡特戰員進場', 0, 60, this)">
+                    <div>
+                        <div class="plan-title">[VIP] NST 月卡特戰員進場</div>
+                        <div class="plan-desc">創始特戰員預約自主訓練 (現場出示卡號)</div>
+                    </div>
+                    <div class="plan-price" style="color:var(--accent-green);">$0</div>
+                </div>
+
+                <!-- 平日包場 (週一至週五顯示) -->
+                <div class="plan-card b2b-card" id="b2bWeekdayCard" data-type="B2B_WEEKDAY" onclick="selectPlan('平日企業包場 (2H)', 6000, 120, this)">
+                    <div>
+                        <div class="plan-title">平日企業包場 (2H)</div>
+                        <div class="plan-desc">週一至週五專用 / 全館 4 道獨佔 / 限額 12 人</div>
+                    </div>
+                    <div class="plan-price">$6,000</div>
+                </div>
+
+                <!-- 假日包場 (週六與週日顯示) -->
+                <div class="plan-card b2b-card" id="b2bWeekendCard" data-type="B2B_WEEKEND" onclick="selectPlan('假日熱門包場 (2H)', 9000, 120, this)">
+                    <div>
+                        <div class="plan-title">假日熱門包場 (2H)</div>
+                        <div class="plan-desc">週六週日專用 / 假日全館獨佔 / 專人主持對抗賽</div>
+                    </div>
+                    <div class="plan-price">$9,000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. 特殊備註 -->
+        <div class="form-group">
+            <div class="section-header">
+                <span class="section-label">5. 特殊備註 (選填)</span>
+            </div>
+            <textarea id="bookNotes" class="input-notes" placeholder="例如："></textarea>
+        </div>
+
+        <button class="btn-submit" id="btnSubmit" onclick="submitReservation()" disabled>請確認預約資訊</button>
+    </div>
+
+    <!-- 預約完成彈窗 -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="modal-title">預約確認成功</div>
+            <div style="font-size: 0.75rem; color: var(--text-body); margin-top: 2px;">席位已保留 // 請截圖保存</div>
+
+            <div class="modal-summary" id="modalSummaryText">
+                <!-- 動態注入摘要 -->
+            </div>
+
+            <div class="qr-box" id="resQrCode"></div>
+            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;">入場請出示此條碼，現場櫃台掃描即可開局</div>
+
+            <button class="modal-btn" onclick="closeModalAndExit()">完成並關閉</button>
+        </div>
+    </div>
+
+    <script>
+        // ─── 1. Firebase 初始化 ───
+        const firebaseConfig = {
+            apiKey: "AIzaSyArJJA38NiEyQs1spfNSBDTOne_INJ7d5k",
+            authDomain: "nst-killhouse.firebaseapp.com",
+            databaseURL: "https://nst-killhouse-default-rtdb.firebaseio.com",
+            projectId: "nst-killhouse",
+            storageBucket: "nst-killhouse.firebasestorage.app",
+            messagingSenderId: "637304240805",
+            appId: "1:637304240805:web:37a2b7cdfdc9fb46596b4c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ─── 2. LINE LIFF 設定 ───
+        const LIFF_ID = "2011351699-ICoDeO6U";
+
+        let currentOperator = {
+            name: "WALK_IN_OPERATOR",
+            uid: "ANONYMOUS_UID"
+        };
+
+        let currentSelection = {
+            dateStr: "",          // YYYYMMDD
+            dateIso: "",          // YYYY-MM-DD
+            isWeekend: false,
+            lane: "AUTO",         // AUTO 或 1, 2, 3, 4
+            slot: "",             // "18:00"
+            plan: "都會新手神經重置包",
+            price: 499,
+            duration: 60
+        };
+
+        // 平日最晚 23:00 / 假日最晚 24:00 (整點)
+        const WEEKDAY_HOURLY_SLOTS = [
+            "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"
+        ];
+
+        const WEEKEND_HOURLY_SLOTS = [
+            "14:00", "15:00", "16:00", "17:00", "18:00",
+            "19:00", "20:00", "21:00", "22:00", "23:00", "24:00"
+        ];
+
+        const realToday = new Date();
+        let viewYear = realToday.getFullYear();
+        let viewMonth = realToday.getMonth();
+
+        const maxBookDate = new Date();
+        maxBookDate.setDate(realToday.getDate() + 30);
+
+        // ─── 3. 頁面初始化 ───
+        window.addEventListener("DOMContentLoaded", async () => {
+            renderCalendar(viewYear, viewMonth);
+            
+            const yyyy = realToday.getFullYear();
+            const mm = String(realToday.getMonth() + 1).padStart(2, '0');
+            const dd = String(realToday.getDate()).padStart(2, '0');
+            onDateSelected(`${yyyy}-${mm}-${dd}`);
+
+            await initLiffAuth();
+        });
+
+        function changeMonth(delta) {
+            viewMonth += delta;
+            if (viewMonth > 11) {
+                viewMonth = 0;
+                viewYear++;
+            } else if (viewMonth < 0) {
+                viewMonth = 11;
+                viewYear--;
+            }
+            renderCalendar(viewYear, viewMonth);
+        }
+
+        function renderCalendar(year, month) {
+            const container = document.getElementById("calendarDays");
+            container.innerHTML = "";
+
+            document.getElementById("calMonthLabel").innerText = `${year} 年 ${month + 1} 月`;
+
+            const isMinMonth = (year === realToday.getFullYear() && month === realToday.getMonth());
+            const isMaxMonth = (year === maxBookDate.getFullYear() && month === maxBookDate.getMonth());
+            document.getElementById("btnPrevMonth").disabled = isMinMonth;
+            document.getElementById("btnNextMonth").disabled = isMaxMonth;
+
+            const firstDayOfWeek = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyCell = document.createElement("div");
+                container.appendChild(emptyCell);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement("div");
+                cell.className = "cal-day-cell";
+                cell.innerText = day;
+
+                const thisDate = new Date(year, month, day);
+                const isPast = thisDate < new Date(realToday.getFullYear(), realToday.getMonth(), realToday.getDate());
+                const isTooFar = thisDate > maxBookDate;
+                const isToday = (year === realToday.getFullYear() && month === realToday.getMonth() && day === realToday.getDate());
+
+                if (isToday) {
+                    cell.classList.add("today");
+                }
+
+                if (isPast || isTooFar) {
+                    cell.classList.add("disabled");
+                } else {
+                    const yyyy = year;
+                    const mm = String(month + 1).padStart(2, '0');
+                    const dd = String(day).padStart(2, '0');
+                    const isoDate = `${yyyy}-${mm}-${dd}`;
+
+                    if (isoDate === currentSelection.dateIso) {
+                        cell.classList.add("active");
+                    }
+
+                    cell.onclick = () => {
+                        document.querySelectorAll(".cal-day-cell").forEach(c => c.classList.remove("active"));
+                        cell.classList.add("active");
+                        onDateSelected(isoDate);
+                    };
+                }
+
+                container.appendChild(cell);
+            }
+        }
+
+        function onDateSelected(isoStr) {
+            currentSelection.dateIso = isoStr;
+            currentSelection.dateStr = isoStr.replace(/-/g, "");
+
+            const [selY, selM] = isoStr.split('-').map(Number);
+            if (selY !== viewYear || (selM - 1) !== viewMonth) {
+                viewYear = selY;
+                viewMonth = selM - 1;
+                renderCalendar(viewYear, viewMonth);
+            }
+
+            const dateObj = new Date(isoStr + "T00:00:00");
+            const dayOfWeek = dateObj.getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            currentSelection.isWeekend = isWeekend;
+
+            const badge = document.getElementById("dayTypeBadge");
+            const hintText = document.getElementById("slotHintText");
+            const weekdayB2BCard = document.getElementById("b2bWeekdayCard");
+            const weekendB2BCard = document.getElementById("b2bWeekendCard");
+
+            if (isWeekend) {
+                badge.innerText = "假日營業 (最晚 24:00)";
+                badge.style.color = "var(--accent-green)";
+                badge.style.borderColor = "var(--accent-green)";
+                hintText.innerText = "週六日整點 (最晚進場 24:00)";
+
+                weekdayB2BCard.style.display = "none";
+                weekendB2BCard.style.display = "flex";
+
+                if (currentSelection.plan === "平日企業包場 (2H)") {
+                    resetToDefaultPlan();
+                }
+
+                renderTimeSlots(WEEKEND_HOURLY_SLOTS);
+            } else {
+                badge.innerText = "平日夜間 (最晚 23:00)";
+                badge.style.color = "var(--primary-cyan)";
+                badge.style.borderColor = "var(--primary-cyan)";
+                hintText.innerText = "週一至週五整點 (最晚進場 23:00)";
+
+                weekdayB2BCard.style.display = "flex";
+                weekendB2BCard.style.display = "none";
+
+                if (currentSelection.plan === "假日熱門包場 (2H)") {
+                    resetToDefaultPlan();
+                }
+
+                renderTimeSlots(WEEKDAY_HOURLY_SLOTS);
+            }
+
+            validateForm();
+        }
+
+        function renderTimeSlots(slotList) {
+            const container = document.getElementById("slotsContainer");
+            container.innerHTML = "";
+            currentSelection.slot = slotList[0];
+
+            slotList.forEach((slot, index) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "slot-btn" + (index === 0 ? " active" : "");
+                btn.innerText = slot;
+                btn.onclick = () => selectSlot(slot, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectSlot(slot, elem) {
+            document.querySelectorAll(".slot-btn").forEach(b => b.classList.remove("active"));
+            elem.classList.add("active");
+            currentSelection.slot = slot;
+            validateForm();
+        }
+
+        function selectLane(laneId, elem) {
+            document.querySelectorAll(".lane-btn").forEach(b => b.classList.remove("active"));
+            elem.classList.add("active");
+            currentSelection.lane = laneId;
+            validateForm();
+        }
+
+        function selectPlan(planName, price, duration, elem) {
+            document.querySelectorAll(".plan-card").forEach(c => c.classList.remove("active"));
+            elem.classList.add("active");
+            currentSelection.plan = planName;
+            currentSelection.price = price;
+            currentSelection.duration = duration;
+            validateForm();
+        }
+
+        function resetToDefaultPlan() {
+            const defaultCard = document.querySelector('.plan-card[data-type="STANDARD"]');
+            selectPlan('都會新手神經重置包', 499, 60, defaultCard);
+        }
+
+        // ─── 4. LINE LIFF 授權 ───
+        async function initLiffAuth() {
+            try {
+                const liffPromise = liff.init({ liffId: LIFF_ID });
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("TIMEOUT"), 2500));
+                await Promise.race([liffPromise, timeoutPromise]);
+
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    currentOperator.name = (profile.displayName || "VIP 特戰員").trim();
+                    currentOperator.uid = profile.userId || "ID_SECURED";
+
+                    document.getElementById("dispOpName").innerText = currentOperator.name;
+                    document.getElementById("dispOpUid").innerText = currentOperator.uid.substring(0, 14) + "...";
+                    if (profile.pictureUrl) {
+                        document.getElementById("opAvatar").src = profile.pictureUrl;
+                    }
+                } else {
+                    fallbackGuest();
+                }
+            } catch (err) {
+                console.warn("[LIFF STATUS] 切入訪客模式:", err);
+                fallbackGuest();
+            }
+        }
+
+        function fallbackGuest() {
+            currentOperator.name = "射手_" + Math.floor(Math.random() * 899 + 100);
+            currentOperator.uid = "GUEST_USER";
+            document.getElementById("dispOpName").innerText = currentOperator.name;
+            document.getElementById("dispOpUid").innerText = "LINE 訪客模式";
+        }
+
+        // ─── 5. 表單檢查 ───
+        function validateForm() {
+            const btn = document.getElementById("btnSubmit");
+            const isValid = currentSelection.dateStr && currentSelection.slot && currentSelection.plan;
+            btn.disabled = !isValid;
+
+            if (isValid) {
+                const laneText = currentSelection.lane === 'AUTO' ? '教官自動調度' : `LANE ${currentSelection.lane}`;
+                btn.innerText = `確認預約 [${currentSelection.dateIso} ${currentSelection.slot}] (${laneText})`;
+            } else {
+                btn.innerText = "請完成日期與時段選擇";
+            }
+        }
+
+        // ─── 6. 寫入 Firebase 資料庫 ───
+        function submitReservation() {
+            const btn = document.getElementById("btnSubmit");
+            btn.disabled = true;
+            btn.innerText = "預約傳輸中...";
+
+            const notes = document.getElementById("bookNotes").value.trim();
+
+            const payload = {
+                uid: currentOperator.uid,
+                operator: currentOperator.name,
+                plan: currentSelection.plan,
+                price: currentSelection.price,
+                durationMinutes: currentSelection.duration,
+                assignedLane: currentSelection.lane,
+                slot: currentSelection.slot,
+                date: currentSelection.dateIso,
+                dayType: currentSelection.isWeekend ? "WEEKEND" : "WEEKDAY",
+                notes: notes,
+                status: "pending",
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            const targetRef = db.ref(`GhostSteel/Reservations/${currentSelection.dateStr}`);
+
+            targetRef.push(payload)
+                .then((newRef) => {
+                    showSuccessModal(newRef.key, payload);
+                })
+                .catch((err) => {
+                    alert("⚠️ 預約失敗，請檢查網路連線：" + err.message);
+                    btn.disabled = false;
+                    validateForm();
+                });
+        }
+
+        // ─── 7. 完成彈窗與專屬 QR Code ───
+        function showSuccessModal(resKey, data) {
+            const modal = document.getElementById("successModal");
+            const summary = document.getElementById("modalSummaryText");
+
+            const laneDisplay = data.assignedLane === 'AUTO' ? '現場教官安排' : `指定 LANE ${data.assignedLane}`;
+
+            summary.innerHTML = `
+                <div>預約射手：<b>${data.operator}</b></div>
+                <div>預約日期：<b>${data.date} (${data.dayType === 'WEEKEND' ? '假日' : '平日'})</b></div>
+                <div>抵達時段：<b style="color:var(--accent-green);">${data.slot} (體驗 ${data.durationMinutes} 分鐘)</b></div>
+                <div>靶位席次：<b>${laneDisplay}</b></div>
+                <div>體驗方案：<b style="color:var(--accent-gold);">${data.plan}</b></div>
+                <div>結算金額：<b style="color:var(--accent-gold);">$${data.price.toLocaleString()}</b></div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">預約單號：${resKey}</div>
+            `;
+
+            const qrPayload = `NST_RES:${resKey}:${data.operator}`;
+            const qrContainer = document.getElementById("resQrCode");
+            qrContainer.innerHTML = "";
+
+            if (typeof QRCode !== "undefined") {
+                new QRCode(qrContainer, {
+                    text: qrPayload,
+                    width: 124,
+                    height: 124,
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            }
+
+            modal.style.display = "flex";
+        }
+
+        function closeModalAndExit() {
+            if (typeof liff !== "undefined" && liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                document.getElementById("successModal").style.display = "none";
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
