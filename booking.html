@@ -923,6 +923,7 @@
                 dayType: currentSelection.isWeekend ? "WEEKEND" : "WEEKDAY",
                 notes: notes,
                 status: "pending",
+                secret: "NST_VIP_2026_TACTICAL", // 補齊戰術通行金鑰
                 createdAt: firebase.database.ServerValue.TIMESTAMP
             };
 
@@ -933,7 +934,8 @@
                     showSuccessModal(newRef.key, payload);
                 })
                 .catch((err) => {
-                    alert("⚠️ 預約失敗，請檢查網路連線：" + err.message);
+                    console.error("Firebase 傳輸報錯:", err);
+                    alert("⚠️ 預約失敗！代碼：" + err.code + "\n訊息：" + err.message);
                     btn.disabled = false;
                     validateForm();
                 });
