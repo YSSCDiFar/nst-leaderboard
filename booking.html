@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NEURONSTRIKE // 戰術線上預約系統</title>
-    <!-- 現代清晰字體與戰術電競英文字型 -->
+    <!-- 現代俐落字體與戰術電競英文字型 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Orbitron:wght@600;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -13,7 +13,7 @@
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-    <!-- Firebase SDK (相容既有 v8 規範) -->
+    <!-- Firebase SDK (相容既有系統 v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -476,7 +476,7 @@
             <div class="op-meta">
                 <div class="lbl">預約幹員呼號</div>
                 <div class="name" id="dispOpName">IDENTIFYING...</div>
-                <div class="uid" id="dispOpUid">--</div>
+                <div class="uid" id="dispOpUid">驗證中...</div>
             </div>
         </div>
 
@@ -594,7 +594,7 @@
             <div class="section-header">
                 <span class="section-label">5. 特殊備註 (選填)</span>
             </div>
-            <textarea id="bookNotes" class="input-notes" placeholder="例如："></textarea>
+            <textarea id="bookNotes" class="input-notes" placeholder=""></textarea>
         </div>
 
         <button class="btn-submit" id="btnSubmit" onclick="submitReservation()" disabled>請確認預約資訊</button>
@@ -631,8 +631,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ─── 2. LINE LIFF 設定 ───
-        const LIFF_ID = "2011351699-ICoDeO6U";
+        // ─── 2. LINE LIFF 設定 (鎖定最新真實 ID) ───
+        const LIFF_ID = "2011351699-B1ZEhXQ0";
 
         let currentOperator = {
             name: "WALK_IN_OPERATOR",
@@ -676,9 +676,54 @@
             const dd = String(realToday.getDate()).padStart(2, '0');
             onDateSelected(`${yyyy}-${mm}-${dd}`);
 
+            // 啟動 LIFF 穿透驗證
             await initLiffAuth();
         });
 
+        // ─── 4. 穿透型 LINE LIFF 授權核心 ───
+        async function initLiffAuth() {
+            try {
+                // 寬放 5 秒避免連線不穩
+                const liffPromise = liff.init({ liffId: LIFF_ID });
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("TIMEOUT"), 5000));
+                await Promise.race([liffPromise, timeoutPromise]);
+
+                // 若未登入，主動觸發登入授權（消除訪客模式）
+                if (!liff.isLoggedIn()) {
+                    console.log("[LIFF] 尚未取得授權，觸發 LINE 授權跳轉...");
+                    liff.login();
+                    return;
+                }
+
+                // 成功登入，抓取 LINE 真實資料
+                const profile = await liff.getProfile();
+                currentOperator.name = (profile.displayName || "VIP 特戰員").trim();
+                currentOperator.uid = profile.userId || "ID_SECURED";
+
+                document.getElementById("dispOpName").innerText = currentOperator.name;
+                document.getElementById("dispOpUid").innerText = currentOperator.uid.substring(0, 14) + "...";
+                if (profile.pictureUrl) {
+                    document.getElementById("opAvatar").src = profile.pictureUrl;
+                }
+
+                validateForm();
+
+            } catch (err) {
+                console.warn("[LIFF STATUS] 初始化異常或超時:", err);
+                // 只有在連線徹底失敗時才做保底
+                fallbackGuest();
+            }
+        }
+
+        function fallbackGuest() {
+            currentOperator.name = "射手_" + Math.floor(Math.random() * 899 + 100);
+            currentOperator.uid = "LINE 訪客模式";
+            document.getElementById("dispOpName").innerText = currentOperator.name;
+            document.getElementById("dispOpUid").innerText = "LINE 訪客模式";
+            validateForm();
+        }
+
+        // ─── 5. 日曆與時段運算 ───
         function changeMonth(delta) {
             viewMonth += delta;
             if (viewMonth > 11) {
@@ -844,44 +889,7 @@
             selectPlan('都會新手神經重置包', 499, 60, defaultCard);
         }
 
-        // ─── 4. 強化版 LINE LIFF 身份授權 ───
-async function initLiffAuth() {
-    try {
-        // 將超時放寬至 5 秒，避免行動網路延遲誤判
-        const liffPromise = liff.init({ liffId: LIFF_ID });
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject("TIMEOUT"), 5000));
-        await Promise.race([liffPromise, timeoutPromise]);
-
-        // 若尚未登入，且不在 LINE 內，自動引導跳轉 LINE 登入授權
-        if (!liff.isLoggedIn()) {
-            console.warn("[LIFF] 尚未登入，自動發起登入導引...");
-            // 如果希望外部瀏覽器自動跳出 LINE 登入頁，解開下一行註解：
-            // liff.login();
-            fallbackGuest();
-            return;
-        }
-
-        // 已登入狀態，順利抓取射手呼號與頭貼
-        const profile = await liff.getProfile();
-        currentOperator.name = (profile.displayName || "VIP 特戰員").trim();
-        currentOperator.uid = profile.userId || "ID_SECURED";
-
-        document.getElementById("dispOpName").innerText = currentOperator.name;
-        document.getElementById("dispOpUid").innerText = currentOperator.uid.substring(0, 14) + "...";
-        if (profile.pictureUrl) {
-            document.getElementById("opAvatar").src = profile.pictureUrl;
-        }
-        
-        // 成功辨識後即時刷新預約確認按鈕狀態
-        validateForm();
-
-    } catch (err) {
-        console.warn("[LIFF STATUS] 初始化異常或超時，切入訪客模式:", err);
-        fallbackGuest();
-    }
-}
-
-        // ─── 5. 表單檢查 ───
+        // ─── 6. 表單校驗 ───
         function validateForm() {
             const btn = document.getElementById("btnSubmit");
             const isValid = currentSelection.dateStr && currentSelection.slot && currentSelection.plan;
@@ -895,7 +903,7 @@ async function initLiffAuth() {
             }
         }
 
-        // ─── 6. 寫入 Firebase 資料庫 ───
+        // ─── 7. 寫入 Firebase 資料庫 ───
         function submitReservation() {
             const btn = document.getElementById("btnSubmit");
             btn.disabled = true;
@@ -931,7 +939,7 @@ async function initLiffAuth() {
                 });
         }
 
-        // ─── 7. 完成彈窗與專屬 QR Code ───
+        // ─── 8. 完成彈窗與 QR Code ───
         function showSuccessModal(resKey, data) {
             const modal = document.getElementById("successModal");
             const summary = document.getElementById("modalSummaryText");
