@@ -391,6 +391,7 @@
             border-radius: 6px;
             font-size: 0.72rem;
             color: var(--text-dim);
+            line-height: 1.4;
             text-align: center;
         }
 
@@ -433,7 +434,7 @@
                 <div class="name" id="dispName">OPERATOR_GHOST</div>
             </div>
             <div class="grade-badge">
-                <div class="grade" id="dispRank">MASTER</div>
+                <div class="grade" id="dispRank">CONFIRMED</div>
             </div>
         </div>
 
@@ -446,8 +447,8 @@
                     <div class="val" style="color: var(--neon-green);">COMMAND</div>
                 </div>
                 <div class="stat-card">
-                    <div class="lbl">命中板塊</div>
-                    <div class="val" id="dispAction" style="color: var(--neon-green);">指定板塊</div>
+                    <div class="lbl">指令目標</div>
+                    <div class="val" id="dispAction" style="color: var(--neon-green);">--</div>
                 </div>
                 <div class="stat-card">
                     <div class="lbl">靶道編號</div>
@@ -456,7 +457,6 @@
             </div>
         </div>
 
-        <!-- 鋼靶系統 (1~8 號活動鋼板配置) -->
         <div class="target-container">
             <div class="tac-steel-target">
                 <div class="led-edge-strip" id="ledEdgeStrip"></div>
@@ -528,14 +528,35 @@
         const name = params.get('name') || "OPERATOR_GHOST";
         const lane = params.get('lane') || "1";
         const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 1.12);
-        const rank = params.get('rank') || "MASTER";
-        const targetId = params.get('plate') || params.get('target') || "1"; // 預設命中 1 號板
+        const rank = params.get('rank') || "CONFIRMED";
+        const rawZone = (params.get('zone') || "").toUpperCase();
+        let targetId = params.get('plate') || params.get('target');
+
+        // 若無指定 plate 則依 zone 反推目標板
+        if (!targetId) {
+            if (rawZone === 'A') targetId = '2';
+            else if (rawZone === 'C') targetId = '4';
+            else targetId = '1';
+        }
+
+        // 定義板塊所屬分區與亮燈色彩 (比照 LaneFor4Mode.html 第 235-245 行 PLATE_MAP 與第 471-477 行 colorMap)
+        const plateZoneMap = {
+            1: { zone: 'B', hex: '#ffaa00', label: '1號板 (B區)' },
+            2: { zone: 'A', hex: '#ff1a35', label: '2號板 (A區)' },
+            3: { zone: 'A', hex: '#ff1a35', label: '3號板 (A區)' },
+            4: { zone: 'C', hex: '#00e65c', label: '4號板 (C區)' },
+            5: { zone: 'C', hex: '#00e65c', label: '5號板 (C區)' },
+            6: { zone: 'C', hex: '#00e65c', label: '6號板 (C區)' },
+            7: { zone: 'B', hex: '#ffaa00', label: '7號板 (B區)' },
+            8: { zone: 'C', hex: '#00e65c', label: '8號板 (C區)' }
+        };
+        const activeCfg = plateZoneMap[targetId] || plateZoneMap[1];
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
         document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
         document.getElementById("dispRank").innerText = rank;
-        document.getElementById("dispAction").innerText = `${targetId}號鋼板`;
+        document.getElementById("dispAction").innerText = activeCfg.label;
 
         const now = new Date();
         document.getElementById("dispDate").innerText = 
@@ -557,54 +578,65 @@
             document.documentElement.style.setProperty('--strip-opacity', opacity);
         }
 
-        function flashStripOnly(colorHex, duration = 160) {
-            setStrip(colorHex, 1);
-            scheduleTimer(() => { setStrip('transparent', 0); }, duration);
-        }
+        // 雙向同步注入彈孔 (主畫面 + 彈窗)
+        function createBulletHole(plateId, rx = 50, ry = 50) {
+            const targets = [];
+            const mainPlate = document.querySelector(`#storyCaptureArea #${plateId}`);
+            if (mainPlate) targets.push(mainPlate);
 
-        function createBulletHole(plateElement, rx = 50, ry = 50) {
-            if (!plateElement) return null;
-            const hole = document.createElement("div");
-            hole.className = "bullet-hole";
-            hole.style.left = rx + "%";
-            hole.style.top = ry + "%";
-            plateElement.appendChild(hole);
-            return hole;
+            const clonePlate = document.querySelector(`#modalCloneSlot #${plateId}`);
+            if (clonePlate) targets.push(clonePlate);
+
+            targets.forEach(plate => {
+                const hole = document.createElement("div");
+                hole.className = "bullet-hole";
+                hole.style.left = rx + "%";
+                hole.style.top = ry + "%";
+                plate.appendChild(hole);
+            });
         }
 
         function clearAllBulletHoles() {
             document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
         }
 
-        function plantFixedBulletHoles(scope = document) {
-            const targetPlate = scope.getElementById ? scope.getElementById(`plt-${targetId}`) : scope.querySelector(`#plt-${targetId}`);
-            if (targetPlate) createBulletHole(targetPlate, 50, 50);
-        }
-
         let replayLoopTimer = null;
         let strobeInterval = null;
 
+        // ─── 亮燈模式比照 LaneFor4Mode.html ───
         function runReplayOnce() {
             clearAllBulletHoles();
-            setStrip('transparent', 0);
 
-            const targetPlate = document.getElementById(`plt-${targetId}`) || document.getElementById("plt-1");
-            const shotTime = Math.min(800, recordedTimeSec * 1000);
+            // 階段 1：起跑前全滅
+            setStrip('#000000', 0);
 
-            // 隨機指令命中目標 (戰術綠光爆閃 + 1發烙印)
+            // 階段 2：下達隨機指令 -> 亮該區指示燈 (A:紅, B:橘, C:綠) (比照 LaneFor4Mode.html 第 478 行 setStripColor(cmd.hex, 1.0))
             scheduleTimer(() => {
-                flashStripOnly('#00e65c', 160);
-                createBulletHole(targetPlate, 50, 50);
+                setStrip(activeCfg.hex, 1.0);
+            }, 300);
+
+            // 階段 3：射手在時間內命中指定板塊 -> 烙印彈孔
+            const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
+            scheduleTimer(() => {
+                createBulletHole(`plt-${targetId}`, 50, 50);
             }, shotTime);
 
-            // 隨機綠光脈衝爆閃
-            const strobeStart = shotTime + 250;
+            // 階段 4：命中正確目標結算 -> 綠光爆閃 4 次 (比照 LaneFor4Mode.html 第 502 行 strobeStrip('#00e65c', 4, 60))
+            const strobeStart = shotTime + 200;
             scheduleTimer(() => {
-                let step = 0;
+                let count = 0;
                 strobeInterval = setInterval(() => {
-                    setStrip(step % 2 === 0 ? 'var(--neon-green)' : 'transparent', step % 2 === 0 ? 1 : 0);
-                    step++;
-                }, 90);
+                    if (count % 2 === 0) {
+                        setStrip('#00e65c', 1.0);
+                    } else {
+                        setStrip('#000000', 0);
+                    }
+                    count++;
+                    if (count >= 4 * 2) {
+                        clearInterval(strobeInterval);
+                        setStrip('#00e65c', 0.4); // 結尾保持呼吸微光
+                    }
+                }, 60);
             }, strobeStart);
 
             return strobeStart + 1200;
@@ -627,12 +659,19 @@
             const modal = document.getElementById("previewModal");
             const slot = document.getElementById("modalCloneSlot");
             slot.innerHTML = "";
+            
             const clone = document.getElementById("storyCaptureArea").cloneNode(true);
             clone.id = "storyCaptureAreaClone";
             clone.classList.add("modal-card-scale");
+            clone.querySelectorAll(".bullet-hole").forEach(h => h.remove());
             slot.appendChild(clone);
-            plantFixedBulletHoles(clone);
+
             modal.style.display = "flex";
+
+            // 重設動畫循環，開窗立即同步從 0 開始播放
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            runOneShotReplayCycle();
         }
 
         async function handleSaveOrShareCard() {
@@ -644,8 +683,10 @@
             clearAllActiveTimers();
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
+
+            // 釘死命中目標之彈孔，保證截圖存在
             clearAllBulletHoles();
-            plantFixedBulletHoles(document);
+            createBulletHole(`plt-${targetId}`, 50, 50);
 
             try {
                 const target = document.getElementById("storyCaptureArea");
@@ -670,17 +711,8 @@
         function triggerRestartForRecording() {
             clearAllActiveTimers();
             clearInterval(strobeInterval);
+            clearAllBulletHoles();
             runOneShotReplayCycle();
-
-            const slot = document.getElementById("modalCloneSlot");
-            if (slot) {
-                slot.innerHTML = "";
-                const clone = document.getElementById("storyCaptureArea").cloneNode(true);
-                clone.id = "storyCaptureAreaClone";
-                clone.classList.add("modal-card-scale");
-                slot.appendChild(clone);
-                plantFixedBulletHoles(clone);
-            }
         }
 
         function closeImageOverlay() {
