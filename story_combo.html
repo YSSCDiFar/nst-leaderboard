@@ -562,26 +562,26 @@
             scheduleTimer(() => { setStrip('transparent', 0); }, duration);
         }
 
-        function createBulletHole(plateElement, rx = 50, ry = 50) {
-            if (!plateElement) return null;
-            const hole = document.createElement("div");
-            hole.className = "bullet-hole";
-            hole.style.left = rx + "%";
-            hole.style.top = ry + "%";
-            plateElement.appendChild(hole);
-            return hole;
+        // 核心同步函式：同時注入主畫面與彈窗內克隆的鋼板
+        function createBulletHole(plateId, rx = 50, ry = 50) {
+            const targets = [];
+            const mainPlate = document.querySelector(`#storyCaptureArea #${plateId}`);
+            if (mainPlate) targets.push(mainPlate);
+
+            const clonePlate = document.querySelector(`#modalCloneSlot #${plateId}`);
+            if (clonePlate) targets.push(clonePlate);
+
+            targets.forEach(plate => {
+                const hole = document.createElement("div");
+                hole.className = "bullet-hole";
+                hole.style.left = rx + "%";
+                hole.style.top = ry + "%";
+                plate.appendChild(hole);
+            });
         }
 
         function clearAllBulletHoles() {
             document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
-        }
-
-        function plantFixedBulletHoles(scope = document) {
-            const p1 = scope.getElementById ? scope.getElementById("plt-1") : scope.querySelector("#plt-1");
-            const p2 = scope.getElementById ? scope.getElementById("plt-2") : scope.querySelector("#plt-2");
-            createBulletHole(p1, 40, 45);
-            createBulletHole(p1, 60, 52);
-            createBulletHole(p2, 50, 45);
         }
 
         const firstShot = Math.min(800, recordedTimeSec * 400);
@@ -595,22 +595,22 @@
             clearAllBulletHoles();
             setStrip('transparent', 0);
 
-            const p1 = document.getElementById("plt-1");
-            const p2 = document.getElementById("plt-2");
-
+            // 第 1 發 (胸口 1 號板)
             scheduleTimer(() => {
                 flashStripOnly('#ffaa00', 140);
-                createBulletHole(p1, 40, 45);
+                createBulletHole('plt-1', 40, 45);
             }, shotDelays[0]);
 
+            // 第 2 發 (胸口 1 號板)
             scheduleTimer(() => {
                 flashStripOnly('#ffaa00', 140);
-                createBulletHole(p1, 60, 52);
+                createBulletHole('plt-1', 60, 52);
             }, shotDelays[1]);
 
+            // 第 3 發 (頭部 2 號板)
             scheduleTimer(() => {
                 flashStripOnly('#ff1a35', 160);
-                createBulletHole(p2, 50, 45);
+                createBulletHole('plt-2', 50, 45);
             }, shotDelays[2]);
 
             const strobeStart = shotDelays[2] + 250;
@@ -638,16 +638,25 @@
             runOneShotReplayCycle();
         };
 
+        // 開啟 Boomerang 彈窗：重置時序從 0 發開始，與主畫面同步播放動畫
         function openBoomerangModal() {
             const modal = document.getElementById("previewModal");
             const slot = document.getElementById("modalCloneSlot");
             slot.innerHTML = "";
+            
             const clone = document.getElementById("storyCaptureArea").cloneNode(true);
             clone.id = "storyCaptureAreaClone";
             clone.classList.add("modal-card-scale");
+            // 清理克隆體內部已有的彈孔殘影，由時序重新注入
+            clone.querySelectorAll(".bullet-hole").forEach(h => h.remove());
             slot.appendChild(clone);
-            plantFixedBulletHoles(clone);
+
             modal.style.display = "flex";
+
+            // 重置動畫迴圈，讓使用者一打開彈窗就看到 0發 -> 1發 -> 2發 -> 3發 -> 跑馬燈
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            runOneShotReplayCycle();
         }
 
         async function handleSaveOrShareCard() {
@@ -659,8 +668,12 @@
             clearAllActiveTimers();
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
+
+            // 強制在主畫面上釘好完整的 3 發彈孔
             clearAllBulletHoles();
-            plantFixedBulletHoles(document);
+            createBulletHole('plt-1', 40, 45);
+            createBulletHole('plt-1', 60, 52);
+            createBulletHole('plt-2', 50, 45);
 
             try {
                 const target = document.getElementById("storyCaptureArea");
@@ -685,17 +698,8 @@
         function triggerRestartForRecording() {
             clearAllActiveTimers();
             clearInterval(strobeInterval);
+            clearAllBulletHoles();
             runOneShotReplayCycle();
-
-            const slot = document.getElementById("modalCloneSlot");
-            if (slot) {
-                slot.innerHTML = "";
-                const clone = document.getElementById("storyCaptureArea").cloneNode(true);
-                clone.id = "storyCaptureAreaClone";
-                clone.classList.add("modal-card-scale");
-                slot.appendChild(clone);
-                plantFixedBulletHoles(clone);
-            }
         }
 
         function closeImageOverlay() {
