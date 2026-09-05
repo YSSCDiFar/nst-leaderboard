@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURONSTRIKE // GHOSTSTEEL AAR</title>
+    <title>NEURONSTRIKE // GHOSTSTEEL SHOT REPLAY</title>
     <!-- 戰術電競字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,24 +14,29 @@
 
     <style>
         :root {
-            --bg-deep: #05080c;
-            --cyan-core: #00f0ff;
-            --cyan-glow: rgba(0, 240, 255, 0.4);
-            --neon-green: #00ff66;
-            --neon-gold: #ffaa00;
-            --gold-glow: rgba(255, 170, 0, 0.45);
-            --neon-red: #ff1a35;
-            --text-dim: #617d9d;
-            --tac-black: #0b1117;
-            --tac-plate: #131d2a;
-            --tac-border: #1b2838;
+            --bg-deep: #030508;
+            --panel-bg: #06090e;
+            --cyan-core: #00d8e6;
+            --cyan-glow: rgba(0, 216, 230, 0.35);
+            --neon-green: #00e65c;
+            --neon-gold: #e6a800;
+            --gold-glow: rgba(230, 168, 0, 0.4);
+            --neon-red: #e62237;
+            --text-dim: #506477;
+            --tac-black: #05080c;
+            --tac-plate: #0c1219;
+            --tac-border: #141f2b;
+
+            /* 實時動態燈條顏色 */
+            --strip-color: transparent;
+            --strip-opacity: 0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: #020406;
-            color: #fff;
+            background-color: #010204;
+            color: #dce7f2;
             font-family: 'Share Tech Mono', monospace;
             display: flex;
             flex-direction: column;
@@ -40,12 +45,12 @@
             min-height: 100vh;
         }
 
-        /* 戰術 9:16 IG 限動畫布容器 (美感留白比例) */
+        /* 戰術 9:16 IG 限動畫布容器 */
         .story-wrapper {
             width: 360px;
             height: 640px;
-            background: radial-gradient(circle at top right, #0e1c2b, #05080c 85%);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: radial-gradient(circle at 50% 20%, #070c12 0%, #020406 85%);
+            border: 1px solid #162433;
             border-radius: 8px;
             padding: 18px 16px 14px 16px;
             display: flex;
@@ -53,11 +58,11 @@
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 35px rgba(0, 240, 255, 0.15);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.95);
         }
 
         .header-brand {
-            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            border-bottom: 1px solid #101a24;
             padding-bottom: 6px;
             display: flex;
             justify-content: space-between;
@@ -73,10 +78,26 @@
             text-shadow: 0 0 10px var(--cyan-glow);
         }
 
-        .brand-sub {
-            font-size: 0.58rem;
-            color: var(--text-dim);
-            letter-spacing: 1px;
+        .brand-sub { font-size: 0.58rem; color: var(--text-dim); letter-spacing: 1px; }
+
+        .live-tag {
+            font-size: 0.65rem;
+            color: var(--neon-gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-gold);
+            border-radius: 50%;
+            animation: pulseDot 0.8s infinite alternate;
+        }
+        @keyframes pulseDot {
+            from { opacity: 0.3; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-gold); }
         }
 
         .hero-section {
@@ -87,12 +108,7 @@
             z-index: 10;
         }
 
-        .operator-tag .lbl {
-            font-size: 0.55rem;
-            color: var(--text-dim);
-            letter-spacing: 1.5px;
-        }
-
+        .operator-tag .lbl { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 1.5px; }
         .operator-tag .name {
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
@@ -104,11 +120,11 @@
         /* 特戰鋼印評級徽章 */
         .grade-badge {
             text-align: center;
-            background: rgba(255, 170, 0, 0.06);
+            background: #090e14;
             border: 2px solid var(--neon-gold);
             padding: 2px 10px;
             border-radius: 4px;
-            box-shadow: 0 0 12px var(--gold-glow), inset 0 0 6px rgba(255, 170, 0, 0.2);
+            box-shadow: 0 0 12px var(--gold-glow), inset 0 0 6px rgba(230, 168, 0, 0.2);
             transform: rotate(-3deg);
             max-width: 115px;
             overflow: hidden;
@@ -121,26 +137,19 @@
             color: var(--neon-gold);
             letter-spacing: 1px;
             white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
             line-height: 1.2;
         }
 
-        /* 核心計時區塊 */
         .score-display {
-            background: rgba(0, 240, 255, 0.03);
-            border: 1px dashed rgba(0, 240, 255, 0.2);
+            background: #04070a;
+            border: 1px solid #101a24;
             border-radius: 6px;
             padding: 8px 10px;
             text-align: center;
             z-index: 10;
         }
 
-        .score-lbl {
-            font-size: 0.55rem;
-            color: var(--text-dim);
-            letter-spacing: 2px;
-        }
+        .score-lbl { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 2px; }
 
         .score-val {
             font-family: 'Orbitron', monospace;
@@ -160,8 +169,8 @@
         }
 
         .stat-card {
-            background: #090e16;
-            border: 1px solid rgba(0, 240, 255, 0.1);
+            background: #06090d;
+            border: 1px solid #0f1822;
             padding: 5px 2px;
             border-radius: 4px;
             text-align: center;
@@ -170,7 +179,7 @@
         .stat-card .lbl { font-size: 0.5rem; color: var(--text-dim); }
         .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* ─── 實體比例消光戰術鋼靶 (空出版面後的開闊呼吸感) ─── */
+        /* ─── 鋼靶與光纖燈條容器 ─── */
         .target-container {
             display: flex;
             flex-direction: column;
@@ -188,7 +197,19 @@
             border: 2px solid var(--tac-border);
             border-radius: 0 0 8px 8px;
             position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.95), 0 0 16px rgba(0, 240, 255, 0.08);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.95);
+        }
+
+        /* 軀幹外沿燈條 */
+        .led-edge-strip {
+            position: absolute;
+            inset: -4px;
+            border-radius: 0 0 12px 12px;
+            pointer-events: none;
+            box-shadow: 0 0 18px var(--strip-color), inset 0 0 6px var(--strip-color);
+            opacity: var(--strip-opacity);
+            transition: opacity 0.08s ease, box-shadow 0.08s ease;
+            z-index: 1;
         }
 
         .target-head {
@@ -202,7 +223,18 @@
             top: -48px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 1;
+            z-index: 2;
+        }
+
+        /* 頭部外沿燈條 */
+        .head-led-strip {
+            position: absolute;
+            inset: -4px;
+            border-radius: 14px 14px 0 0;
+            pointer-events: none;
+            box-shadow: 0 0 18px var(--strip-color), inset 0 0 6px var(--strip-color);
+            opacity: var(--strip-opacity);
+            transition: opacity 0.08s ease, box-shadow 0.08s ease;
         }
 
         .top-hang-hole {
@@ -230,7 +262,7 @@
         /* 1~8 號活動鋼板樣式 */
         .tac-plate {
             background: var(--tac-plate);
-            border: 1px solid var(--tac-border);
+            border: 1px solid #1d3345;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -238,42 +270,54 @@
             font-weight: 700;
             color: #556c82;
             position: absolute;
-            z-index: 2;
+            z-index: 3;
             overflow: visible;
+            transition: background 0.1s ease, box-shadow 0.1s ease, transform 0.1s ease;
         }
 
         #plt-2 { width: 36px; height: 36px; border-radius: 50%; top: 8px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
         #plt-3 { width: 60px; height: 20px; border-radius: 3px; top: 15px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; }
-        #plt-1 { width: 62px; height: 62px; border-radius: 50%; top: 48px; left: 50%; transform: translateX(-50%); font-size: 1.25rem; border-color: #4a3c18; color: #8c7634; }
+        #plt-1 { width: 62px; height: 62px; border-radius: 50%; top: 48px; left: 50%; transform: translateX(-50%); font-size: 1.25rem; border-color: #594719; color: #bfa048; }
         #plt-4 { width: 28px; height: 82px; border-radius: 3px; top: 40px; left: 8px; font-size: 0.85rem; }
         #plt-5 { width: 28px; height: 82px; border-radius: 3px; top: 40px; right: 8px; font-size: 0.85rem; }
         #plt-6 { width: 34px; height: 46px; border-radius: 3px; top: 162px; left: 18px; font-size: 0.85rem; }
         #plt-7 { width: 38px; height: 50px; border-radius: 3px; top: 170px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
         #plt-8 { width: 34px; height: 46px; border-radius: 3px; top: 162px; right: 18px; font-size: 0.85rem; }
 
+        /* 鋼板受彈瞬發高光 */
+        .plate-flash-a { background: var(--neon-red) !important; color: #fff !important; box-shadow: 0 0 25px var(--neon-red) !important; transform: scale(1.15) !important; }
+        #plt-2.plate-flash-a { transform: translateX(-50%) scale(1.15) !important; }
+        .plate-flash-b { background: var(--neon-gold) !important; color: #000 !important; box-shadow: 0 0 25px var(--neon-gold) !important; transform: scale(1.12) !important; }
+        #plt-1.plate-flash-b { transform: translateX(-50%) scale(1.12) !important; }
+        .plate-flash-c { background: var(--neon-green) !important; color: #000 !important; box-shadow: 0 0 25px var(--neon-green) !important; transform: scale(1.12) !important; }
+
+        /* 彈著孔（依射速烙印彈出） */
         .bullet-hole {
             position: absolute;
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: radial-gradient(circle at 35% 35%, #ffffff 15%, #222 75%, #000 100%);
-            box-shadow: 0 0 10px var(--neon-green), inset 0 0 2px #000;
-            border: 1.5px solid var(--neon-green);
-            transform: translate(-50%, -50%);
+            background: #d4ffea;
+            box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000;
+            border: 1px solid var(--neon-green);
+            transform: translate(-50%, -50%) scale(0);
             z-index: 25;
             pointer-events: none;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .bullet-hole.popped { transform: translate(-50%, -50%) scale(1); }
 
         .bullet-hole.charlie-hole {
-            box-shadow: 0 0 10px var(--cyan-core), inset 0 0 2px #000;
+            background: #d8f7ff;
+            box-shadow: 0 0 8px var(--cyan-core), inset 0 0 2px #000;
             border-color: var(--cyan-core);
         }
 
         .brand-pedestal {
             margin-top: 14px;
             padding: 4px 12px;
-            background: rgba(6, 12, 20, 0.85);
-            border: 1px solid #1a293b;
+            background: #05080c;
+            border: 1px solid #14202b;
             border-radius: 3px;
             display: inline-flex;
             align-items: center;
@@ -282,78 +326,120 @@
             font-size: 0.68rem;
             font-weight: 900;
             letter-spacing: 2.5px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
         }
-        .brand-pedestal .tag-p1 { color: var(--cyan-core); text-shadow: 0 0 8px var(--cyan-glow); }
-        .brand-pedestal .tag-p2 { color: var(--neon-gold); text-shadow: 0 0 8px var(--gold-glow); }
+        .brand-pedestal .tag-p1 { color: #5a829e; }
+        .brand-pedestal .tag-p2 { color: #9c8038; }
 
         .footer-stamp {
-            border-top: 1px solid rgba(0, 240, 255, 0.2);
+            border-top: 1px solid #101a24;
             padding-top: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.55rem;
+            font-size: 0.52rem;
             color: var(--text-dim);
             z-index: 10;
         }
 
+        /* ─── 終極賽博特戰 (Cyberpunk / Tactical) 操作區 ─── */
         .action-area {
             width: 360px;
-            margin-top: 10px;
+            margin-top: 12px;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .btn-webshare {
+        /* 主按鈕：錄製動動 (暗紅金屬戰術切角按鈕) */
+        .btn-motion {
             width: 100%;
-            background: linear-gradient(90deg, #00f0ff, #00ffaa);
-            color: #000;
-            border: none;
+            background: linear-gradient(135deg, #180a0d 0%, #2a1014 100%);
+            color: #ffaa00;
+            border: 1px solid #4d1c24;
             padding: 13px;
             font-family: 'Chakra Petch', sans-serif;
             font-size: 0.95rem;
             font-weight: 700;
             letter-spacing: 1.5px;
-            border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 0 20px var(--cyan-glow);
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
+            position: relative;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            transition: all 0.2s ease;
+            box-shadow: inset 0 0 12px rgba(255, 26, 53, 0.15), 0 4px 15px rgba(0,0,0,0.8);
+        }
+        .btn-motion::before {
+            content: "";
+            position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: #ffaa00;
+        }
+        .btn-motion:active {
+            background: #331218;
+            border-color: #ffaa00;
+            box-shadow: 0 0 16px rgba(255, 170, 0, 0.3);
+            transform: scale(0.99);
         }
 
-        .btn-leaderboard {
+        /* 次按鈕：儲存靜態卡 (軍規消光灰黑線框按鈕) */
+        .btn-webshare {
             width: 100%;
-            background: rgba(8, 14, 22, 0.95);
-            color: var(--neon-gold);
-            border: 1px solid #382c0e;
-            padding: 12px;
+            background: #090f17;
+            color: var(--cyan-core);
+            border: 1px solid #192e42;
+            padding: 11px;
             font-family: 'Chakra Petch', sans-serif;
             font-size: 0.88rem;
             font-weight: 700;
             letter-spacing: 1.5px;
-            border-radius: 5px;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s;
+            position: relative;
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            transition: all 0.2s ease;
         }
-        .btn-leaderboard:active {
-            background: #141a12;
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 12px var(--gold-glow);
+        .btn-webshare:active {
+            background: #111e2e;
+            border-color: var(--cyan-core);
+            box-shadow: 0 0 12px var(--cyan-glow);
         }
 
+        /* 第三按鈕：天梯排位 (低反差暗金邊線按鈕) */
+        .btn-leaderboard {
+            width: 100%;
+            background: #070a0f;
+            color: #8da4be;
+            border: 1px solid #1e2836;
+            padding: 10px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            transition: all 0.2s ease;
+        }
+        .btn-leaderboard:active {
+            background: #101622;
+            color: #fff;
+            border-color: #556c88;
+        }
+
+        /* 預覽彈窗 */
         .preview-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.92);
+            background: rgba(1, 2, 4, 0.96);
             z-index: 999;
             flex-direction: column;
             align-items: center;
@@ -361,21 +447,22 @@
             padding: 16px;
         }
 
-        .preview-modal img {
+        .preview-modal video, .preview-modal img {
             max-width: 85%;
             max-height: 75vh;
             border-radius: 6px;
-            border: 1px solid var(--cyan-core);
-            box-shadow: 0 0 25px var(--cyan-glow);
+            border: 1px solid #1e364f;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
         }
 
         .modal-hint {
             color: var(--neon-gold);
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: bold;
             margin-top: 14px;
             text-align: center;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -387,7 +474,10 @@
                 <div class="brand-title">NEURONSTRIKE</div>
                 <div class="brand-sub">TACTICAL CQB // GHOSTSTEEL OS</div>
             </div>
-            <div style="font-size: 0.65rem; color: var(--neon-green); font-weight: bold;">● VERIFIED AAR</div>
+            <div class="live-tag">
+                <span class="live-dot"></span>
+                <span>SHOT REPLAY LOOP</span>
+            </div>
         </div>
 
         <div class="hero-section">
@@ -419,10 +509,12 @@
             </div>
         </div>
 
-        <!-- 鋼靶展示區 (無促銷干擾，呼吸感拉滿) -->
         <div class="target-container">
             <div class="tac-steel-target">
+                <div class="led-edge-strip" id="ledEdgeStrip"></div>
+
                 <div class="target-head">
+                    <div class="head-led-strip" id="headLedStrip"></div>
                     <div class="top-hang-hole"></div>
                     <div class="tac-plate" id="plt-2">2</div>
                 </div>
@@ -439,7 +531,6 @@
                 <div class="tac-plate" id="plt-8">8</div>
             </div>
 
-            <!-- 戰術雙色懸浮銘牌 -->
             <div class="brand-pedestal">
                 <span class="tag-p1">NEURONSTRIKE</span>
                 <span class="tag-p2">TACTICAL</span>
@@ -452,26 +543,27 @@
         </div>
     </div>
 
-    <!-- 底部操作列 -->
+    <!-- 終極賽博特戰操作按鈕列 -->
     <div class="action-area">
-        <button class="btn-webshare" id="btnShare" onclick="handleGenerateShare()">
-            <span>📸</span> 產生高畫質限動卡 (SAVE & SHARE)
+        <button class="btn-motion" id="btnRecord" onclick="recordBoomerangMotion()">
+            <span>⚡</span> 下載 IG 動動短影片 (SAVE BOOMERANG)
+        </button>
+
+        <button class="btn-webshare" id="btnShare" onclick="handleGenerateStaticShare()">
+            <span>📸</span> 儲存高清靜態戰報 (SAVE IMAGE)
         </button>
 
         <button class="btn-leaderboard" id="btnLeaderboard" onclick="goToLeaderboard()">
             <span>🏆</span> 查看今日天梯排位 (LEADERBOARD)
         </button>
-
-        <div style="font-size: 0.62rem; color: var(--text-dim); text-align: center;">
-            長按戰報圖即可儲存或發送至 IG 限動
-        </div>
     </div>
 
-    <!-- 預覽彈窗 -->
+    <!-- 預覽 Modal -->
     <div class="preview-modal" id="previewModal" onclick="closeModal()">
-        <img id="generatedImg" src="" alt="Tactical Report">
-        <div class="modal-hint">👆 長按上方圖片 ➜ 加入「照片」或「分享」</div>
-        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 8px;">(點擊任意空白處關閉)</div>
+        <video id="previewVideo" autoplay loop muted playsinline style="display:none;"></video>
+        <img id="previewImg" src="" alt="Tactical Report" style="display:none;">
+        <div class="modal-hint" id="modalHint">👆 長按上方影片／圖片 儲存或分享至 IG 限動！</div>
+        <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意空白處關閉)</div>
     </div>
 
     <script>
@@ -479,15 +571,15 @@
         const name = params.get('name') || "OPERATOR_GHOST";
         const lane = params.get('lane') || "1";
         const mode = (params.get('mode') || "combo").toLowerCase();
-        const time = params.get('time') || "0.00";
+        const recordedTimeSec = Math.max(0.4, parseFloat(params.get('time')) || 1.82);
         const rank = params.get('rank') || (mode === "reaction" ? "ELITE" : "MASTER");
         const comboName = params.get('name') || "";
-        const code = params.get('code') || "";
+        const code = params.get('code') || "BBA";
         const zone = params.get('zone') || "B";
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
-        document.getElementById("dispScore").innerText = `${time}s`;
+        document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
         document.getElementById("dispRank").innerText = rank;
 
         const now = new Date();
@@ -503,106 +595,241 @@
             modeTitle.style.color = "var(--neon-gold)";
             actionTitle.innerText = `首發 1 擊 (${zone}區)`;
             scoreTitle.innerText = "FIRST-SHOT REACTION TIME";
-        }
-        else if (mode === "combo") {
+        } else if (mode === "combo") {
             modeTitle.innerText = "COMBO";
             modeTitle.style.color = "var(--neon-red)";
             actionTitle.innerText = comboName ? comboName.split(" ")[0] : (code || "3-HIT");
             scoreTitle.innerText = "TACTICAL COMBO TIME";
-        }
-        else if (mode === "random") {
+        } else if (mode === "random") {
             modeTitle.innerText = "COMMAND";
             modeTitle.style.color = "var(--neon-green)";
             actionTitle.innerText = `命中 ZONE ${zone}`;
             scoreTitle.innerText = "DECISION REACTION TIME";
-        }
-        else {
+        } else {
             modeTitle.innerText = "FREE FIRE";
             actionTitle.innerText = "自由校準";
             scoreTitle.innerText = "LAST SHOT TIME";
         }
 
-        function spawnBulletHole(plateElement, isCharlie = false) {
-            if (!plateElement) return;
+        function setStrip(color, opacity = 1) {
+            document.documentElement.style.setProperty('--strip-color', color);
+            document.documentElement.style.setProperty('--strip-opacity', opacity);
+        }
+
+        function flashPlateAndStrip(plateId, zone, duration = 140) {
+            const plate = document.getElementById(`plt-${plateId}`);
+            const cls = `plate-flash-${zone.toLowerCase()}`;
+            const colorMap = { A: '#ff1a35', B: '#ffaa00', C: '#00e65c' };
+            const stripColor = colorMap[zone] || '#00d8e6';
+
+            if (plate) plate.classList.add(cls);
+            setStrip(stripColor, 1);
+
+            setTimeout(() => {
+                if (plate) plate.classList.remove(cls);
+                setStrip('transparent', 0);
+            }, duration);
+        }
+
+        function createBulletHole(plateElement, isCharlie = false) {
+            if (!plateElement) return null;
             const hole = document.createElement("div");
             hole.className = "bullet-hole" + (isCharlie ? " charlie-hole" : "");
-            const randomX = Math.floor(Math.random() * 54) + 23;
-            const randomY = Math.floor(Math.random() * 54) + 23;
-            hole.style.left = randomX + "%";
-            hole.style.top = randomY + "%";
+            const rx = Math.floor(Math.random() * 52) + 24;
+            const ry = Math.floor(Math.random() * 52) + 24;
+            hole.style.left = rx + "%";
+            hole.style.top = ry + "%";
             plateElement.appendChild(hole);
+            return hole;
         }
 
-        const p1 = document.getElementById("plt-1");
-        const p2 = document.getElementById("plt-2");
-        const p3 = document.getElementById("plt-3");
-        const p4 = document.getElementById("plt-4");
-        const p5 = document.getElementById("plt-5");
-        const p7 = document.getElementById("plt-7");
-
-        if (mode === "reaction") {
-            if (zone === "A") spawnBulletHole(p2, false);
-            else if (zone === "B") spawnBulletHole(p1, false);
-            else spawnBulletHole(p4, true);
+        function clearAllBulletHoles() {
+            document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
         }
-        else if (mode === "combo") {
-            if (code === "B-B-A" || code === "BBA") {
-                spawnBulletHole(p1, false);
-                spawnBulletHole(p1, false);
-                spawnBulletHole(p2, false);
-            } else if (code === "A-A-A" || code === "AAA") {
-                spawnBulletHole(p2, false);
-                spawnBulletHole(p2, false);
-                spawnBulletHole(p3, false);
-            } else if (code === "C-B-A" || code === "CBA") {
-                spawnBulletHole(p4, true);
-                spawnBulletHole(p1, false);
-                spawnBulletHole(p2, false);
+
+        let shotDelays = [];
+        if (recordedTimeSec <= 1.2) {
+            shotDelays = [200, 200 + recordedTimeSec * 450, 200 + recordedTimeSec * 900];
+        } else {
+            const firstShot = Math.min(800, recordedTimeSec * 400);
+            const split = (recordedTimeSec * 1000 - firstShot) / 2;
+            shotDelays = [firstShot, firstShot + split, firstShot + split * 2];
+        }
+
+        let replayLoopTimer = null;
+
+        function runOneShotReplayCycle() {
+            clearAllBulletHoles();
+            setStrip('transparent', 0);
+
+            const p1 = document.getElementById("plt-1");
+            const p2 = document.getElementById("plt-2");
+            const p4 = document.getElementById("plt-4");
+
+            const isMozambique = (code === "B-B-A" || code === "BBA");
+            const shots = isMozambique
+                ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
+                : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
+
+            setTimeout(() => {
+                flashPlateAndStrip(shots[0].plt, shots[0].z, 140);
+                const h1 = createBulletHole(shots[0].elem, shots[0].charlie);
+                setTimeout(() => { if (h1) h1.classList.add('popped'); }, 20);
+            }, shotDelays[0]);
+
+            setTimeout(() => {
+                flashPlateAndStrip(shots[1].plt, shots[1].z, 140);
+                const h2 = createBulletHole(shots[1].elem, shots[1].charlie);
+                setTimeout(() => { if (h2) h2.classList.add('popped'); }, 20);
+            }, shotDelays[1]);
+
+            setTimeout(() => {
+                flashPlateAndStrip(shots[2].plt, shots[2].z, 160);
+                const h3 = createBulletHole(shots[2].elem, shots[2].charlie);
+                setTimeout(() => { if (h3) h3.classList.add('popped'); }, 20);
+            }, shotDelays[2]);
+
+            const strobeStartTime = shotDelays[2] + 250;
+            setTimeout(() => {
+                startModeStrobe(isMozambique);
+            }, strobeStartTime);
+
+            const totalCycleTime = strobeStartTime + 1800;
+            replayLoopTimer = setTimeout(() => {
+                stopModeStrobe();
+                runOneShotReplayCycle();
+            }, totalCycleTime);
+        }
+
+        let strobeInterval = null;
+        function startModeStrobe(isMozambique) {
+            let step = 0;
+            if (isMozambique) {
+                strobeInterval = setInterval(() => {
+                    const c = step % 2 === 0 ? 'var(--neon-red)' : '#0055ff';
+                    setStrip(c, 1);
+                    step++;
+                }, 80);
+            } else if (mode === "reaction") {
+                strobeInterval = setInterval(() => {
+                    const c = step % 2 === 0 ? 'var(--neon-gold)' : 'transparent';
+                    setStrip(c, step % 2 === 0 ? 1 : 0);
+                    step++;
+                }, 90);
             } else {
-                spawnBulletHole(p1, false);
-                spawnBulletHole(p7, false);
-                spawnBulletHole(p2, false);
+                const rainbow = ['#ff1a35', '#ffaa00', '#00e65c', '#00d8e6', '#b026ff'];
+                strobeInterval = setInterval(() => {
+                    setStrip(rainbow[step % rainbow.length], 1);
+                    step++;
+                }, 90);
             }
         }
-        else if (mode === "random") {
-            if (zone === "A") spawnBulletHole(p2, false);
-            else if (zone === "B") spawnBulletHole(p1, false);
-            else spawnBulletHole(p5, true);
-        }
-        else {
-            spawnBulletHole(p1, false);
-            spawnBulletHole(p1, false);
-            spawnBulletHole(p2, false);
-            spawnBulletHole(p4, true);
+
+        function stopModeStrobe() {
+            clearInterval(strobeInterval);
+            setStrip('transparent', 0);
         }
 
-        async function handleGenerateShare() {
-            if (typeof html2canvas === "undefined") {
-                alert("截圖引擎載入中，請稍候重試或手動截圖！");
-                return;
+        window.onload = () => {
+            runOneShotReplayCycle();
+        };
+
+        async function recordBoomerangMotion() {
+            const btn = document.getElementById("btnRecord");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "<span>🔴</span> RECORDING CYCLE...";
+            btn.disabled = true;
+
+            const targetElement = document.getElementById("storyCaptureArea");
+            const canvas = document.createElement("canvas");
+            canvas.width = 720;
+            canvas.height = 1280;
+            const ctx = canvas.getContext("2d");
+
+            const stream = canvas.captureStream(30);
+            let mediaRecorder;
+            try {
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+            } catch (e) {
+                mediaRecorder = new MediaRecorder(stream);
             }
 
+            const chunks = [];
+            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/mp4' });
+                const videoUrl = URL.createObjectURL(blob);
+
+                const modal = document.getElementById("previewModal");
+                const video = document.getElementById("previewVideo");
+                const img = document.getElementById("previewImg");
+
+                img.style.display = "none";
+                video.style.display = "block";
+                video.src = videoUrl;
+                document.getElementById("modalHint").innerText = "👆 戰術動動已就緒！長按影片存入相簿，直上 IG 限動！";
+                modal.style.display = "flex";
+
+                const a = document.createElement("a");
+                a.href = videoUrl;
+                a.download = `GHOSTSTEEL_LOOP_${Date.now()}.mp4`;
+                a.click();
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            };
+
+            clearTimeout(replayLoopTimer);
+            stopModeStrobe();
+            runOneShotReplayCycle();
+
+            mediaRecorder.start();
+
+            const recordDuration = Math.max(3000, shotDelays[2] + 2200);
+            const startTime = performance.now();
+
+            const renderInterval = setInterval(async () => {
+                const frameCanvas = await html2canvas(targetElement, {
+                    scale: 2,
+                    backgroundColor: "#020406",
+                    logging: false
+                });
+                ctx.drawImage(frameCanvas, 0, 0, 720, 1280);
+
+                if (performance.now() - startTime > recordDuration) {
+                    clearInterval(renderInterval);
+                    mediaRecorder.stop();
+                }
+            }, 66);
+        }
+
+        async function handleGenerateStaticShare() {
             const btn = document.getElementById("btnShare");
             const originalText = btn.innerHTML;
-            btn.innerHTML = "<span>⏳</span> 正在產生戰術圖卡...";
+            btn.innerHTML = "<span>⏳</span> GENERATING DOSSIER...";
             btn.disabled = true;
 
             try {
                 const captureElement = document.getElementById("storyCaptureArea");
                 const canvas = await html2canvas(captureElement, {
                     scale: 2,
-                    backgroundColor: "#05080c",
+                    backgroundColor: "#020406",
                     useCORS: true,
                     logging: false
                 });
 
                 const dataUrl = canvas.toDataURL("image/png");
                 const modal = document.getElementById("previewModal");
-                const img = document.getElementById("generatedImg");
+                const img = document.getElementById("previewImg");
+                const video = document.getElementById("previewVideo");
+
+                video.style.display = "none";
+                img.style.display = "block";
                 img.src = dataUrl;
+                document.getElementById("modalHint").innerText = "👆 長按上方圖片 ➜ 加入「照片」或「分享」";
                 modal.style.display = "flex";
             } catch (err) {
-                console.error("生成失敗:", err);
                 alert("截圖生成異常，請手動截圖保存！");
             } finally {
                 btn.innerHTML = originalText;
@@ -612,6 +839,9 @@
 
         function closeModal() {
             document.getElementById("previewModal").style.display = "none";
+            const video = document.getElementById("previewVideo");
+            video.pause();
+            video.src = "";
         }
 
         function goToLeaderboard() {
