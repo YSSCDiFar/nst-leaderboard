@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURONSTRIKE // GHOSTSTEEL MOTION AAR</title>
+    <title>NEURONSTRIKE // GHOSTSTEEL BOOMERANG AAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.min.js"></script>
 
     <style>
         :root {
@@ -185,7 +184,6 @@
             z-index: 10;
         }
 
-        /* 靶身核心：強制純黑背景，隔離外層任何樣式滲透 */
         .tac-steel-target {
             width: 190px;
             height: 245px;
@@ -193,20 +191,20 @@
             border: 2px solid var(--tac-border);
             border-radius: 0 0 8px 8px;
             position: relative;
-            box-shadow: inset 0 0 20px #000000;
+            box-shadow: inset 0 0 25px #000000;
             overflow: visible;
         }
 
-        /* 外圍燈條：純外圍 2px 線框，不使用任何擴散與背景色，杜絕滿版染色 */
         .led-edge-strip {
             position: absolute;
             inset: -4px;
             border-radius: 0 0 12px 12px;
             pointer-events: none;
             border: 2px solid var(--strip-color) !important;
-            background: none !important;
-            box-shadow: none !important;
+            background: transparent !important;
+            box-shadow: 0 0 12px var(--strip-color) !important;
             opacity: var(--strip-opacity);
+            transition: opacity 0.08s ease, border-color 0.08s ease;
             z-index: 1;
         }
 
@@ -230,9 +228,10 @@
             border-radius: 14px 14px 0 0;
             pointer-events: none;
             border: 2px solid var(--strip-color) !important;
-            background: none !important;
-            box-shadow: none !important;
+            background: transparent !important;
+            box-shadow: 0 0 12px var(--strip-color) !important;
             opacity: var(--strip-opacity);
+            transition: opacity 0.08s ease, border-color 0.08s ease;
         }
 
         .top-hang-hole {
@@ -257,10 +256,10 @@
         .shoulder-line-l { left: 44px; transform: rotate(-35deg); }
         .shoulder-line-r { right: 44px; transform: rotate(35deg); }
 
-        /* 鋼板：固定深藍灰色，完全不隨擊發變色 */
         .tac-plate {
             background: #0c1219 !important;
             border: 1px solid #1d3345 !important;
+            box-shadow: none !important;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -281,22 +280,21 @@
         #plt-7 { width: 38px; height: 50px; border-radius: 3px; top: 170px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
         #plt-8 { width: 34px; height: 46px; border-radius: 3px; top: 162px; right: 18px; font-size: 0.85rem; }
 
-        /* 彈著孔：精確綠色亮點 */
         .bullet-hole {
             position: absolute;
             width: 8px;
             height: 8px;
             border-radius: 50%;
             background: #ffffff;
-            box-shadow: 0 0 6px var(--neon-green), inset 0 0 2px #000;
-            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000;
+            border: 1.5px solid var(--neon-green);
             transform: translate(-50%, -50%);
             z-index: 25;
             pointer-events: none;
         }
 
         .bullet-hole.charlie-hole {
-            box-shadow: 0 0 6px var(--cyan-core), inset 0 0 2px #000;
+            box-shadow: 0 0 8px var(--cyan-core), inset 0 0 2px #000;
             border-color: var(--cyan-core);
         }
 
@@ -362,65 +360,106 @@
             transform: scale(0.99);
         }
 
+        /* 彈窗樣式 */
         .preview-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(1, 2, 4, 0.96);
+            background: rgba(1, 2, 4, 0.97);
             z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .modal-card-scale {
+            transform: scale(0.78);
+            transform-origin: top center;
+            box-shadow: 0 0 45px rgba(0, 216, 230, 0.3);
+            border-color: var(--cyan-core);
+            margin-bottom: -110px;
+        }
+
+        .modal-action-bar {
+            width: 330px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1005;
+        }
+
+        .btn-action-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0d1a24 0%, #172a3a 100%);
+            border: 1px solid var(--cyan-core);
+            color: var(--cyan-core);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(0, 216, 230, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-action-primary:active { transform: scale(0.98); }
+
+        .btn-action-record {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #200f13 0%, #36151a 100%);
+            border: 1px solid var(--neon-red);
+            color: #ffaa00;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(230, 34, 55, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-action-record:active { transform: scale(0.98); }
+
+        .record-tip-box {
+            background: rgba(14, 25, 36, 0.9);
+            border: 1px dashed #20455e;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+            text-align: center;
+        }
+        .record-tip-box strong { color: var(--neon-gold); }
+
+        /* 靜態圖預覽浮層 (長按直接存照片) */
+        .image-save-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1010;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 16px;
         }
-
-        .preview-card-box {
-            width: 330px;
-            height: 586px;
-            border-radius: 8px;
+        .image-save-overlay img {
+            max-width: 85%;
+            max-height: 75vh;
             border: 1px solid var(--cyan-core);
-            box-shadow: 0 0 35px rgba(0, 216, 230, 0.25);
-            overflow: hidden;
-            background: #000;
-        }
-
-        .preview-card-box img {
-            width: 100%;
-            height: 100%;
-            display: block;
-            object-fit: contain;
-        }
-
-        .download-gif-btn {
-            display: block;
-            margin-top: 14px;
-            width: 330px;
-            max-width: 100%;
-            text-align: center;
-            padding: 12px;
-            background: linear-gradient(135deg, #062018 0%, #063a2a 100%);
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            font-family: 'Chakra Petch', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            text-decoration: none;
+            box-shadow: 0 0 30px rgba(0, 216, 230, 0.3);
             border-radius: 6px;
-            box-shadow: 0 0 14px rgba(0, 230, 92, 0.25);
-        }
-        .download-gif-btn:active {
-            transform: scale(0.99);
-        }
-
-        .modal-hint {
-            color: var(--neon-gold);
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.88rem;
-            font-weight: bold;
-            margin-top: 14px;
-            text-align: center;
-            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -469,7 +508,6 @@
 
         <div class="target-container">
             <div class="tac-steel-target">
-                <!-- 光纖燈條：純外圍 2px 線框 -->
                 <div class="led-edge-strip" id="ledEdgeStrip"></div>
 
                 <div class="target-head">
@@ -504,22 +542,42 @@
 
     <!-- 終極戰術操作區 -->
     <div class="action-area">
-        <button class="btn-motion" id="btnRecord" onclick="captureFastMotionCard()">
-            <span>⚡</span> 產生動態戰報圖卡 (SAVE MOTION GIF)
+        <button class="btn-motion" id="btnRecord" onclick="openBoomerangModal()">
+            <span>⚡</span> 產生 IG Boomerang 動態戰報卡
         </button>
         <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 4px;">
-            純光纖細邊條爆閃＋彈孔烙印，點擊按鈕下載或長按加入相簿！
+            60FPS 絲滑循環重現，支援一鍵分享與錄製 IG 動動！
         </div>
     </div>
 
-    <!-- 完整等比預覽彈窗 -->
+    <!-- 60FPS Boomerang 彈窗 -->
     <div class="preview-modal" id="previewModal" onclick="closeModal(event)">
-        <div class="preview-card-box" onclick="event.stopPropagation()">
-            <img id="previewImg" src="" alt="Tactical Dossier">
+        <div id="modalCloneSlot" onclick="event.stopPropagation()"></div>
+        
+        <!-- 操作按鈕列 -->
+        <div class="modal-action-bar" onclick="event.stopPropagation()">
+            <button class="btn-action-primary" id="btnSaveCard" onclick="handleSaveOrShareCard()">
+                <span>📲</span> 儲存 / 分享戰報圖卡
+            </button>
+            <button class="btn-action-record" onclick="triggerRestartForRecording()">
+                <span>🎥</span> 重設循環 ➔ 啟動螢幕錄影 3 秒
+            </button>
+            <div class="record-tip-box">
+                💡 <strong>IG 限動秘訣</strong>：點擊重設後開啟手機內建「螢幕錄影」錄 3 秒，發 IG 限動即可無損呈現 60FPS Boomerang！
+            </div>
+            <div style="font-size: 0.65rem; color: #506477; text-align:center; cursor:pointer;" onclick="closeModal(event)">
+                [ 點擊此處或空白區關閉 ]
+            </div>
         </div>
-        <a id="downloadGifLink" class="download-gif-btn" style="display:none;" onclick="event.stopPropagation()">⬇ 下載動態圖卡 (GIF)</a>
-        <div class="modal-hint">👆 長按上方卡片 ➜ 加入「照片」或「分享」！</div>
-        <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意空白處關閉)</div>
+    </div>
+
+    <!-- 靜態圖長按儲存層 -->
+    <div class="image-save-overlay" id="imageSaveOverlay" onclick="closeImageOverlay()">
+        <img id="savedCardImg" src="" alt="Tactical Report" onclick="event.stopPropagation()">
+        <div style="color: var(--neon-gold); font-family: 'Chakra Petch', sans-serif; font-size: 0.88rem; font-weight: bold; margin-top: 14px; text-align:center;">
+            👆 長按上方圖片 ➜ 加入「照片」或「分享」！
+        </div>
+        <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意處返回動態彈窗)</div>
     </div>
 
     <script>
@@ -578,7 +636,6 @@
             activeTimers = [];
         }
 
-        // 純燈條細框控制
         function setStrip(color, opacity = 1) {
             document.documentElement.style.setProperty('--strip-color', color);
             document.documentElement.style.setProperty('--strip-opacity', opacity);
@@ -620,7 +677,7 @@
             shotDelays = [firstShot, firstShot + split, firstShot + split * 2];
         }
 
-        // ─── 實時 60FPS 原生流暢回放 ───
+        // ─── 60FPS 原生流暢回放狀態機 ───
         let replayLoopTimer = null;
         let strobeInterval = null;
 
@@ -637,31 +694,27 @@
                 ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
                 : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
 
-            // 第 1 發
             scheduleTimer(() => {
                 flashStripOnly(shots[0].z, 140);
                 createBulletHole(shots[0].elem, shots[0].charlie);
             }, shotDelays[0]);
 
-            // 第 2 發
             scheduleTimer(() => {
                 flashStripOnly(shots[1].z, 140);
                 createBulletHole(shots[1].elem, shots[1].charlie);
             }, shotDelays[1]);
 
-            // 第 3 發
             scheduleTimer(() => {
                 flashStripOnly(shots[2].z, 160);
                 createBulletHole(shots[2].elem, shots[2].charlie);
             }, shotDelays[2]);
 
-            // 第 4 階段跑馬燈
             const strobeStartTime = shotDelays[2] + 250;
             scheduleTimer(() => {
                 startModeStrobe(isMozambique);
             }, strobeStartTime);
 
-            return strobeStartTime + 1800;
+            return strobeStartTime + 1200;
         }
 
         function runOneShotReplayCycle() {
@@ -679,7 +732,7 @@
                     const c = step % 2 === 0 ? 'var(--neon-red)' : '#0055ff';
                     setStrip(c, 1);
                     step++;
-                }, 80);
+                }, 85);
             } else if (mode === "reaction") {
                 strobeInterval = setInterval(() => {
                     const c = step % 2 === 0 ? 'var(--neon-gold)' : 'transparent';
@@ -704,139 +757,91 @@
             runOneShotReplayCycle();
         };
 
-        // ─── 嚴格保證 0➔1➔2➔3 彈孔遞增 + 絕不染色錄製引擎 ───
-        let gifWorkerBlobUrl = null;
-        async function getSafeWorkerUrl() {
-            if (gifWorkerBlobUrl) return gifWorkerBlobUrl;
+        // ─── 彈窗控制 ───
+        function openBoomerangModal() {
+            const modal = document.getElementById("previewModal");
+            const slot = document.getElementById("modalCloneSlot");
+
+            slot.innerHTML = "";
+            const clone = document.getElementById("storyCaptureArea").cloneNode(true);
+            clone.id = "storyCaptureAreaClone";
+            clone.classList.add("modal-card-scale");
+            slot.appendChild(clone);
+
+            modal.style.display = "flex";
+        }
+
+        // 功能 1：極速 0.2 秒無感截圖並呼叫原生分享 / 長按存圖
+        async function handleSaveOrShareCard() {
+            const btn = document.getElementById("btnSaveCard");
+            const orig = btn.innerHTML;
+            btn.innerHTML = "<span>⏳</span> 正在生成高清戰報...";
+            btn.disabled = true;
+
             try {
-                const res = await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
-                const blob = await res.blob();
-                gifWorkerBlobUrl = URL.createObjectURL(blob);
-                return gifWorkerBlobUrl;
+                const target = document.getElementById("storyCaptureArea");
+                const canvas = await html2canvas(target, {
+                    scale: 2,
+                    backgroundColor: "#010204",
+                    logging: false
+                });
+
+                canvas.toBlob(async (blob) => {
+                    btn.innerHTML = orig;
+                    btn.disabled = false;
+
+                    // 1. 優先嘗試呼叫手機原生系統分享選單 (可直接儲存至相簿)
+                    if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'ghoststeel.png', { type: 'image/png' })] })) {
+                        try {
+                            const file = new File([blob], `GHOSTSTEEL_AAR_${Date.now()}.png`, { type: 'image/png' });
+                            await navigator.share({
+                                files: [file],
+                                title: 'NEURONSTRIKE TACTICAL REPORT',
+                                text: `特戰評級：${rank} | 成績：${recordedTimeSec.toFixed(2)}s`
+                            });
+                            return;
+                        } catch (err) {
+                            console.log("原生分享略過:", err);
+                        }
+                    }
+
+                    // 2. 備援方案：跳出高畫質預覽圖，長按直接加入照片
+                    const dataUrl = canvas.toDataURL("image/png");
+                    document.getElementById("savedCardImg").src = dataUrl;
+                    document.getElementById("imageSaveOverlay").style.display = "flex";
+                }, 'image/png');
+
             } catch (e) {
-                return "https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js";
+                btn.innerHTML = orig;
+                btn.disabled = false;
+                alert("生成異常，請手動截圖！");
             }
         }
 
-        async function captureFastMotionCard() {
-            const btn = document.getElementById("btnRecord");
-            if (btn.disabled) return;
-
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-
-            // 1. 完全終止螢幕上的定時器，徹底清除所有舊彈孔與燈效
+        // 功能 2：重設動畫循環，方便射手啟動螢幕錄影 3 秒
+        function triggerRestartForRecording() {
             clearAllActiveTimers();
             stopModeStrobe();
-            clearAllBulletHoles();
-            setStrip('transparent', 0);
+            runOneShotReplayCycle();
 
-            const target = document.getElementById("storyCaptureArea");
-            const p1 = document.getElementById("plt-1");
-            const p2 = document.getElementById("plt-2");
-            const p4 = document.getElementById("plt-4");
-
-            const isMozambique = (code === "B-B-A" || code === "BBA");
-            const shots = isMozambique
-                ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
-                : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
-
-            const holePositions = shots.map(() => ({
-                rx: Math.floor(Math.random() * 52) + 24,
-                ry: Math.floor(Math.random() * 52) + 24
-            }));
-
-            try {
-                btn.innerHTML = "<span>⚡</span> 準備錄製引擎...";
-                const workerUrl = await getSafeWorkerUrl();
-                
-                const gif = new GIF({
-                    workers: 2,
-                    quality: 10,
-                    workerScript: workerUrl,
-                    background: "#010204",
-                    width: 360,
-                    height: 640
-                });
-
-                // Frame 0: 空靶（0 個彈孔，燈條滅）
-                btn.innerHTML = "<span>🎬</span> 影格 0 (空靶)...";
-                let c0 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
-                gif.addFrame(c0, { delay: 180 });
-
-                // Frame 1: 第 1 發（燈條亮 + 產生第 1 顆彈孔）
-                btn.innerHTML = "<span>🎬</span> 影格 1 (第 1 發)...";
-                setStrip(shots[0].z === 'A' ? '#ff1a35' : (shots[0].z === 'B' ? '#ffaa00' : '#00e65c'), 1);
-                createBulletHole(shots[0].elem, shots[0].charlie, holePositions[0]);
-                let c1 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
-                gif.addFrame(c1, { delay: Math.max(160, Math.round(shotDelays[1] - shotDelays[0])) });
-
-                // Frame 2: 第 2 發（燈條亮 + 產生第 2 顆彈孔，第 1 顆保留）
-                btn.innerHTML = "<span>🎬</span> 影格 2 (第 2 發)...";
-                setStrip(shots[1].z === 'A' ? '#ff1a35' : (shots[1].z === 'B' ? '#ffaa00' : '#00e65c'), 1);
-                createBulletHole(shots[1].elem, shots[1].charlie, holePositions[1]);
-                let c2 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
-                gif.addFrame(c2, { delay: Math.max(160, Math.round(shotDelays[2] - shotDelays[1])) });
-
-                // Frame 3: 第 3 發（燈條亮 + 產生第 3 顆彈孔，前 2 顆保留）
-                btn.innerHTML = "<span>🎬</span> 影格 3 (第 3 發)...";
-                setStrip(shots[2].z === 'A' ? '#ff1a35' : (shots[2].z === 'B' ? '#ffaa00' : '#00e65c'), 1);
-                createBulletHole(shots[2].elem, shots[2].charlie, holePositions[2]);
-                let c3 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
-                gif.addFrame(c3, { delay: 240 });
-
-                // Frame 4~7: 慶祝跑馬燈（3 顆彈孔保持在靶上，純外圍燈條變色）
-                btn.innerHTML = "<span>⚡</span> 影格 4 (跑馬燈)...";
-                const strobeColors = isMozambique 
-                    ? ['var(--neon-red)', '#0055ff', 'var(--neon-red)', '#0055ff']
-                    : (mode === 'reaction' ? ['var(--neon-gold)', 'transparent', 'var(--neon-gold)', 'transparent'] : ['#ff1a35', '#00ff66', '#00d8e6', '#b026ff']);
-
-                for (let i = 0; i < strobeColors.length; i++) {
-                    setStrip(strobeColors[i], strobeColors[i] === 'transparent' ? 0 : 1);
-                    let cf = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
-                    gif.addFrame(cf, { delay: 140 });
-                }
-
-                btn.innerHTML = "<span>⚙️</span> 合成動態圖卡中...";
-
-                gif.on('finished', (blob) => {
-                    const gifUrl = URL.createObjectURL(blob);
-                    const modal = document.getElementById("previewModal");
-                    const img = document.getElementById("previewImg");
-                    const dlBtn = document.getElementById("downloadGifLink");
-
-                    img.src = gifUrl;
-                    dlBtn.href = gifUrl;
-                    dlBtn.download = `NEURONSTRIKE_${mode.toUpperCase()}_${Date.now()}.gif`;
-                    dlBtn.style.display = "block";
-
-                    modal.style.display = "flex";
-
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-
-                    runOneShotReplayCycle();
-                });
-
-                gif.render();
-
-            } catch (err) {
-                console.error("生成失敗:", err);
-                alert("生成異常，請重試！");
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                runOneShotReplayCycle();
+            // 若彈窗開著，同時更新彈窗內的鏡像
+            const slot = document.getElementById("modalCloneSlot");
+            if (slot) {
+                slot.innerHTML = "";
+                const clone = document.getElementById("storyCaptureArea").cloneNode(true);
+                clone.id = "storyCaptureAreaClone";
+                clone.classList.add("modal-card-scale");
+                slot.appendChild(clone);
             }
+        }
+
+        function closeImageOverlay() {
+            document.getElementById("imageSaveOverlay").style.display = "none";
         }
 
         function closeModal(e) {
             document.getElementById("previewModal").style.display = "none";
-            const img = document.getElementById("previewImg");
-            if (img.src && img.src.startsWith("blob:")) {
-                URL.revokeObjectURL(img.src);
-            }
-            img.src = "";
-            document.getElementById("downloadGifLink").style.display = "none";
+            document.getElementById("modalCloneSlot").innerHTML = "";
         }
     </script>
 </body>
