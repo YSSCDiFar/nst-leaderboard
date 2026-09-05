@@ -164,7 +164,6 @@
         .stat-card .lbl { font-size: 0.48rem; color: var(--text-dim); }
         .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* 鋼靶容器 */
         .target-container {
             display: flex;
             flex-direction: column;
@@ -448,8 +447,8 @@
                     <div class="val" style="color: var(--neon-gold);">REACTION</div>
                 </div>
                 <div class="stat-card">
-                    <div class="lbl">打擊目標</div>
-                    <div class="val" id="dispAction" style="color: var(--neon-green);">1號胸板</div>
+                    <div class="lbl">命中鋼板</div>
+                    <div class="val" id="dispAction" style="color: var(--neon-green);">--</div>
                 </div>
                 <div class="stat-card">
                     <div class="lbl">靶道編號</div>
@@ -531,11 +530,15 @@
         const lane = params.get('lane') || "1";
         const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 0.86);
         const rank = params.get('rank') || (recordedTimeSec < 1.0 ? "GODLIKE" : (recordedTimeSec <= 1.5 ? "ELITE" : (recordedTimeSec <= 2.0 ? "PASS" : "FAIL")));
+        
+        // 🎯 核心修復：精確接收大螢幕擊中的真實鋼板 (預設 1 號板)
+        const hitPlateId = parseInt(params.get('hits') || params.get('plate') || "1") || 1;
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
         document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
         document.getElementById("dispRank").innerText = rank;
+        document.getElementById("dispAction").innerText = `#${hitPlateId}號板`;
 
         const rankBadge = document.getElementById("dispRankBadge");
         const rankColors = {
@@ -572,10 +575,10 @@
         // 雙向同步注入彈孔 (主畫面 + 彈窗)
         function createBulletHole(plateId, rx = 50, ry = 50) {
             const targets = [];
-            const mainPlate = document.querySelector(`#storyCaptureArea #${plateId}`);
+            const mainPlate = document.querySelector(`#storyCaptureArea #plt-${plateId}`);
             if (mainPlate) targets.push(mainPlate);
 
-            const clonePlate = document.querySelector(`#modalCloneSlot #${plateId}`);
+            const clonePlate = document.querySelector(`#modalCloneSlot #plt-${plateId}`);
             if (clonePlate) targets.push(clonePlate);
 
             targets.forEach(plate => {
@@ -594,25 +597,24 @@
         let replayLoopTimer = null;
         let strobeInterval = null;
 
-        // ─── 亮燈模式比照 LaneFor4Mode.html ───
         function runReplayOnce() {
             clearAllBulletHoles();
             
             // 階段 1：等待信號中（全滅）
             setStrip('#000000', 0);
 
-            // 階段 2：嗶聲起跑 (FIRE) -> 亮全白光 (比照 LaneFor4Mode.html 第 415 行)
+            // 階段 2：嗶聲起跑 (FIRE) -> 亮全白光
             scheduleTimer(() => {
                 setStrip('#ffffff', 1.0);
             }, 300);
 
-            // 階段 3：射擊命中 1 號胸板 -> 烙印彈孔
+            // 階段 3：🎯 在大螢幕實際擊中的板塊上烙印彈孔
             const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
             scheduleTimer(() => {
-                createBulletHole('plt-1', 50, 50);
+                createBulletHole(hitPlateId, 50, 50);
             }, shotTime);
 
-            // 階段 4：命中後結算爆閃 (比照 LaneFor4Mode.html 第 435-455 行的評級亮燈邏輯)
+            // 階段 4：命中後結算爆閃 (比照 LaneFor4Mode.html 評級燈效)
             const strobeStart = shotTime + 200;
             scheduleTimer(() => {
                 let count = 0;
@@ -621,19 +623,19 @@
                 let flashSpeed = 50;
 
                 if (rank === "GODLIKE" || recordedTimeSec < 1.00) {
-                    strobeColor = 'var(--neon-gold)'; // 金光爆閃 5 次
+                    strobeColor = 'var(--neon-gold)';
                     flashCount = 5;
                     flashSpeed = 50;
                 } else if (rank === "ELITE" || recordedTimeSec <= 1.50) {
-                    strobeColor = '#ffffff';          // 白光爆閃 5 次
+                    strobeColor = '#ffffff';
                     flashCount = 5;
                     flashSpeed = 50;
                 } else if (rank === "PASS" || recordedTimeSec <= 2.00) {
-                    strobeColor = '#0055ff';          // 青藍光爆閃 4 次
+                    strobeColor = '#0055ff';
                     flashCount = 4;
                     flashSpeed = 60;
                 } else {
-                    strobeColor = '#ff1a35';          // 紅光慢閃 3 次
+                    strobeColor = '#ff1a35';
                     flashCount = 3;
                     flashSpeed = 150;
                 }
@@ -647,7 +649,7 @@
                     count++;
                     if (count >= flashCount * 2) {
                         clearInterval(strobeInterval);
-                        setStrip(strobeColor, 0.4); // 結尾呼吸微光
+                        setStrip(strobeColor, 0.4);
                     }
                 }, flashSpeed);
             }, strobeStart);
@@ -668,7 +670,6 @@
             runOneShotReplayCycle();
         };
 
-        // 開啟 Boomerang 彈窗
         function openBoomerangModal() {
             const modal = document.getElementById("previewModal");
             const slot = document.getElementById("modalCloneSlot");
@@ -698,9 +699,9 @@
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
 
-            // 釘死 1 號彈孔，保證截圖存在
+            // 釘死真實命中彈孔
             clearAllBulletHoles();
-            createBulletHole('plt-1', 50, 50);
+            createBulletHole(hitPlateId, 50, 50);
 
             try {
                 const target = document.getElementById("storyCaptureArea");
