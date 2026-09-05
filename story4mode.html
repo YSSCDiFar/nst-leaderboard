@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURONSTRIKE // GHOSTSTEEL SHOT REPLAY</title>
-    <!-- 戰術電競字體 -->
+    <title>NEURONSTRIKE // GHOSTSTEEL MOTION AAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
-    <!-- html2canvas 截圖引擎 -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.min.js"></script>
 
     <style>
         :root {
@@ -27,7 +26,6 @@
             --tac-plate: #0c1219;
             --tac-border: #141f2b;
 
-            /* 實時動態燈條顏色 */
             --strip-color: transparent;
             --strip-opacity: 0;
         }
@@ -45,7 +43,6 @@
             min-height: 100vh;
         }
 
-        /* 戰術 9:16 IG 限動畫布容器 */
         .story-wrapper {
             width: 360px;
             height: 640px;
@@ -117,7 +114,6 @@
             letter-spacing: 1px;
         }
 
-        /* 特戰鋼印評級徽章 */
         .grade-badge {
             text-align: center;
             background: #090e14;
@@ -179,7 +175,6 @@
         .stat-card .lbl { font-size: 0.5rem; color: var(--text-dim); }
         .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* ─── 鋼靶與光纖燈條容器 ─── */
         .target-container {
             display: flex;
             flex-direction: column;
@@ -200,15 +195,15 @@
             box-shadow: inset 0 0 20px rgba(0,0,0,0.95);
         }
 
-        /* 軀幹外沿燈條 */
         .led-edge-strip {
             position: absolute;
-            inset: -4px;
+            inset: -3px;
             border-radius: 0 0 12px 12px;
             pointer-events: none;
-            box-shadow: 0 0 18px var(--strip-color), inset 0 0 6px var(--strip-color);
+            border: 2px solid var(--strip-color);
+            box-shadow: 0 0 10px var(--strip-color);
             opacity: var(--strip-opacity);
-            transition: opacity 0.08s ease, box-shadow 0.08s ease;
+            transition: opacity 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
             z-index: 1;
         }
 
@@ -226,15 +221,15 @@
             z-index: 2;
         }
 
-        /* 頭部外沿燈條 */
         .head-led-strip {
             position: absolute;
-            inset: -4px;
+            inset: -3px;
             border-radius: 14px 14px 0 0;
             pointer-events: none;
-            box-shadow: 0 0 18px var(--strip-color), inset 0 0 6px var(--strip-color);
+            border: 2px solid var(--strip-color);
+            box-shadow: 0 0 10px var(--strip-color);
             opacity: var(--strip-opacity);
-            transition: opacity 0.08s ease, box-shadow 0.08s ease;
+            transition: opacity 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
         }
 
         .top-hang-hole {
@@ -259,7 +254,6 @@
         .shoulder-line-l { left: 44px; transform: rotate(-35deg); }
         .shoulder-line-r { right: 44px; transform: rotate(35deg); }
 
-        /* 1~8 號活動鋼板樣式 */
         .tac-plate {
             background: var(--tac-plate);
             border: 1px solid #1d3345;
@@ -272,7 +266,7 @@
             position: absolute;
             z-index: 3;
             overflow: visible;
-            transition: background 0.1s ease, box-shadow 0.1s ease, transform 0.1s ease;
+            transition: background 0.08s ease, box-shadow 0.08s ease;
         }
 
         #plt-2 { width: 36px; height: 36px; border-radius: 50%; top: 8px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
@@ -284,14 +278,10 @@
         #plt-7 { width: 38px; height: 50px; border-radius: 3px; top: 170px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
         #plt-8 { width: 34px; height: 46px; border-radius: 3px; top: 162px; right: 18px; font-size: 0.85rem; }
 
-        /* 鋼板受彈瞬發高光 */
-        .plate-flash-a { background: var(--neon-red) !important; color: #fff !important; box-shadow: 0 0 25px var(--neon-red) !important; transform: scale(1.15) !important; }
-        #plt-2.plate-flash-a { transform: translateX(-50%) scale(1.15) !important; }
-        .plate-flash-b { background: var(--neon-gold) !important; color: #000 !important; box-shadow: 0 0 25px var(--neon-gold) !important; transform: scale(1.12) !important; }
-        #plt-1.plate-flash-b { transform: translateX(-50%) scale(1.12) !important; }
-        .plate-flash-c { background: var(--neon-green) !important; color: #000 !important; box-shadow: 0 0 25px var(--neon-green) !important; transform: scale(1.12) !important; }
+        .plate-flash-a { border-color: var(--neon-red) !important; border-width: 2px !important; box-shadow: 0 0 8px var(--neon-red) !important; }
+        .plate-flash-b { border-color: var(--neon-gold) !important; border-width: 2px !important; box-shadow: 0 0 8px var(--neon-gold) !important; }
+        .plate-flash-c { border-color: var(--neon-green) !important; border-width: 2px !important; box-shadow: 0 0 8px var(--neon-green) !important; }
 
-        /* 彈著孔（依射速烙印彈出） */
         .bullet-hole {
             position: absolute;
             width: 8px;
@@ -300,12 +290,10 @@
             background: #d4ffea;
             box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000;
             border: 1px solid var(--neon-green);
-            transform: translate(-50%, -50%) scale(0);
+            transform: translate(-50%, -50%);
             z-index: 25;
             pointer-events: none;
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .bullet-hole.popped { transform: translate(-50%, -50%) scale(1); }
 
         .bullet-hole.charlie-hole {
             background: #d8f7ff;
@@ -341,24 +329,22 @@
             z-index: 10;
         }
 
-        /* ─── 終極賽博特戰 (Cyberpunk / Tactical) 操作區 ─── */
         .action-area {
             width: 360px;
-            margin-top: 12px;
+            margin-top: 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
-        /* 主按鈕：錄製動動 (暗紅金屬戰術切角按鈕) */
         .btn-motion {
             width: 100%;
             background: linear-gradient(135deg, #180a0d 0%, #2a1014 100%);
             color: #ffaa00;
             border: 1px solid #4d1c24;
-            padding: 13px;
+            padding: 14px;
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.98rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             cursor: pointer;
@@ -366,15 +352,9 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            position: relative;
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
             transition: all 0.2s ease;
             box-shadow: inset 0 0 12px rgba(255, 26, 53, 0.15), 0 4px 15px rgba(0,0,0,0.8);
-        }
-        .btn-motion::before {
-            content: "";
-            position: absolute; top: 0; left: 0; width: 4px; height: 100%;
-            background: #ffaa00;
         }
         .btn-motion:active {
             background: #331218;
@@ -383,58 +363,7 @@
             transform: scale(0.99);
         }
 
-        /* 次按鈕：儲存靜態卡 (軍規消光灰黑線框按鈕) */
-        .btn-webshare {
-            width: 100%;
-            background: #090f17;
-            color: var(--cyan-core);
-            border: 1px solid #192e42;
-            padding: 11px;
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.88rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-            transition: all 0.2s ease;
-        }
-        .btn-webshare:active {
-            background: #111e2e;
-            border-color: var(--cyan-core);
-            box-shadow: 0 0 12px var(--cyan-glow);
-        }
-
-        /* 第三按鈕：天梯排位 (低反差暗金邊線按鈕) */
-        .btn-leaderboard {
-            width: 100%;
-            background: #070a0f;
-            color: #8da4be;
-            border: 1px solid #1e2836;
-            padding: 10px;
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.82rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-            transition: all 0.2s ease;
-        }
-        .btn-leaderboard:active {
-            background: #101622;
-            color: #fff;
-            border-color: #556c88;
-        }
-
-        /* 預覽彈窗 */
+        /* 彈窗：等比手機限動框 */
         .preview-modal {
             display: none;
             position: fixed;
@@ -447,18 +376,68 @@
             padding: 16px;
         }
 
-        .preview-modal video, .preview-modal img {
-            max-width: 85%;
-            max-height: 75vh;
+        .preview-card-box {
+            width: 330px;
+            height: 586px;
+            border-radius: 8px;
+            border: 1px solid var(--cyan-core);
+            box-shadow: 0 0 35px rgba(0, 216, 230, 0.25);
+            overflow: hidden;
+            background: #000;
+        }
+
+        .preview-card-box img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .download-gif-btn {
+            display: block;
+            margin-top: 14px;
+            width: 330px;
+            max-width: 100%;
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #062018 0%, #063a2a 100%);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-decoration: none;
             border-radius: 6px;
-            border: 1px solid #1e364f;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.95);
+            box-shadow: 0 0 14px rgba(0, 230, 92, 0.25);
+        }
+        .download-gif-btn:active {
+            transform: scale(0.99);
+        }
+
+        .btn-motion-secondary {
+            width: 100%;
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--tac-border);
+            padding: 9px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 8px;
+            border-radius: 4px;
+        }
+        .btn-motion-secondary:active {
+            border-color: var(--cyan-core);
+            color: var(--cyan-core);
         }
 
         .modal-hint {
             color: var(--neon-gold);
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             font-weight: bold;
             margin-top: 14px;
             text-align: center;
@@ -509,6 +488,7 @@
             </div>
         </div>
 
+        <!-- 鋼靶展示區 (原生 60FPS 極速回放) -->
         <div class="target-container">
             <div class="tac-steel-target">
                 <div class="led-edge-strip" id="ledEdgeStrip"></div>
@@ -543,26 +523,25 @@
         </div>
     </div>
 
-    <!-- 終極賽博特戰操作按鈕列 -->
+    <!-- 終極戰術操作區 -->
     <div class="action-area">
-        <button class="btn-motion" id="btnRecord" onclick="recordBoomerangMotion()">
-            <span>⚡</span> 下載 IG 動動短影片 (SAVE BOOMERANG)
+        <button class="btn-motion" id="btnRecord" onclick="captureMotionCard()">
+            <span>⚡</span> 產生動態戰報圖卡 (SAVE MOTION)
         </button>
-
-        <button class="btn-webshare" id="btnShare" onclick="handleGenerateStaticShare()">
-            <span>📸</span> 儲存高清靜態戰報 (SAVE IMAGE)
+        <button class="btn-motion-secondary" id="btnRecordStatic" onclick="captureFlawlessCard()">
+            改用靜態高清圖卡（備援，不含動畫）
         </button>
-
-        <button class="btn-leaderboard" id="btnLeaderboard" onclick="goToLeaderboard()">
-            <span>🏆</span> 查看今日天梯排位 (LEADERBOARD)
-        </button>
+        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 6px;">
+            動態圖卡為 GIF 格式，彈窗後可直接下載，或長按圖片儲存！
+        </div>
     </div>
 
-    <!-- 預覽 Modal -->
-    <div class="preview-modal" id="previewModal" onclick="closeModal()">
-        <video id="previewVideo" autoplay loop muted playsinline style="display:none;"></video>
-        <img id="previewImg" src="" alt="Tactical Report" style="display:none;">
-        <div class="modal-hint" id="modalHint">👆 長按上方影片／圖片 儲存或分享至 IG 限動！</div>
+    <!-- 完整等比預覽彈窗 -->
+    <div class="preview-modal" id="previewModal" onclick="closeModal(event)">
+        <div class="preview-card-box" onclick="event.stopPropagation()">
+            <img id="previewImg" src="" alt="Tactical Dossier">
+        </div>
+        <div class="modal-hint">👆 長按上方卡片 ➜ 加入「照片」或「分享」！</div>
         <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意空白處關閉)</div>
     </div>
 
@@ -611,6 +590,21 @@
             scoreTitle.innerText = "LAST SHOT TIME";
         }
 
+        // 所有由回放邏輯排程的計時器都會被記錄在這裡，
+        // 這樣錄製動態圖卡前才能「連同尚未觸發的舊計時器」一起徹底清除，
+        // 否則舊一輪還沒觸發的擊發/滅燈計時器會在錄製過程中突然插進來，
+        // 造成靶子全部同時亮、彈著點重複出現的問題。
+        let activeTimers = [];
+        function scheduleTimer(fn, delay) {
+            const id = setTimeout(fn, delay);
+            activeTimers.push(id);
+            return id;
+        }
+        function clearAllActiveTimers() {
+            activeTimers.forEach(id => clearTimeout(id));
+            activeTimers = [];
+        }
+
         function setStrip(color, opacity = 1) {
             document.documentElement.style.setProperty('--strip-color', color);
             document.documentElement.style.setProperty('--strip-opacity', opacity);
@@ -625,22 +619,28 @@
             if (plate) plate.classList.add(cls);
             setStrip(stripColor, 1);
 
-            setTimeout(() => {
+            scheduleTimer(() => {
                 if (plate) plate.classList.remove(cls);
                 setStrip('transparent', 0);
             }, duration);
         }
 
-        function createBulletHole(plateElement, isCharlie = false) {
+        function createBulletHole(plateElement, isCharlie = false, pos = null) {
             if (!plateElement) return null;
             const hole = document.createElement("div");
             hole.className = "bullet-hole" + (isCharlie ? " charlie-hole" : "");
-            const rx = Math.floor(Math.random() * 52) + 24;
-            const ry = Math.floor(Math.random() * 52) + 24;
+            const rx = pos ? pos.rx : (Math.floor(Math.random() * 52) + 24);
+            const ry = pos ? pos.ry : (Math.floor(Math.random() * 52) + 24);
             hole.style.left = rx + "%";
             hole.style.top = ry + "%";
             plateElement.appendChild(hole);
             return hole;
+        }
+
+        function resetAllPlateFlashes() {
+            document.querySelectorAll(".tac-plate").forEach(p => {
+                p.classList.remove("plate-flash-a", "plate-flash-b", "plate-flash-c");
+            });
         }
 
         function clearAllBulletHoles() {
@@ -656,9 +656,13 @@
             shotDelays = [firstShot, firstShot + split, firstShot + split * 2];
         }
 
+        // ─── 60FPS 原生流暢回放狀態機 (保證絲滑、不卡頓) ───
         let replayLoopTimer = null;
+        let strobeInterval = null;
 
-        function runOneShotReplayCycle() {
+        // 執行「一次」完整的回放（不會自我排程下一輪）。
+        // 回傳這一輪動畫的總長度（毫秒），錄製動態圖卡時會用到這個時間長度。
+        function runReplayOnce() {
             clearAllBulletHoles();
             setStrip('transparent', 0);
 
@@ -671,37 +675,38 @@
                 ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
                 : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
 
-            setTimeout(() => {
+            scheduleTimer(() => {
                 flashPlateAndStrip(shots[0].plt, shots[0].z, 140);
-                const h1 = createBulletHole(shots[0].elem, shots[0].charlie);
-                setTimeout(() => { if (h1) h1.classList.add('popped'); }, 20);
+                createBulletHole(shots[0].elem, shots[0].charlie);
             }, shotDelays[0]);
 
-            setTimeout(() => {
+            scheduleTimer(() => {
                 flashPlateAndStrip(shots[1].plt, shots[1].z, 140);
-                const h2 = createBulletHole(shots[1].elem, shots[1].charlie);
-                setTimeout(() => { if (h2) h2.classList.add('popped'); }, 20);
+                createBulletHole(shots[1].elem, shots[1].charlie);
             }, shotDelays[1]);
 
-            setTimeout(() => {
+            scheduleTimer(() => {
                 flashPlateAndStrip(shots[2].plt, shots[2].z, 160);
-                const h3 = createBulletHole(shots[2].elem, shots[2].charlie);
-                setTimeout(() => { if (h3) h3.classList.add('popped'); }, 20);
+                createBulletHole(shots[2].elem, shots[2].charlie);
             }, shotDelays[2]);
 
             const strobeStartTime = shotDelays[2] + 250;
-            setTimeout(() => {
+            scheduleTimer(() => {
                 startModeStrobe(isMozambique);
             }, strobeStartTime);
 
-            const totalCycleTime = strobeStartTime + 1800;
-            replayLoopTimer = setTimeout(() => {
+            return strobeStartTime + 1800;
+        }
+
+        // 畫面閒置時的無限循環預覽（存檔錄製時會先暫停這個 loop）。
+        function runOneShotReplayCycle() {
+            const totalCycleTime = runReplayOnce();
+            replayLoopTimer = scheduleTimer(() => {
                 stopModeStrobe();
                 runOneShotReplayCycle();
             }, totalCycleTime);
         }
 
-        let strobeInterval = null;
         function startModeStrobe(isMozambique) {
             let step = 0;
             if (isMozambique) {
@@ -734,118 +739,268 @@
             runOneShotReplayCycle();
         };
 
-        async function recordBoomerangMotion() {
-            const btn = document.getElementById("btnRecord");
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "<span>🔴</span> RECORDING CYCLE...";
-            btn.disabled = true;
+        // ─── 動態戰報圖卡生成 (真・動畫 GIF，非單張截圖) ───
+        // 原理：html2canvas 本身只能截取「當下那一刻」的畫面，這就是舊版
+        // 「存檔只有單張照片」的根本原因。要保留動畫，必須在動畫播放的
+        // 過程中連續截圖，再用 gif.js 把這些畫格編碼成一支會動的 GIF。
+        let gifWorkerScriptUrl = null;
 
-            const targetElement = document.getElementById("storyCaptureArea");
-            const canvas = document.createElement("canvas");
-            canvas.width = 720;
-            canvas.height = 1280;
-            const ctx = canvas.getContext("2d");
-
-            const stream = canvas.captureStream(30);
-            let mediaRecorder;
-            try {
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
-            } catch (e) {
-                mediaRecorder = new MediaRecorder(stream);
-            }
-
-            const chunks = [];
-            mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(chunks, { type: 'video/mp4' });
-                const videoUrl = URL.createObjectURL(blob);
-
-                const modal = document.getElementById("previewModal");
-                const video = document.getElementById("previewVideo");
-                const img = document.getElementById("previewImg");
-
-                img.style.display = "none";
-                video.style.display = "block";
-                video.src = videoUrl;
-                document.getElementById("modalHint").innerText = "👆 戰術動動已就緒！長按影片存入相簿，直上 IG 限動！";
-                modal.style.display = "flex";
-
-                const a = document.createElement("a");
-                a.href = videoUrl;
-                a.download = `GHOSTSTEEL_LOOP_${Date.now()}.mp4`;
-                a.click();
-
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            };
-
-            clearTimeout(replayLoopTimer);
-            stopModeStrobe();
-            runOneShotReplayCycle();
-
-            mediaRecorder.start();
-
-            const recordDuration = Math.max(3000, shotDelays[2] + 2200);
-            const startTime = performance.now();
-
-            const renderInterval = setInterval(async () => {
-                const frameCanvas = await html2canvas(targetElement, {
-                    scale: 2,
-                    backgroundColor: "#020406",
-                    logging: false
-                });
-                ctx.drawImage(frameCanvas, 0, 0, 720, 1280);
-
-                if (performance.now() - startTime > recordDuration) {
-                    clearInterval(renderInterval);
-                    mediaRecorder.stop();
-                }
-            }, 66);
+        async function getGifWorkerScriptUrl() {
+            if (gifWorkerScriptUrl) return gifWorkerScriptUrl;
+            // 直接用 CDN 網址當 workerScript 在部分瀏覽器會有跨網域限制，
+            // 所以先 fetch 下來轉成同源的 Blob URL 再交給 gif.js 使用。
+            const resp = await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
+            const blob = await resp.blob();
+            gifWorkerScriptUrl = URL.createObjectURL(blob);
+            return gifWorkerScriptUrl;
         }
 
-        async function handleGenerateStaticShare() {
-            const btn = document.getElementById("btnShare");
+        function showGifDownloadLink(url) {
+            let dl = document.getElementById("downloadGifLink");
+            if (!dl) {
+                dl = document.createElement("a");
+                dl.id = "downloadGifLink";
+                dl.className = "download-gif-btn";
+                dl.onclick = (e) => e.stopPropagation();
+                document.querySelector(".preview-card-box").insertAdjacentElement("afterend", dl);
+            }
+            dl.href = url;
+            dl.download = `neuronstrike_motion_${Date.now()}.gif`;
+            dl.textContent = "⬇ 下載動態圖卡 (GIF)";
+        }
+
+        // 依照「已經過去的虛擬時間」直接算出畫面該長怎樣，並套用到 DOM。
+        // 這是修正「靶子全部同時亮、彈著點重複」的關鍵：
+        // 舊版做法是用 setTimeout 排程特效，但 html2canvas 每次截圖都會讓主執行緒
+        // 卡住一小段時間，卡住期間所有排定的 setTimeout 會被延遲、擠在一起，
+        // 一次全部觸發，導致好幾個特效同時生效、彈著點被建立超過一次。
+        // 改成「每一格截圖前，都用經過的時間重新計算一次完整狀態」就不會有這個問題，
+        // 因為每一次套用都是獨立、完整、不疊加的。
+        function buildReplayScript() {
+            const p1 = document.getElementById("plt-1");
+            const p2 = document.getElementById("plt-2");
+            const p4 = document.getElementById("plt-4");
+
+            const isMozambique = (code === "B-B-A" || code === "BBA");
+            const shots = isMozambique
+                ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
+                : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
+
+            const shotDurations = [140, 140, 160];
+            const strobeStartTime = shotDelays[2] + 250;
+            const totalCycleTime = strobeStartTime + 1800;
+
+            return {
+                shots,
+                shotDurations,
+                isMozambique,
+                strobeStartTime,
+                totalCycleTime,
+                holeCreated: [false, false, false],
+                // 彈著點位置預先算好、只用一次，確保「一顆彈只會出現一次、位置固定」
+                holePositions: shots.map(() => ({
+                    rx: Math.floor(Math.random() * 52) + 24,
+                    ry: Math.floor(Math.random() * 52) + 24
+                }))
+            };
+        }
+
+        function applyReplayStateAtTime(t, ctx) {
+            const colorMap = { A: '#ff1a35', B: '#ffaa00', C: '#00e65c' };
+            let activeStripColor = null;
+
+            ctx.shots.forEach((s, i) => {
+                const start = shotDelays[i];
+                const dur = ctx.shotDurations[i];
+                const cls = `plate-flash-${s.z.toLowerCase()}`;
+                const isActive = t >= start && t < start + dur;
+
+                if (s.elem) {
+                    if (isActive) s.elem.classList.add(cls);
+                    else s.elem.classList.remove(cls);
+                }
+
+                if (isActive) activeStripColor = colorMap[s.z] || '#00d8e6';
+
+                // 每一顆彈著點只在「第一次時間到」時建立一次，之後即使重複套用也不會再新增
+                if (t >= start && !ctx.holeCreated[i]) {
+                    ctx.holeCreated[i] = true;
+                    createBulletHole(s.elem, s.charlie, ctx.holePositions[i]);
+                }
+            });
+
+            if (t < ctx.strobeStartTime) {
+                if (activeStripColor) setStrip(activeStripColor, 1);
+                else setStrip('transparent', 0);
+                return;
+            }
+
+            if (t < ctx.totalCycleTime) {
+                const dt = t - ctx.strobeStartTime;
+                if (ctx.isMozambique) {
+                    const step = Math.floor(dt / 80);
+                    setStrip(step % 2 === 0 ? 'var(--neon-red)' : '#0055ff', 1);
+                } else if (mode === "reaction") {
+                    const step = Math.floor(dt / 90);
+                    setStrip(step % 2 === 0 ? 'var(--neon-gold)' : 'transparent', step % 2 === 0 ? 1 : 0);
+                } else {
+                    const rainbow = ['#ff1a35', '#ffaa00', '#00e65c', '#00d8e6', '#b026ff'];
+                    const step = Math.floor(dt / 90);
+                    setStrip(rainbow[step % rainbow.length], 1);
+                }
+                return;
+            }
+
+            setStrip('transparent', 0);
+        }
+
+        async function captureMotionCard() {
+            const btn = document.getElementById("btnRecord");
+            const staticBtn = document.getElementById("btnRecordStatic");
+            if (btn.disabled) return;
+
             const originalText = btn.innerHTML;
-            btn.innerHTML = "<span>⏳</span> GENERATING DOSSIER...";
             btn.disabled = true;
+            staticBtn.disabled = true;
+
+            // 徹底清掉畫面上原本無限循環預覽「還沒觸發」的舊計時器，
+            // 並重置所有殘留的亮燈/彈孔，確保錄製從乾淨狀態開始。
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            clearAllBulletHoles();
+            resetAllPlateFlashes();
+            setStrip('transparent', 0);
+
+            const target = document.getElementById("storyCaptureArea");
+            const scale = 1.3; // 在畫質與截圖速度之間取平衡，太高會讓錄製過程變很慢
 
             try {
-                const captureElement = document.getElementById("storyCaptureArea");
-                const canvas = await html2canvas(captureElement, {
+                btn.innerHTML = "<span>⚙️</span> 初始化錄製引擎...";
+                const workerScript = await getGifWorkerScriptUrl();
+
+                const rect = target.getBoundingClientRect();
+                const gif = new GIF({
+                    workers: 2,
+                    quality: 8,
+                    workerScript,
+                    background: "#010204",
+                    width: Math.round(rect.width * scale),
+                    height: Math.round(rect.height * scale)
+                });
+
+                const ctx = buildReplayScript();
+                const captureDuration = ctx.totalCycleTime + 200; // 多留一點緩衝，收尾更完整
+
+                const startTime = performance.now();
+                let lastTime = startTime;
+                let frameCount = 0;
+
+                applyReplayStateAtTime(0, ctx);
+
+                // 在錄製期間，每一格截圖前都先用「已經過去的時間」重新算出正確畫面，
+                // 再截圖存成 GIF 的一格，動畫的節奏會照實際經過的時間走，不會卡在一起。
+                while (true) {
+                    const elapsed = performance.now() - startTime;
+                    if (elapsed > captureDuration) break;
+
+                    applyReplayStateAtTime(elapsed, ctx);
+
+                    const canvas = await html2canvas(target, {
+                        scale,
+                        backgroundColor: "#010204",
+                        useCORS: true,
+                        logging: false
+                    });
+                    const now = performance.now();
+                    const delay = Math.max(40, Math.round(now - lastTime));
+                    gif.addFrame(canvas, { delay, copy: true });
+                    lastTime = now;
+                    frameCount++;
+                    btn.innerHTML = `<span>🎬</span> 擷取動態影格中 (${frameCount})...`;
+                }
+
+                // 收尾：確保最後畫面是乾淨的（燈條熄滅、無殘留亮燈）
+                applyReplayStateAtTime(ctx.totalCycleTime, ctx);
+                resetAllPlateFlashes();
+
+                btn.innerHTML = "<span>⚙️</span> 編碼動態圖卡中，請稍候...";
+
+                gif.on("finished", (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const modal = document.getElementById("previewModal");
+                    const img = document.getElementById("previewImg");
+                    img.src = url;
+                    modal.style.display = "flex";
+                    showGifDownloadLink(url);
+
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    staticBtn.disabled = false;
+
+                    // 錄製結束後，恢復畫面上的無限循環預覽
+                    runOneShotReplayCycle();
+                });
+
+                gif.render();
+
+            } catch (err) {
+                console.error("動態圖卡生成失敗:", err);
+                alert("動態圖卡生成失敗，請重試，或改用下方靜態圖卡備援！");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                staticBtn.disabled = false;
+                runOneShotReplayCycle();
+            }
+        }
+
+        // ─── 單次超高畫質截圖生成 (極速、零破圖、保證清晰；動態圖卡的備援方案) ───
+        async function captureFlawlessCard() {
+            const btn = document.getElementById("btnRecordStatic");
+            const motionBtn = document.getElementById("btnRecord");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "正在生成高清圖卡...";
+            btn.disabled = true;
+            motionBtn.disabled = true;
+
+            const targetElement = document.getElementById("storyCaptureArea");
+
+            try {
+                const canvas = await html2canvas(targetElement, {
                     scale: 2,
-                    backgroundColor: "#020406",
+                    backgroundColor: "#010204",
                     useCORS: true,
                     logging: false
                 });
 
-                const dataUrl = canvas.toDataURL("image/png");
                 const modal = document.getElementById("previewModal");
                 const img = document.getElementById("previewImg");
-                const video = document.getElementById("previewVideo");
-
-                video.style.display = "none";
-                img.style.display = "block";
-                img.src = dataUrl;
-                document.getElementById("modalHint").innerText = "👆 長按上方圖片 ➜ 加入「照片」或「分享」";
+                img.src = canvas.toDataURL("image/png");
                 modal.style.display = "flex";
+                removeGifDownloadLink();
+
             } catch (err) {
-                alert("截圖生成異常，請手動截圖保存！");
+                console.error("生成失敗:", err);
+                alert("生成異常，請重試！");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+                motionBtn.disabled = false;
             }
         }
 
-        function closeModal() {
-            document.getElementById("previewModal").style.display = "none";
-            const video = document.getElementById("previewVideo");
-            video.pause();
-            video.src = "";
+        function removeGifDownloadLink() {
+            const dl = document.getElementById("downloadGifLink");
+            if (dl) dl.remove();
         }
 
-        function goToLeaderboard() {
-            window.location.href = `index.html?highlight=${encodeURIComponent(name)}`;
+        function closeModal(e) {
+            document.getElementById("previewModal").style.display = "none";
+            const img = document.getElementById("previewImg");
+            if (img.src && img.src.startsWith("blob:")) {
+                URL.revokeObjectURL(img.src);
+            }
+            img.src = "";
+            removeGifDownloadLink();
         }
     </script>
 </body>
