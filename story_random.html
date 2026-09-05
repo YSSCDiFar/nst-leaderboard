@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEURONSTRIKE // COMMAND RANDOM AAR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #030508;
+            --panel-bg: #06090e;
+            --cyan-core: #00d8e6;
+            --cyan-glow: rgba(0, 216, 230, 0.35);
+            --neon-green: #00e65c;
+            --neon-gold: #e6a800;
+            --neon-red: #e62237;
+            --text-dim: #506477;
+            --tac-black: #05080c;
+            --tac-plate: #0c1219;
+            --tac-border: #141f2b;
+            --strip-color: transparent;
+            --strip-opacity: 0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #010204;
+            color: #dce7f2;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px;
+            min-height: 100vh;
+        }
+
+        .story-wrapper {
+            width: 360px;
+            height: 640px;
+            background: radial-gradient(circle at 50% 20%, #070c12 0%, #020406 85%);
+            border: 1px solid #162433;
+            border-radius: 8px;
+            padding: 16px 14px 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.95);
+        }
+
+        .header-brand {
+            border-bottom: 1px solid #101a24;
+            padding-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            color: var(--cyan-core);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .brand-sub { font-size: 0.58rem; color: var(--text-dim); letter-spacing: 1px; }
+
+        .live-tag {
+            font-size: 0.65rem;
+            color: var(--neon-green);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            animation: pulseDot 0.8s infinite alternate;
+        }
+        @keyframes pulseDot {
+            from { opacity: 0.3; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-green); }
+        }
+
+        .hero-section {
+            margin: 4px 0 2px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .operator-tag .lbl { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 1.5px; }
+        .operator-tag .name {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .grade-badge {
+            text-align: center;
+            background: #090e14;
+            border: 2px solid var(--neon-green);
+            padding: 2px 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(0, 230, 92, 0.3);
+            transform: rotate(-2deg);
+        }
+        .grade-badge .grade {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.0rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            letter-spacing: 1px;
+        }
+
+        .score-display {
+            background: #04070a;
+            border: 1px solid #101a24;
+            border-radius: 6px;
+            padding: 6px 10px;
+            text-align: center;
+            z-index: 10;
+        }
+        .score-lbl { font-size: 0.52rem; color: var(--text-dim); letter-spacing: 2px; }
+        .score-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 18px rgba(0, 230, 92, 0.4);
+            line-height: 1.05;
+            margin: 2px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .stat-card {
+            background: #06090d;
+            border: 1px solid #0f1822;
+            padding: 4px 2px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-card .lbl { font-size: 0.48rem; color: var(--text-dim); }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: bold; color: #fff; margin-top: 2px; }
+
+        .target-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 24px 0 6px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tac-steel-target {
+            width: 200px;
+            height: 260px;
+            background: #05080c !important;
+            border: 2px solid var(--tac-border);
+            border-radius: 0 0 10px 10px;
+            position: relative;
+            box-shadow: inset 0 0 25px #000000;
+        }
+
+        .led-edge-strip {
+            position: absolute;
+            inset: -4px;
+            border-radius: 0 0 14px 14px;
+            pointer-events: none;
+            border: 2px solid var(--strip-color) !important;
+            background: transparent !important;
+            box-shadow: 0 0 14px var(--strip-color) !important;
+            opacity: var(--strip-opacity);
+            transition: opacity 0.08s ease, border-color 0.08s ease;
+            z-index: 1;
+        }
+
+        .target-head {
+            width: 76px;
+            height: 52px;
+            background: #05080c !important;
+            border: 2px solid var(--tac-border);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        .head-led-strip {
+            position: absolute;
+            inset: -4px;
+            border-radius: 14px 14px 0 0;
+            pointer-events: none;
+            border: 2px solid var(--strip-color) !important;
+            background: transparent !important;
+            box-shadow: 0 0 14px var(--strip-color) !important;
+            opacity: var(--strip-opacity);
+            transition: opacity 0.08s ease, border-color 0.08s ease;
+        }
+
+        .top-hang-hole {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #000;
+            border: 1px solid #334455;
+        }
+
+        .tac-plate {
+            background: #0c1219 !important;
+            border: 1px solid #1d3345 !important;
+            box-shadow: none !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Share Tech Mono', sans-serif;
+            font-weight: 700;
+            color: #556c82;
+            position: absolute;
+            z-index: 3;
+            overflow: visible;
+        }
+
+        #plt-2 { width: 40px; height: 38px; border-radius: 4px; top: 6px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
+        #plt-3 { width: 78px; height: 26px; border-radius: 3px; top: 14px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
+        #plt-1 { width: 66px; height: 66px; border-radius: 50%; top: 72px; left: 50%; transform: translateX(-50%); font-size: 1.3rem; }
+        #plt-4 { width: 30px; height: 86px; border-radius: 3px; top: 40px; left: 8px; font-size: 0.85rem; }
+        #plt-5 { width: 30px; height: 86px; border-radius: 3px; top: 40px; right: 8px; font-size: 0.85rem; }
+        #plt-6 { width: 36px; height: 50px; border-radius: 3px; top: 175px; left: 16px; font-size: 0.85rem; }
+        #plt-7 { width: 42px; height: 54px; border-radius: 3px; top: 185px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
+        #plt-8 { width: 36px; height: 50px; border-radius: 3px; top: 175px; right: 16px; font-size: 0.85rem; }
+
+        .bullet-hole {
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #ffffff !important;
+            box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000 !important;
+            border: 1.5px solid var(--neon-green) !important;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .brand-pedestal {
+            margin-top: 14px;
+            padding: 4px 12px;
+            background: #05080c;
+            border: 1px solid #14202b;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+        }
+        .brand-pedestal .tag-p1 { color: #5a829e; }
+        .brand-pedestal .tag-p2 { color: #9c8038; }
+
+        .footer-stamp {
+            border-top: 1px solid #101a24;
+            padding-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.52rem;
+            color: var(--text-dim);
+            z-index: 10;
+        }
+
+        .action-area {
+            width: 360px;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-motion {
+            width: 100%;
+            background: linear-gradient(135deg, #180a0d 0%, #2a1014 100%);
+            color: #ffaa00;
+            border: 1px solid #4d1c24;
+            padding: 13px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            box-shadow: inset 0 0 12px rgba(255, 26, 53, 0.15), 0 4px 15px rgba(0,0,0,0.8);
+        }
+
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(1, 2, 4, 0.97);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .modal-card-scale {
+            transform: scale(0.78);
+            transform-origin: top center;
+            box-shadow: 0 0 45px rgba(0, 230, 92, 0.3);
+            border-color: var(--neon-green);
+            margin-bottom: -115px;
+        }
+
+        .modal-action-bar {
+            width: 330px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1005;
+        }
+
+        .btn-action-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #062018 0%, #063a2a 100%);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(0, 230, 92, 0.2);
+        }
+
+        .btn-action-record {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #200f13 0%, #36151a 100%);
+            border: 1px solid var(--neon-red);
+            color: #ffaa00;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .record-tip-box {
+            background: rgba(14, 25, 36, 0.9);
+            border: 1px dashed #20455e;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            text-align: center;
+        }
+
+        .image-save-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1010;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .image-save-overlay img {
+            max-width: 85%;
+            max-height: 75vh;
+            border: 1px solid var(--neon-green);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="story-wrapper" id="storyCaptureArea">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">NEURONSTRIKE</div>
+                <div class="brand-sub">TACTICAL CQB // GHOSTSTEEL OS</div>
+            </div>
+            <div class="live-tag">
+                <span class="live-dot"></span>
+                <span>COMMAND RANDOM</span>
+            </div>
+        </div>
+
+        <div class="hero-section">
+            <div class="operator-tag">
+                <div class="lbl">CALLSIGN // 射手呼號</div>
+                <div class="name" id="dispName">OPERATOR_GHOST</div>
+            </div>
+            <div class="grade-badge">
+                <div class="grade" id="dispRank">MASTER</div>
+            </div>
+        </div>
+
+        <div class="score-display">
+            <div class="score-lbl">DECISION REACTION TIME</div>
+            <div class="score-val" id="dispScore">0.00s</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="lbl">特訓模式</div>
+                    <div class="val" style="color: var(--neon-green);">COMMAND</div>
+                </div>
+                <div class="stat-card">
+                    <div class="lbl">命中板塊</div>
+                    <div class="val" id="dispAction" style="color: var(--neon-green);">指定板塊</div>
+                </div>
+                <div class="stat-card">
+                    <div class="lbl">靶道編號</div>
+                    <div class="val" id="dispLane">LANE 1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 鋼靶系統 (1~8 號活動鋼板配置) -->
+        <div class="target-container">
+            <div class="tac-steel-target">
+                <div class="led-edge-strip" id="ledEdgeStrip"></div>
+
+                <div class="target-head">
+                    <div class="head-led-strip" id="headLedStrip"></div>
+                    <div class="top-hang-hole"></div>
+                    <div class="tac-plate" id="plt-2">2</div>
+                </div>
+
+                <div class="tac-plate" id="plt-3">3</div>
+                <div class="tac-plate" id="plt-1">1</div>
+                <div class="tac-plate" id="plt-4">4</div>
+                <div class="tac-plate" id="plt-5">5</div>
+                <div class="tac-plate" id="plt-6">6</div>
+                <div class="tac-plate" id="plt-7">7</div>
+                <div class="tac-plate" id="plt-8">8</div>
+            </div>
+
+            <div class="brand-pedestal">
+                <span class="tag-p1">NEURONSTRIKE</span>
+                <span class="tag-p2">TACTICAL</span>
+            </div>
+        </div>
+
+        <div class="footer-stamp">
+            <span id="dispDate">2026.09.05 // TACTICAL LAB</span>
+            <span>IDPA ACCREDITED STEEL</span>
+        </div>
+    </div>
+
+    <div class="action-area">
+        <button class="btn-motion" onclick="openBoomerangModal()">
+            <span>⚡</span> 產生 IG Boomerang 動態戰報卡
+        </button>
+        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 2px;">
+            隨機指令命中瞬間 60FPS 循環重現，支援一鍵存圖與 IG 動動！
+        </div>
+    </div>
+
+    <div class="preview-modal" id="previewModal" onclick="closeModal(event)">
+        <div id="modalCloneSlot" onclick="event.stopPropagation()"></div>
+        <div class="modal-action-bar" onclick="event.stopPropagation()">
+            <button class="btn-action-primary" id="btnSaveCard" onclick="handleSaveOrShareCard()">
+                <span>📲</span> 儲存戰報圖卡
+            </button>
+            <button class="btn-action-record" onclick="triggerRestartForRecording()">
+                <span>🎥</span> 重設循環 ➔ 啟動螢幕錄影 3 秒
+            </button>
+            <div class="record-tip-box">
+                💡 <strong>IG 限動秘訣</strong>：點擊重設後開啟手機「螢幕錄影」錄 3 秒，發 IG 限動即可無損呈現 60FPS Boomerang！
+            </div>
+            <div style="font-size: 0.65rem; color: #506477; text-align:center; cursor:pointer;" onclick="closeModal(event)">
+                [ 點擊此處或空白區關閉 ]
+            </div>
+        </div>
+    </div>
+
+    <div class="image-save-overlay" id="imageSaveOverlay" onclick="closeImageOverlay()">
+        <img id="savedCardImg" src="" alt="Tactical Report" onclick="event.stopPropagation()">
+        <div style="color: var(--neon-gold); font-family: 'Chakra Petch', sans-serif; font-size: 0.88rem; font-weight: bold; margin-top: 14px; text-align:center;">
+            👆 長按上方圖片 ➜ 加入「照片」！
+        </div>
+        <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意處返回動態彈窗)</div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name') || "OPERATOR_GHOST";
+        const lane = params.get('lane') || "1";
+        const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 1.12);
+        const rank = params.get('rank') || "MASTER";
+        const targetId = params.get('plate') || params.get('target') || "1"; // 預設命中 1 號板
+
+        document.getElementById("dispName").innerText = name.toUpperCase();
+        document.getElementById("dispLane").innerText = `LANE 0${lane}`;
+        document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
+        document.getElementById("dispRank").innerText = rank;
+        document.getElementById("dispAction").innerText = `${targetId}號鋼板`;
+
+        const now = new Date();
+        document.getElementById("dispDate").innerText = 
+            `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+
+        let activeTimers = [];
+        function scheduleTimer(fn, delay) {
+            const id = setTimeout(fn, delay);
+            activeTimers.push(id);
+            return id;
+        }
+        function clearAllActiveTimers() {
+            activeTimers.forEach(id => clearTimeout(id));
+            activeTimers = [];
+        }
+
+        function setStrip(color, opacity = 1) {
+            document.documentElement.style.setProperty('--strip-color', color);
+            document.documentElement.style.setProperty('--strip-opacity', opacity);
+        }
+
+        function flashStripOnly(colorHex, duration = 160) {
+            setStrip(colorHex, 1);
+            scheduleTimer(() => { setStrip('transparent', 0); }, duration);
+        }
+
+        function createBulletHole(plateElement, rx = 50, ry = 50) {
+            if (!plateElement) return null;
+            const hole = document.createElement("div");
+            hole.className = "bullet-hole";
+            hole.style.left = rx + "%";
+            hole.style.top = ry + "%";
+            plateElement.appendChild(hole);
+            return hole;
+        }
+
+        function clearAllBulletHoles() {
+            document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
+        }
+
+        function plantFixedBulletHoles(scope = document) {
+            const targetPlate = scope.getElementById ? scope.getElementById(`plt-${targetId}`) : scope.querySelector(`#plt-${targetId}`);
+            if (targetPlate) createBulletHole(targetPlate, 50, 50);
+        }
+
+        let replayLoopTimer = null;
+        let strobeInterval = null;
+
+        function runReplayOnce() {
+            clearAllBulletHoles();
+            setStrip('transparent', 0);
+
+            const targetPlate = document.getElementById(`plt-${targetId}`) || document.getElementById("plt-1");
+            const shotTime = Math.min(800, recordedTimeSec * 1000);
+
+            // 隨機指令命中目標 (戰術綠光爆閃 + 1發烙印)
+            scheduleTimer(() => {
+                flashStripOnly('#00e65c', 160);
+                createBulletHole(targetPlate, 50, 50);
+            }, shotTime);
+
+            // 隨機綠光脈衝爆閃
+            const strobeStart = shotTime + 250;
+            scheduleTimer(() => {
+                let step = 0;
+                strobeInterval = setInterval(() => {
+                    setStrip(step % 2 === 0 ? 'var(--neon-green)' : 'transparent', step % 2 === 0 ? 1 : 0);
+                    step++;
+                }, 90);
+            }, strobeStart);
+
+            return strobeStart + 1200;
+        }
+
+        function runOneShotReplayCycle() {
+            const totalCycleTime = runReplayOnce();
+            replayLoopTimer = scheduleTimer(() => {
+                clearInterval(strobeInterval);
+                setStrip('transparent', 0);
+                runOneShotReplayCycle();
+            }, totalCycleTime);
+        }
+
+        window.onload = () => {
+            runOneShotReplayCycle();
+        };
+
+        function openBoomerangModal() {
+            const modal = document.getElementById("previewModal");
+            const slot = document.getElementById("modalCloneSlot");
+            slot.innerHTML = "";
+            const clone = document.getElementById("storyCaptureArea").cloneNode(true);
+            clone.id = "storyCaptureAreaClone";
+            clone.classList.add("modal-card-scale");
+            slot.appendChild(clone);
+            plantFixedBulletHoles(clone);
+            modal.style.display = "flex";
+        }
+
+        async function handleSaveOrShareCard() {
+            const btn = document.getElementById("btnSaveCard");
+            const orig = btn.innerHTML;
+            btn.innerHTML = "<span>⏳</span> 正在生成戰報...";
+            btn.disabled = true;
+
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            setStrip('transparent', 0);
+            clearAllBulletHoles();
+            plantFixedBulletHoles(document);
+
+            try {
+                const target = document.getElementById("storyCaptureArea");
+                const canvas = await html2canvas(target, {
+                    scale: 2,
+                    backgroundColor: "#010204",
+                    logging: false
+                });
+
+                const dataUrl = canvas.toDataURL("image/png");
+                document.getElementById("savedCardImg").src = dataUrl;
+                document.getElementById("imageSaveOverlay").style.display = "flex";
+            } catch (e) {
+                alert("生成異常，請手動截圖！");
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+                runOneShotReplayCycle();
+            }
+        }
+
+        function triggerRestartForRecording() {
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            runOneShotReplayCycle();
+
+            const slot = document.getElementById("modalCloneSlot");
+            if (slot) {
+                slot.innerHTML = "";
+                const clone = document.getElementById("storyCaptureArea").cloneNode(true);
+                clone.id = "storyCaptureAreaClone";
+                clone.classList.add("modal-card-scale");
+                slot.appendChild(clone);
+                plantFixedBulletHoles(clone);
+            }
+        }
+
+        function closeImageOverlay() {
+            document.getElementById("imageSaveOverlay").style.display = "none";
+        }
+
+        function closeModal(e) {
+            document.getElementById("previewModal").style.display = "none";
+            document.getElementById("modalCloneSlot").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
