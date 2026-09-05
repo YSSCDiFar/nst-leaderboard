@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURONSTRIKE // GHOSTSTEEL BOOMERANG AAR</title>
+    <title>NEURONSTRIKE // GHOSTSTEEL COMBO REPLAY</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -18,13 +18,11 @@
             --cyan-glow: rgba(0, 216, 230, 0.35);
             --neon-green: #00e65c;
             --neon-gold: #e6a800;
-            --gold-glow: rgba(230, 168, 0, 0.4);
             --neon-red: #e62237;
             --text-dim: #506477;
             --tac-black: #05080c;
             --tac-plate: #0c1219;
             --tac-border: #141f2b;
-
             --strip-color: transparent;
             --strip-opacity: 0;
         }
@@ -48,7 +46,7 @@
             background: radial-gradient(circle at 50% 20%, #070c12 0%, #020406 85%);
             border: 1px solid #162433;
             border-radius: 8px;
-            padding: 18px 16px 14px 16px;
+            padding: 16px 14px 12px 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -78,7 +76,7 @@
 
         .live-tag {
             font-size: 0.65rem;
-            color: var(--neon-gold);
+            color: var(--neon-red);
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -87,17 +85,17 @@
         .live-dot {
             width: 6px;
             height: 6px;
-            background: var(--neon-gold);
+            background: var(--neon-red);
             border-radius: 50%;
             animation: pulseDot 0.8s infinite alternate;
         }
         @keyframes pulseDot {
             from { opacity: 0.3; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-gold); }
+            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-red); }
         }
 
         .hero-section {
-            margin: 6px 0 2px 0;
+            margin: 4px 0 2px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -108,7 +106,7 @@
         .operator-tag .name {
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             color: #fff;
             letter-spacing: 1px;
         }
@@ -119,41 +117,34 @@
             border: 2px solid var(--neon-gold);
             padding: 2px 10px;
             border-radius: 4px;
-            box-shadow: 0 0 12px var(--gold-glow), inset 0 0 6px rgba(230, 168, 0, 0.2);
-            transform: rotate(-3deg);
-            max-width: 115px;
-            overflow: hidden;
+            box-shadow: 0 0 12px rgba(230, 168, 0, 0.4);
+            transform: rotate(-2deg);
         }
-
         .grade-badge .grade {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.05rem;
+            font-size: 1.0rem;
             font-weight: 900;
             color: var(--neon-gold);
             letter-spacing: 1px;
-            white-space: nowrap;
-            line-height: 1.2;
         }
 
         .score-display {
             background: #04070a;
             border: 1px solid #101a24;
             border-radius: 6px;
-            padding: 8px 10px;
+            padding: 6px 10px;
             text-align: center;
             z-index: 10;
         }
-
-        .score-lbl { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 2px; }
-
+        .score-lbl { font-size: 0.52rem; color: var(--text-dim); letter-spacing: 2px; }
         .score-val {
             font-family: 'Orbitron', monospace;
-            font-size: 2.6rem;
+            font-size: 2.4rem;
             font-weight: 900;
             color: var(--cyan-core);
-            text-shadow: 0 0 20px var(--cyan-glow);
-            line-height: 1;
-            margin: 3px 0;
+            text-shadow: 0 0 18px var(--cyan-glow);
+            line-height: 1.05;
+            margin: 2px 0;
         }
 
         .stats-grid {
@@ -162,61 +153,58 @@
             gap: 6px;
             margin-top: 4px;
         }
-
         .stat-card {
             background: #06090d;
             border: 1px solid #0f1822;
-            padding: 5px 2px;
+            padding: 4px 2px;
             border-radius: 4px;
             text-align: center;
         }
-
-        .stat-card .lbl { font-size: 0.5rem; color: var(--text-dim); }
-        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: bold; color: #fff; margin-top: 2px; }
+        .stat-card .lbl { font-size: 0.48rem; color: var(--text-dim); }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
         .target-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 36px 0 8px 0;
+            margin: 24px 0 6px 0;
             position: relative;
             z-index: 10;
         }
 
         .tac-steel-target {
-            width: 190px;
-            height: 245px;
+            width: 200px;
+            height: 260px;
             background: #05080c !important;
             border: 2px solid var(--tac-border);
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 10px 10px;
             position: relative;
             box-shadow: inset 0 0 25px #000000;
-            overflow: visible;
         }
 
         .led-edge-strip {
             position: absolute;
             inset: -4px;
-            border-radius: 0 0 12px 12px;
+            border-radius: 0 0 14px 14px;
             pointer-events: none;
             border: 2px solid var(--strip-color) !important;
             background: transparent !important;
-            box-shadow: 0 0 12px var(--strip-color) !important;
+            box-shadow: 0 0 14px var(--strip-color) !important;
             opacity: var(--strip-opacity);
             transition: opacity 0.08s ease, border-color 0.08s ease;
             z-index: 1;
         }
 
         .target-head {
-            width: 72px;
-            height: 50px;
+            width: 76px;
+            height: 52px;
             background: #05080c !important;
             border: 2px solid var(--tac-border);
             border-bottom: none;
             border-radius: 12px 12px 0 0;
             position: absolute;
-            top: -48px;
+            top: -50px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -229,7 +217,7 @@
             pointer-events: none;
             border: 2px solid var(--strip-color) !important;
             background: transparent !important;
-            box-shadow: 0 0 12px var(--strip-color) !important;
+            box-shadow: 0 0 14px var(--strip-color) !important;
             opacity: var(--strip-opacity);
             transition: opacity 0.08s ease, border-color 0.08s ease;
         }
@@ -246,16 +234,6 @@
             border: 1px solid #334455;
         }
 
-        .shoulder-line-l, .shoulder-line-r {
-            position: absolute;
-            top: 6px;
-            width: 2px;
-            height: 18px;
-            background: var(--tac-border);
-        }
-        .shoulder-line-l { left: 44px; transform: rotate(-35deg); }
-        .shoulder-line-r { right: 44px; transform: rotate(35deg); }
-
         .tac-plate {
             background: #0c1219 !important;
             border: 1px solid #1d3345 !important;
@@ -271,31 +249,26 @@
             overflow: visible;
         }
 
-        #plt-2 { width: 36px; height: 36px; border-radius: 50%; top: 8px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
-        #plt-3 { width: 60px; height: 20px; border-radius: 3px; top: 15px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; }
-        #plt-1 { width: 62px; height: 62px; border-radius: 50%; top: 48px; left: 50%; transform: translateX(-50%); font-size: 1.25rem; border-color: #594719 !important; color: #bfa048; }
-        #plt-4 { width: 28px; height: 82px; border-radius: 3px; top: 40px; left: 8px; font-size: 0.85rem; }
-        #plt-5 { width: 28px; height: 82px; border-radius: 3px; top: 40px; right: 8px; font-size: 0.85rem; }
-        #plt-6 { width: 34px; height: 46px; border-radius: 3px; top: 162px; left: 18px; font-size: 0.85rem; }
-        #plt-7 { width: 38px; height: 50px; border-radius: 3px; top: 170px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
-        #plt-8 { width: 34px; height: 46px; border-radius: 3px; top: 162px; right: 18px; font-size: 0.85rem; }
+        #plt-2 { width: 40px; height: 38px; border-radius: 4px; top: 6px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
+        #plt-3 { width: 78px; height: 26px; border-radius: 3px; top: 14px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
+        #plt-1 { width: 66px; height: 66px; border-radius: 50%; top: 72px; left: 50%; transform: translateX(-50%); font-size: 1.3rem; }
+        #plt-4 { width: 30px; height: 86px; border-radius: 3px; top: 40px; left: 8px; font-size: 0.85rem; }
+        #plt-5 { width: 30px; height: 86px; border-radius: 3px; top: 40px; right: 8px; font-size: 0.85rem; }
+        #plt-6 { width: 36px; height: 50px; border-radius: 3px; top: 175px; left: 16px; font-size: 0.85rem; }
+        #plt-7 { width: 42px; height: 54px; border-radius: 3px; top: 185px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
+        #plt-8 { width: 36px; height: 50px; border-radius: 3px; top: 175px; right: 16px; font-size: 0.85rem; }
 
         .bullet-hole {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
-            background: #ffffff;
-            box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000;
-            border: 1.5px solid var(--neon-green);
+            background: #ffffff !important;
+            box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000 !important;
+            border: 1.5px solid var(--neon-green) !important;
             transform: translate(-50%, -50%);
-            z-index: 25;
+            z-index: 50;
             pointer-events: none;
-        }
-
-        .bullet-hole.charlie-hole {
-            box-shadow: 0 0 8px var(--cyan-core), inset 0 0 2px #000;
-            border-color: var(--cyan-core);
         }
 
         .brand-pedestal {
@@ -328,7 +301,7 @@
 
         .action-area {
             width: 360px;
-            margin-top: 14px;
+            margin-top: 12px;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -339,9 +312,9 @@
             background: linear-gradient(135deg, #180a0d 0%, #2a1014 100%);
             color: #ffaa00;
             border: 1px solid #4d1c24;
-            padding: 14px;
+            padding: 13px;
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.98rem;
+            font-size: 0.95rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             cursor: pointer;
@@ -350,17 +323,9 @@
             align-items: center;
             gap: 8px;
             clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-            transition: all 0.2s ease;
             box-shadow: inset 0 0 12px rgba(255, 26, 53, 0.15), 0 4px 15px rgba(0,0,0,0.8);
         }
-        .btn-motion:active {
-            background: #331218;
-            border-color: #ffaa00;
-            box-shadow: 0 0 16px rgba(255, 170, 0, 0.3);
-            transform: scale(0.99);
-        }
 
-        /* 彈窗樣式 */
         .preview-modal {
             display: none;
             position: fixed;
@@ -379,7 +344,7 @@
             transform-origin: top center;
             box-shadow: 0 0 45px rgba(0, 216, 230, 0.3);
             border-color: var(--cyan-core);
-            margin-bottom: -110px;
+            margin-bottom: -115px;
         }
 
         .modal-action-bar {
@@ -403,12 +368,7 @@
             border-radius: 6px;
             cursor: pointer;
             box-shadow: 0 0 14px rgba(0, 216, 230, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
         }
-        .btn-action-primary:active { transform: scale(0.98); }
 
         .btn-action-record {
             width: 100%;
@@ -422,13 +382,7 @@
             letter-spacing: 1px;
             border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 0 14px rgba(230, 34, 55, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 6px;
         }
-        .btn-action-record:active { transform: scale(0.98); }
 
         .record-tip-box {
             background: rgba(14, 25, 36, 0.9);
@@ -440,9 +394,7 @@
             line-height: 1.4;
             text-align: center;
         }
-        .record-tip-box strong { color: var(--neon-gold); }
 
-        /* 靜態圖預覽浮層 (長按直接存照片) */
         .image-save-overlay {
             display: none;
             position: fixed;
@@ -458,7 +410,6 @@
             max-width: 85%;
             max-height: 75vh;
             border: 1px solid var(--cyan-core);
-            box-shadow: 0 0 30px rgba(0, 216, 230, 0.3);
             border-radius: 6px;
         }
     </style>
@@ -473,7 +424,7 @@
             </div>
             <div class="live-tag">
                 <span class="live-dot"></span>
-                <span>SHOT REPLAY LOOP</span>
+                <span>COMBO REPLAY</span>
             </div>
         </div>
 
@@ -483,17 +434,17 @@
                 <div class="name" id="dispName">OPERATOR_GHOST</div>
             </div>
             <div class="grade-badge">
-                <div class="grade" id="dispRank">PASS</div>
+                <div class="grade" id="dispRank">MASTER</div>
             </div>
         </div>
 
         <div class="score-display">
-            <div class="score-lbl" id="dispScoreTitle">TACTICAL RUN TIME</div>
+            <div class="score-lbl">TACTICAL COMBO TIME</div>
             <div class="score-val" id="dispScore">0.00s</div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="lbl">特訓模式</div>
-                    <div class="val" id="dispMode" style="color: var(--cyan-core);">COMBO</div>
+                    <div class="val" style="color: var(--neon-red);">COMBO</div>
                 </div>
                 <div class="stat-card">
                     <div class="lbl">戰術動作 / 代碼</div>
@@ -516,9 +467,6 @@
                     <div class="tac-plate" id="plt-2">2</div>
                 </div>
 
-                <div class="shoulder-line-l"></div>
-                <div class="shoulder-line-r"></div>
-
                 <div class="tac-plate" id="plt-3">3</div>
                 <div class="tac-plate" id="plt-1">1</div>
                 <div class="tac-plate" id="plt-4">4</div>
@@ -540,30 +488,26 @@
         </div>
     </div>
 
-    <!-- 終極戰術操作區 -->
     <div class="action-area">
-        <button class="btn-motion" id="btnRecord" onclick="openBoomerangModal()">
+        <button class="btn-motion" onclick="openBoomerangModal()">
             <span>⚡</span> 產生 IG Boomerang 動態戰報卡
         </button>
-        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 4px;">
-            60FPS 絲滑循環重現，支援一鍵分享與錄製 IG 動動！
+        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 2px;">
+            比照靶機實體 60FPS 循環重現，支援一鍵分享與錄製 IG 動動！
         </div>
     </div>
 
-    <!-- 60FPS Boomerang 彈窗 -->
     <div class="preview-modal" id="previewModal" onclick="closeModal(event)">
         <div id="modalCloneSlot" onclick="event.stopPropagation()"></div>
-        
-        <!-- 操作按鈕列 -->
         <div class="modal-action-bar" onclick="event.stopPropagation()">
             <button class="btn-action-primary" id="btnSaveCard" onclick="handleSaveOrShareCard()">
-                <span>📲</span> 儲存 / 分享戰報圖卡
+                <span>📲</span> 儲存戰報圖卡
             </button>
             <button class="btn-action-record" onclick="triggerRestartForRecording()">
                 <span>🎥</span> 重設循環 ➔ 啟動螢幕錄影 3 秒
             </button>
             <div class="record-tip-box">
-                💡 <strong>IG 限動秘訣</strong>：點擊重設後開啟手機內建「螢幕錄影」錄 3 秒，發 IG 限動即可無損呈現 60FPS Boomerang！
+                💡 <strong>IG 限動秘訣</strong>：點擊重設後開啟手機「螢幕錄影」錄 3 秒，發 IG 限動即可無損呈現 60FPS Boomerang！
             </div>
             <div style="font-size: 0.65rem; color: #506477; text-align:center; cursor:pointer;" onclick="closeModal(event)">
                 [ 點擊此處或空白區關閉 ]
@@ -571,11 +515,10 @@
         </div>
     </div>
 
-    <!-- 靜態圖長按儲存層 -->
     <div class="image-save-overlay" id="imageSaveOverlay" onclick="closeImageOverlay()">
         <img id="savedCardImg" src="" alt="Tactical Report" onclick="event.stopPropagation()">
         <div style="color: var(--neon-gold); font-family: 'Chakra Petch', sans-serif; font-size: 0.88rem; font-weight: bold; margin-top: 14px; text-align:center;">
-            👆 長按上方圖片 ➜ 加入「照片」或「分享」！
+            👆 長按上方圖片 ➜ 加入「照片」！
         </div>
         <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意處返回動態彈窗)</div>
     </div>
@@ -584,46 +527,19 @@
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || "OPERATOR_GHOST";
         const lane = params.get('lane') || "1";
-        const mode = (params.get('mode') || "combo").toLowerCase();
         const recordedTimeSec = Math.max(0.4, parseFloat(params.get('time')) || 1.82);
-        const rank = params.get('rank') || (mode === "reaction" ? "ELITE" : "MASTER");
-        const comboName = params.get('name') || "";
+        const rank = params.get('rank') || "MASTER";
         const code = params.get('code') || "BBA";
-        const zone = params.get('zone') || "B";
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
         document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
         document.getElementById("dispRank").innerText = rank;
+        document.getElementById("dispAction").innerText = code;
 
         const now = new Date();
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-
-        const modeTitle = document.getElementById("dispMode");
-        const actionTitle = document.getElementById("dispAction");
-        const scoreTitle = document.getElementById("dispScoreTitle");
-
-        if (mode === "reaction") {
-            modeTitle.innerText = "REACTION";
-            modeTitle.style.color = "var(--neon-gold)";
-            actionTitle.innerText = `首發 1 擊 (${zone}區)`;
-            scoreTitle.innerText = "FIRST-SHOT REACTION TIME";
-        } else if (mode === "combo") {
-            modeTitle.innerText = "COMBO";
-            modeTitle.style.color = "var(--neon-red)";
-            actionTitle.innerText = comboName ? comboName.split(" ")[0] : (code || "3-HIT");
-            scoreTitle.innerText = "TACTICAL COMBO TIME";
-        } else if (mode === "random") {
-            modeTitle.innerText = "COMMAND";
-            modeTitle.style.color = "var(--neon-green)";
-            actionTitle.innerText = `命中 ZONE ${zone}`;
-            scoreTitle.innerText = "DECISION REACTION TIME";
-        } else {
-            modeTitle.innerText = "FREE FIRE";
-            actionTitle.innerText = "自由校準";
-            scoreTitle.innerText = "LAST SHOT TIME";
-        }
 
         let activeTimers = [];
         function scheduleTimer(fn, delay) {
@@ -641,23 +557,15 @@
             document.documentElement.style.setProperty('--strip-opacity', opacity);
         }
 
-        function flashStripOnly(zone, duration = 140) {
-            const colorMap = { A: '#ff1a35', B: '#ffaa00', C: '#00e65c' };
-            const stripColor = colorMap[zone] || '#00d8e6';
-
-            setStrip(stripColor, 1);
-
-            scheduleTimer(() => {
-                setStrip('transparent', 0);
-            }, duration);
+        function flashStripOnly(colorHex, duration = 140) {
+            setStrip(colorHex, 1);
+            scheduleTimer(() => { setStrip('transparent', 0); }, duration);
         }
 
-        function createBulletHole(plateElement, isCharlie = false, pos = null) {
+        function createBulletHole(plateElement, rx = 50, ry = 50) {
             if (!plateElement) return null;
             const hole = document.createElement("div");
-            hole.className = "bullet-hole" + (isCharlie ? " charlie-hole" : "");
-            const rx = pos ? pos.rx : (Math.floor(Math.random() * 52) + 24);
-            const ry = pos ? pos.ry : (Math.floor(Math.random() * 52) + 24);
+            hole.className = "bullet-hole";
             hole.style.left = rx + "%";
             hole.style.top = ry + "%";
             plateElement.appendChild(hole);
@@ -668,16 +576,18 @@
             document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
         }
 
-        let shotDelays = [];
-        if (recordedTimeSec <= 1.2) {
-            shotDelays = [200, 200 + recordedTimeSec * 450, 200 + recordedTimeSec * 900];
-        } else {
-            const firstShot = Math.min(800, recordedTimeSec * 400);
-            const split = (recordedTimeSec * 1000 - firstShot) / 2;
-            shotDelays = [firstShot, firstShot + split, firstShot + split * 2];
+        function plantFixedBulletHoles(scope = document) {
+            const p1 = scope.getElementById ? scope.getElementById("plt-1") : scope.querySelector("#plt-1");
+            const p2 = scope.getElementById ? scope.getElementById("plt-2") : scope.querySelector("#plt-2");
+            createBulletHole(p1, 40, 45);
+            createBulletHole(p1, 60, 52);
+            createBulletHole(p2, 50, 45);
         }
 
-        // ─── 60FPS 原生流暢回放狀態機 ───
+        const firstShot = Math.min(800, recordedTimeSec * 400);
+        const split = (recordedTimeSec * 1000 - firstShot) / 2;
+        const shotDelays = [firstShot, firstShot + split, firstShot + split * 2];
+
         let replayLoopTimer = null;
         let strobeInterval = null;
 
@@ -687,96 +597,70 @@
 
             const p1 = document.getElementById("plt-1");
             const p2 = document.getElementById("plt-2");
-            const p4 = document.getElementById("plt-4");
-
-            const isMozambique = (code === "B-B-A" || code === "BBA");
-            const shots = isMozambique
-                ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
-                : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
 
             scheduleTimer(() => {
-                flashStripOnly(shots[0].z, 140);
-                createBulletHole(shots[0].elem, shots[0].charlie);
+                flashStripOnly('#ffaa00', 140);
+                createBulletHole(p1, 40, 45);
             }, shotDelays[0]);
 
             scheduleTimer(() => {
-                flashStripOnly(shots[1].z, 140);
-                createBulletHole(shots[1].elem, shots[1].charlie);
+                flashStripOnly('#ffaa00', 140);
+                createBulletHole(p1, 60, 52);
             }, shotDelays[1]);
 
             scheduleTimer(() => {
-                flashStripOnly(shots[2].z, 160);
-                createBulletHole(shots[2].elem, shots[2].charlie);
+                flashStripOnly('#ff1a35', 160);
+                createBulletHole(p2, 50, 45);
             }, shotDelays[2]);
 
-            const strobeStartTime = shotDelays[2] + 250;
+            const strobeStart = shotDelays[2] + 250;
             scheduleTimer(() => {
-                startModeStrobe(isMozambique);
-            }, strobeStartTime);
+                let step = 0;
+                strobeInterval = setInterval(() => {
+                    setStrip(step % 2 === 0 ? 'var(--neon-red)' : '#0055ff', 1);
+                    step++;
+                }, 85);
+            }, strobeStart);
 
-            return strobeStartTime + 1200;
+            return strobeStart + 1200;
         }
 
         function runOneShotReplayCycle() {
             const totalCycleTime = runReplayOnce();
             replayLoopTimer = scheduleTimer(() => {
-                stopModeStrobe();
+                clearInterval(strobeInterval);
+                setStrip('transparent', 0);
                 runOneShotReplayCycle();
             }, totalCycleTime);
-        }
-
-        function startModeStrobe(isMozambique) {
-            let step = 0;
-            if (isMozambique) {
-                strobeInterval = setInterval(() => {
-                    const c = step % 2 === 0 ? 'var(--neon-red)' : '#0055ff';
-                    setStrip(c, 1);
-                    step++;
-                }, 85);
-            } else if (mode === "reaction") {
-                strobeInterval = setInterval(() => {
-                    const c = step % 2 === 0 ? 'var(--neon-gold)' : 'transparent';
-                    setStrip(c, step % 2 === 0 ? 1 : 0);
-                    step++;
-                }, 90);
-            } else {
-                const rainbow = ['#ff1a35', '#ffaa00', '#00e65c', '#00d8e6', '#b026ff'];
-                strobeInterval = setInterval(() => {
-                    setStrip(rainbow[step % rainbow.length], 1);
-                    step++;
-                }, 90);
-            }
-        }
-
-        function stopModeStrobe() {
-            clearInterval(strobeInterval);
-            setStrip('transparent', 0);
         }
 
         window.onload = () => {
             runOneShotReplayCycle();
         };
 
-        // ─── 彈窗控制 ───
         function openBoomerangModal() {
             const modal = document.getElementById("previewModal");
             const slot = document.getElementById("modalCloneSlot");
-
             slot.innerHTML = "";
             const clone = document.getElementById("storyCaptureArea").cloneNode(true);
             clone.id = "storyCaptureAreaClone";
             clone.classList.add("modal-card-scale");
             slot.appendChild(clone);
-
+            plantFixedBulletHoles(clone);
             modal.style.display = "flex";
         }
 
-        // 功能 1：極速 0.2 秒無感截圖並呼叫原生分享 / 長按存圖
         async function handleSaveOrShareCard() {
             const btn = document.getElementById("btnSaveCard");
             const orig = btn.innerHTML;
-            btn.innerHTML = "<span>⏳</span> 正在生成高清戰報...";
+            btn.innerHTML = "<span>⏳</span> 正在生成戰報...";
             btn.disabled = true;
+
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            setStrip('transparent', 0);
+            clearAllBulletHoles();
+            plantFixedBulletHoles(document);
 
             try {
                 const target = document.getElementById("storyCaptureArea");
@@ -786,45 +670,23 @@
                     logging: false
                 });
 
-                canvas.toBlob(async (blob) => {
-                    btn.innerHTML = orig;
-                    btn.disabled = false;
-
-                    // 1. 優先嘗試呼叫手機原生系統分享選單 (可直接儲存至相簿)
-                    if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'ghoststeel.png', { type: 'image/png' })] })) {
-                        try {
-                            const file = new File([blob], `GHOSTSTEEL_AAR_${Date.now()}.png`, { type: 'image/png' });
-                            await navigator.share({
-                                files: [file],
-                                title: 'NEURONSTRIKE TACTICAL REPORT',
-                                text: `特戰評級：${rank} | 成績：${recordedTimeSec.toFixed(2)}s`
-                            });
-                            return;
-                        } catch (err) {
-                            console.log("原生分享略過:", err);
-                        }
-                    }
-
-                    // 2. 備援方案：跳出高畫質預覽圖，長按直接加入照片
-                    const dataUrl = canvas.toDataURL("image/png");
-                    document.getElementById("savedCardImg").src = dataUrl;
-                    document.getElementById("imageSaveOverlay").style.display = "flex";
-                }, 'image/png');
-
+                const dataUrl = canvas.toDataURL("image/png");
+                document.getElementById("savedCardImg").src = dataUrl;
+                document.getElementById("imageSaveOverlay").style.display = "flex";
             } catch (e) {
+                alert("生成異常，請手動截圖！");
+            } finally {
                 btn.innerHTML = orig;
                 btn.disabled = false;
-                alert("生成異常，請手動截圖！");
+                runOneShotReplayCycle();
             }
         }
 
-        // 功能 2：重設動畫循環，方便射手啟動螢幕錄影 3 秒
         function triggerRestartForRecording() {
             clearAllActiveTimers();
-            stopModeStrobe();
+            clearInterval(strobeInterval);
             runOneShotReplayCycle();
 
-            // 若彈窗開著，同時更新彈窗內的鏡像
             const slot = document.getElementById("modalCloneSlot");
             if (slot) {
                 slot.innerHTML = "";
@@ -832,6 +694,7 @@
                 clone.id = "storyCaptureAreaClone";
                 clone.classList.add("modal-card-scale");
                 slot.appendChild(clone);
+                plantFixedBulletHoles(clone);
             }
         }
 
