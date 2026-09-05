@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NEURONSTRIKE // REACTION DRAW AAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -164,6 +164,7 @@
         .stat-card .lbl { font-size: 0.48rem; color: var(--text-dim); }
         .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
+        /* 鋼靶容器 */
         .target-container {
             display: flex;
             flex-direction: column;
@@ -392,6 +393,7 @@
             border-radius: 6px;
             font-size: 0.72rem;
             color: var(--text-dim);
+            line-height: 1.4;
             text-align: center;
         }
 
@@ -531,14 +533,14 @@
         const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 0.86);
         const rank = params.get('rank') || (recordedTimeSec < 1.0 ? "GODLIKE" : (recordedTimeSec <= 1.5 ? "ELITE" : (recordedTimeSec <= 2.0 ? "PASS" : "FAIL")));
         
-        // 🎯 核心修復：精確接收大螢幕擊中的真實鋼板 (預設 1 號板)
-        const hitPlateId = parseInt(params.get('hits') || params.get('plate') || "1") || 1;
+        // 🎯 核心修復：精確接收大螢幕擊中的真實鋼板編號 (支援 hits, plate 或 target 參數)
+        const hitPlateId = parseInt(params.get('hits') || params.get('plate') || params.get('target') || "1") || 1;
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
         document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
         document.getElementById("dispRank").innerText = rank;
-        document.getElementById("dispAction").innerText = `#${hitPlateId}號板`;
+        document.getElementById("dispAction").innerText = `#${hitPlateId}號鋼板`;
 
         const rankBadge = document.getElementById("dispRankBadge");
         const rankColors = {
@@ -608,13 +610,13 @@
                 setStrip('#ffffff', 1.0);
             }, 300);
 
-            // 階段 3：🎯 在大螢幕實際擊中的板塊上烙印彈孔
+            // 階段 3：🎯 修正：在 hitPlateId 上烙印彈孔 (不再寫死 plt-1)
             const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
             scheduleTimer(() => {
                 createBulletHole(hitPlateId, 50, 50);
             }, shotTime);
 
-            // 階段 4：命中後結算爆閃 (比照 LaneFor4Mode.html 評級燈效)
+            // 階段 4：命中後結算爆閃
             const strobeStart = shotTime + 200;
             scheduleTimer(() => {
                 let count = 0;
@@ -699,7 +701,7 @@
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
 
-            // 釘死真實命中彈孔
+            // 🎯 修正：釘死 hitPlateId 彈孔，保證截圖存在 (不再寫死 plt-1)
             clearAllBulletHoles();
             createBulletHole(hitPlateId, 50, 50);
 
