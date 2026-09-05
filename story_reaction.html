@@ -434,7 +434,7 @@
                 <div class="lbl">CALLSIGN // 射手呼號</div>
                 <div class="name" id="dispName">OPERATOR_GHOST</div>
             </div>
-            <div class="grade-badge">
+            <div class="grade-badge" id="dispRankBadge">
                 <div class="grade" id="dispRank">ELITE</div>
             </div>
         </div>
@@ -530,12 +530,24 @@
         const name = params.get('name') || "OPERATOR_GHOST";
         const lane = params.get('lane') || "1";
         const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 0.86);
-        const rank = params.get('rank') || "ELITE";
+        const rank = params.get('rank') || (recordedTimeSec < 1.0 ? "GODLIKE" : (recordedTimeSec <= 1.5 ? "ELITE" : (recordedTimeSec <= 2.0 ? "PASS" : "FAIL")));
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
         document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
         document.getElementById("dispRank").innerText = rank;
+
+        const rankBadge = document.getElementById("dispRankBadge");
+        const rankColors = {
+            GODLIKE: 'var(--neon-gold)',
+            ELITE: '#ffffff',
+            PASS: 'var(--cyan-core)',
+            FAIL: 'var(--neon-red)'
+        };
+        if (rankBadge && rankColors[rank]) {
+            rankBadge.style.borderColor = rankColors[rank];
+            document.getElementById("dispRank").style.color = rankColors[rank];
+        }
 
         const now = new Date();
         document.getElementById("dispDate").innerText = 
@@ -557,54 +569,87 @@
             document.documentElement.style.setProperty('--strip-opacity', opacity);
         }
 
-        function flashStripOnly(colorHex, duration = 160) {
-            setStrip(colorHex, 1);
-            scheduleTimer(() => { setStrip('transparent', 0); }, duration);
-        }
+        // 雙向同步注入彈孔 (主畫面 + 彈窗)
+        function createBulletHole(plateId, rx = 50, ry = 50) {
+            const targets = [];
+            const mainPlate = document.querySelector(`#storyCaptureArea #${plateId}`);
+            if (mainPlate) targets.push(mainPlate);
 
-        function createBulletHole(plateElement, rx = 50, ry = 50) {
-            if (!plateElement) return null;
-            const hole = document.createElement("div");
-            hole.className = "bullet-hole";
-            hole.style.left = rx + "%";
-            hole.style.top = ry + "%";
-            plateElement.appendChild(hole);
-            return hole;
+            const clonePlate = document.querySelector(`#modalCloneSlot #${plateId}`);
+            if (clonePlate) targets.push(clonePlate);
+
+            targets.forEach(plate => {
+                const hole = document.createElement("div");
+                hole.className = "bullet-hole";
+                hole.style.left = rx + "%";
+                hole.style.top = ry + "%";
+                plate.appendChild(hole);
+            });
         }
 
         function clearAllBulletHoles() {
             document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
         }
 
-        function plantFixedBulletHoles(scope = document) {
-            const p1 = scope.getElementById ? scope.getElementById("plt-1") : scope.querySelector("#plt-1");
-            createBulletHole(p1, 50, 50);
-        }
-
         let replayLoopTimer = null;
         let strobeInterval = null;
 
+        // ─── 亮燈模式比照 LaneFor4Mode.html ───
         function runReplayOnce() {
             clearAllBulletHoles();
-            setStrip('transparent', 0);
+            
+            // 階段 1：等待信號中（全滅）
+            setStrip('#000000', 0);
 
-            const p1 = document.getElementById("plt-1");
-            const shotTime = Math.min(800, recordedTimeSec * 1000);
-
-            // 嗶聲後拔槍首發命中 (金光爆閃 + 1發烙印)
+            // 階段 2：嗶聲起跑 (FIRE) -> 亮全白光 (比照 LaneFor4Mode.html 第 415 行)
             scheduleTimer(() => {
-                flashStripOnly('#e6a800', 160);
-                createBulletHole(p1, 50, 50);
+                setStrip('#ffffff', 1.0);
+            }, 300);
+
+            // 階段 3：射擊命中 1 號胸板 -> 烙印彈孔
+            const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
+            scheduleTimer(() => {
+                createBulletHole('plt-1', 50, 50);
             }, shotTime);
 
-            // 拔槍金光脈衝爆閃
-            const strobeStart = shotTime + 250;
+            // 階段 4：命中後結算爆閃 (比照 LaneFor4Mode.html 第 435-455 行的評級亮燈邏輯)
+            const strobeStart = shotTime + 200;
             scheduleTimer(() => {
-                let step = 0;
+                let count = 0;
+                let strobeColor = '#ffffff';
+                let flashCount = 5;
+                let flashSpeed = 50;
+
+                if (rank === "GODLIKE" || recordedTimeSec < 1.00) {
+                    strobeColor = 'var(--neon-gold)'; // 金光爆閃 5 次
+                    flashCount = 5;
+                    flashSpeed = 50;
+                } else if (rank === "ELITE" || recordedTimeSec <= 1.50) {
+                    strobeColor = '#ffffff';          // 白光爆閃 5 次
+                    flashCount = 5;
+                    flashSpeed = 50;
+                } else if (rank === "PASS" || recordedTimeSec <= 2.00) {
+                    strobeColor = '#0055ff';          // 青藍光爆閃 4 次
+                    flashCount = 4;
+                    flashSpeed = 60;
+                } else {
+                    strobeColor = '#ff1a35';          // 紅光慢閃 3 次
+                    flashCount = 3;
+                    flashSpeed = 150;
+                }
+
                 strobeInterval = setInterval(() => {
-                    setStrip(step % 2 === 0 ? 'var(--neon-gold)' : 'transparent', step % 2 === 0 ? 1 : 0);
-                    step++;
-                }, 90);
+                    if (count % 2 === 0) {
+                        setStrip(strobeColor, 1.0);
+                    } else {
+                        setStrip('#000000', 0);
+                    }
+                    count++;
+                    if (count >= flashCount * 2) {
+                        clearInterval(strobeInterval);
+                        setStrip(strobeColor, 0.4); // 結尾呼吸微光
+                    }
+                }, flashSpeed);
             }, strobeStart);
 
             return strobeStart + 1200;
@@ -623,16 +668,24 @@
             runOneShotReplayCycle();
         };
 
+        // 開啟 Boomerang 彈窗
         function openBoomerangModal() {
             const modal = document.getElementById("previewModal");
             const slot = document.getElementById("modalCloneSlot");
             slot.innerHTML = "";
+            
             const clone = document.getElementById("storyCaptureArea").cloneNode(true);
             clone.id = "storyCaptureAreaClone";
             clone.classList.add("modal-card-scale");
+            clone.querySelectorAll(".bullet-hole").forEach(h => h.remove());
             slot.appendChild(clone);
-            plantFixedBulletHoles(clone);
+
             modal.style.display = "flex";
+
+            // 重設動畫循環，開窗立即同步從 0 開始播放
+            clearAllActiveTimers();
+            clearInterval(strobeInterval);
+            runOneShotReplayCycle();
         }
 
         async function handleSaveOrShareCard() {
@@ -644,8 +697,10 @@
             clearAllActiveTimers();
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
+
+            // 釘死 1 號彈孔，保證截圖存在
             clearAllBulletHoles();
-            plantFixedBulletHoles(document);
+            createBulletHole('plt-1', 50, 50);
 
             try {
                 const target = document.getElementById("storyCaptureArea");
@@ -670,17 +725,8 @@
         function triggerRestartForRecording() {
             clearAllActiveTimers();
             clearInterval(strobeInterval);
+            clearAllBulletHoles();
             runOneShotReplayCycle();
-
-            const slot = document.getElementById("modalCloneSlot");
-            if (slot) {
-                slot.innerHTML = "";
-                const clone = document.getElementById("storyCaptureArea").cloneNode(true);
-                clone.id = "storyCaptureAreaClone";
-                clone.classList.add("modal-card-scale");
-                slot.appendChild(clone);
-                plantFixedBulletHoles(clone);
-            }
         }
 
         function closeImageOverlay() {
