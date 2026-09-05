@@ -185,35 +185,35 @@
             z-index: 10;
         }
 
-        /* 靶身本體：徹底鎖定純消光暗黑底色，禁止任何發光干擾 */
+        /* 靶身核心：強制純黑背景，隔離外層任何樣式滲透 */
         .tac-steel-target {
             width: 190px;
             height: 245px;
-            background-color: #05080c !important;
+            background: #05080c !important;
             border: 2px solid var(--tac-border);
             border-radius: 0 0 8px 8px;
             position: relative;
-            box-shadow: inset 0 0 25px #000000;
+            box-shadow: inset 0 0 20px #000000;
+            overflow: visible;
         }
 
-        /* 軀幹外圍光纖燈條：純外圍描邊發光，不塗抹背景 */
+        /* 外圍燈條：純外圍 2px 線框，不使用任何擴散與背景色，杜絕滿版染色 */
         .led-edge-strip {
             position: absolute;
             inset: -4px;
             border-radius: 0 0 12px 12px;
             pointer-events: none;
-            border: 2px solid var(--strip-color);
-            box-shadow: 0 0 12px var(--strip-color);
-            background: transparent !important;
+            border: 2px solid var(--strip-color) !important;
+            background: none !important;
+            box-shadow: none !important;
             opacity: var(--strip-opacity);
-            transition: opacity 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
             z-index: 1;
         }
 
         .target-head {
             width: 72px;
             height: 50px;
-            background-color: #05080c !important;
+            background: #05080c !important;
             border: 2px solid var(--tac-border);
             border-bottom: none;
             border-radius: 12px 12px 0 0;
@@ -224,17 +224,15 @@
             z-index: 2;
         }
 
-        /* 頭部外圍光纖燈條：純外圍描邊發光 */
         .head-led-strip {
             position: absolute;
             inset: -4px;
             border-radius: 14px 14px 0 0;
             pointer-events: none;
-            border: 2px solid var(--strip-color);
-            box-shadow: 0 0 12px var(--strip-color);
-            background: transparent !important;
+            border: 2px solid var(--strip-color) !important;
+            background: none !important;
+            box-shadow: none !important;
             opacity: var(--strip-opacity);
-            transition: opacity 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease;
         }
 
         .top-hang-hole {
@@ -259,11 +257,10 @@
         .shoulder-line-l { left: 44px; transform: rotate(-35deg); }
         .shoulder-line-r { right: 44px; transform: rotate(35deg); }
 
-        /* 1~8 號活動鋼板：保持消光暗色，禁止染色 */
+        /* 鋼板：固定深藍灰色，完全不隨擊發變色 */
         .tac-plate {
-            background-color: #0c1219 !important;
+            background: #0c1219 !important;
             border: 1px solid #1d3345 !important;
-            box-shadow: none !important;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -284,14 +281,14 @@
         #plt-7 { width: 38px; height: 50px; border-radius: 3px; top: 170px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
         #plt-8 { width: 34px; height: 46px; border-radius: 3px; top: 162px; right: 18px; font-size: 0.85rem; }
 
-        /* 發光彈著點 (子彈打中鋼板後唯一亮點) */
+        /* 彈著孔：精確綠色亮點 */
         .bullet-hole {
             position: absolute;
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #d4ffea;
-            box-shadow: 0 0 8px var(--neon-green), inset 0 0 2px #000;
+            background: #ffffff;
+            box-shadow: 0 0 6px var(--neon-green), inset 0 0 2px #000;
             border: 1px solid var(--neon-green);
             transform: translate(-50%, -50%);
             z-index: 25;
@@ -299,8 +296,7 @@
         }
 
         .bullet-hole.charlie-hole {
-            background: #d8f7ff;
-            box-shadow: 0 0 8px var(--cyan-core), inset 0 0 2px #000;
+            box-shadow: 0 0 6px var(--cyan-core), inset 0 0 2px #000;
             border-color: var(--cyan-core);
         }
 
@@ -364,21 +360,6 @@
             border-color: #ffaa00;
             box-shadow: 0 0 16px rgba(255, 170, 0, 0.3);
             transform: scale(0.99);
-        }
-
-        .btn-motion-secondary {
-            width: 100%;
-            background: transparent;
-            color: var(--text-dim);
-            border: 1px solid var(--tac-border);
-            padding: 9px;
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            cursor: pointer;
-            margin-top: 8px;
-            border-radius: 4px;
         }
 
         .preview-modal {
@@ -488,7 +469,7 @@
 
         <div class="target-container">
             <div class="tac-steel-target">
-                <!-- 光纖燈條 (唯一爆閃處) -->
+                <!-- 光纖燈條：純外圍 2px 線框 -->
                 <div class="led-edge-strip" id="ledEdgeStrip"></div>
 
                 <div class="target-head">
@@ -526,11 +507,8 @@
         <button class="btn-motion" id="btnRecord" onclick="captureFastMotionCard()">
             <span>⚡</span> 產生動態戰報圖卡 (SAVE MOTION GIF)
         </button>
-        <button class="btn-motion-secondary" id="btnRecordStatic" onclick="captureFlawlessCard()">
-            改用靜態高清圖卡（備援，不含動畫）
-        </button>
-        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 6px;">
-            純光纖燈條爆閃＋彈孔烙印，點擊按鈕下載或長按加入相簿！
+        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 4px;">
+            純光纖細邊條爆閃＋彈孔烙印，點擊按鈕下載或長按加入相簿！
         </div>
     </div>
 
@@ -600,6 +578,7 @@
             activeTimers = [];
         }
 
+        // 純燈條細框控制
         function setStrip(color, opacity = 1) {
             document.documentElement.style.setProperty('--strip-color', color);
             document.documentElement.style.setProperty('--strip-opacity', opacity);
@@ -641,7 +620,7 @@
             shotDelays = [firstShot, firstShot + split, firstShot + split * 2];
         }
 
-        // ─── 60FPS 原生流暢回放狀態機 (純外圍燈條爆閃) ───
+        // ─── 實時 60FPS 原生流暢回放 ───
         let replayLoopTimer = null;
         let strobeInterval = null;
 
@@ -658,25 +637,25 @@
                 ? [{ plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }]
                 : [{ plt: 4, z: 'C', elem: p4, charlie: true }, { plt: 1, z: 'B', elem: p1, charlie: false }, { plt: 2, z: 'A', elem: p2, charlie: false }];
 
-            // 第 1 發：閃燈條 + 烙印第 1 顆彈孔
+            // 第 1 發
             scheduleTimer(() => {
                 flashStripOnly(shots[0].z, 140);
                 createBulletHole(shots[0].elem, shots[0].charlie);
             }, shotDelays[0]);
 
-            // 第 2 發：閃燈條 + 烙印第 2 顆彈孔
+            // 第 2 發
             scheduleTimer(() => {
                 flashStripOnly(shots[1].z, 140);
                 createBulletHole(shots[1].elem, shots[1].charlie);
             }, shotDelays[1]);
 
-            // 第 3 發：閃燈條 + 烙印第 3 顆彈孔
+            // 第 3 發
             scheduleTimer(() => {
                 flashStripOnly(shots[2].z, 160);
                 createBulletHole(shots[2].elem, shots[2].charlie);
             }, shotDelays[2]);
 
-            // 第 4 階段：純外圍跑馬燈
+            // 第 4 階段跑馬燈
             const strobeStartTime = shotDelays[2] + 250;
             scheduleTimer(() => {
                 startModeStrobe(isMozambique);
@@ -725,7 +704,7 @@
             runOneShotReplayCycle();
         };
 
-        // ─── 極速高畫質關鍵影格 GIF 合成 (0發 ➔ 1發 ➔ 2發 ➔ 3發 ➔ 跑馬燈) ───
+        // ─── 嚴格保證 0➔1➔2➔3 彈孔遞增 + 絕不染色錄製引擎 ───
         let gifWorkerBlobUrl = null;
         async function getSafeWorkerUrl() {
             if (gifWorkerBlobUrl) return gifWorkerBlobUrl;
@@ -741,14 +720,12 @@
 
         async function captureFastMotionCard() {
             const btn = document.getElementById("btnRecord");
-            const staticBtn = document.getElementById("btnRecordStatic");
             if (btn.disabled) return;
 
             const originalText = btn.innerHTML;
             btn.disabled = true;
-            staticBtn.disabled = true;
 
-            // 1. 徹底清空並重設
+            // 1. 完全終止螢幕上的定時器，徹底清除所有舊彈孔與燈效
             clearAllActiveTimers();
             stopModeStrobe();
             clearAllBulletHoles();
@@ -782,34 +759,34 @@
                     height: 640
                 });
 
-                // Frame 0: 空白起跑 (0 發彈孔，燈條滅)
-                btn.innerHTML = "<span>🎬</span> 擷取起始影格 (0 發)...";
+                // Frame 0: 空靶（0 個彈孔，燈條滅）
+                btn.innerHTML = "<span>🎬</span> 影格 0 (空靶)...";
                 let c0 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
                 gif.addFrame(c0, { delay: 180 });
 
-                // Frame 1: 第 1 發命中 (燈條瞬亮 + 增加第 1 顆彈孔)
-                btn.innerHTML = "<span>🎬</span> 擷取第 1 發 (1 彈孔)...";
+                // Frame 1: 第 1 發（燈條亮 + 產生第 1 顆彈孔）
+                btn.innerHTML = "<span>🎬</span> 影格 1 (第 1 發)...";
                 setStrip(shots[0].z === 'A' ? '#ff1a35' : (shots[0].z === 'B' ? '#ffaa00' : '#00e65c'), 1);
                 createBulletHole(shots[0].elem, shots[0].charlie, holePositions[0]);
                 let c1 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
                 gif.addFrame(c1, { delay: Math.max(160, Math.round(shotDelays[1] - shotDelays[0])) });
 
-                // Frame 2: 第 2 發連打 (燈條瞬亮 + 增加第 2 顆彈孔，前一顆保留)
-                btn.innerHTML = "<span>🎬</span> 擷取第 2 發 (2 彈孔)...";
+                // Frame 2: 第 2 發（燈條亮 + 產生第 2 顆彈孔，第 1 顆保留）
+                btn.innerHTML = "<span>🎬</span> 影格 2 (第 2 發)...";
                 setStrip(shots[1].z === 'A' ? '#ff1a35' : (shots[1].z === 'B' ? '#ffaa00' : '#00e65c'), 1);
                 createBulletHole(shots[1].elem, shots[1].charlie, holePositions[1]);
                 let c2 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
                 gif.addFrame(c2, { delay: Math.max(160, Math.round(shotDelays[2] - shotDelays[1])) });
 
-                // Frame 3: 第 3 發爆頭 (燈條瞬亮 + 增加第 3 顆彈孔，前兩顆保留)
-                btn.innerHTML = "<span>🎬</span> 擷取第 3 發 (3 彈孔)...";
+                // Frame 3: 第 3 發（燈條亮 + 產生第 3 顆彈孔，前 2 顆保留）
+                btn.innerHTML = "<span>🎬</span> 影格 3 (第 3 發)...";
                 setStrip(shots[2].z === 'A' ? '#ff1a35' : (shots[2].z === 'B' ? '#ffaa00' : '#00e65c'), 1);
                 createBulletHole(shots[2].elem, shots[2].charlie, holePositions[2]);
                 let c3 = await html2canvas(target, { scale: 1.0, backgroundColor: "#010204", logging: false });
                 gif.addFrame(c3, { delay: 240 });
 
-                // Frame 4~7: 慶祝跑馬燈 (3 顆彈孔維持在上面，純燈條切換顏色爆閃)
-                btn.innerHTML = "<span>⚡</span> 擷取慶祝跑馬燈...";
+                // Frame 4~7: 慶祝跑馬燈（3 顆彈孔保持在靶上，純外圍燈條變色）
+                btn.innerHTML = "<span>⚡</span> 影格 4 (跑馬燈)...";
                 const strobeColors = isMozambique 
                     ? ['var(--neon-red)', '#0055ff', 'var(--neon-red)', '#0055ff']
                     : (mode === 'reaction' ? ['var(--neon-gold)', 'transparent', 'var(--neon-gold)', 'transparent'] : ['#ff1a35', '#00ff66', '#00d8e6', '#b026ff']);
@@ -837,7 +814,6 @@
 
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    staticBtn.disabled = false;
 
                     runOneShotReplayCycle();
                 });
@@ -845,47 +821,11 @@
                 gif.render();
 
             } catch (err) {
-                console.error("生成失敗，切換至備援:", err);
-                await captureFlawlessCard();
+                console.error("生成失敗:", err);
+                alert("生成異常，請重試！");
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-                staticBtn.disabled = false;
                 runOneShotReplayCycle();
-            }
-        }
-
-        async function captureFlawlessCard() {
-            const btn = document.getElementById("btnRecordStatic");
-            const motionBtn = document.getElementById("btnRecord");
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "正在生成高清圖卡...";
-            btn.disabled = true;
-            motionBtn.disabled = true;
-
-            const targetElement = document.getElementById("storyCaptureArea");
-
-            try {
-                const canvas = await html2canvas(targetElement, {
-                    scale: 2,
-                    backgroundColor: "#010204",
-                    useCORS: true,
-                    logging: false
-                });
-
-                const modal = document.getElementById("previewModal");
-                const img = document.getElementById("previewImg");
-                const dlBtn = document.getElementById("downloadGifLink");
-
-                img.src = canvas.toDataURL("image/png");
-                dlBtn.style.display = "none";
-                modal.style.display = "flex";
-
-            } catch (err) {
-                alert("生成異常，請手動截圖！");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                motionBtn.disabled = false;
             }
         }
 
