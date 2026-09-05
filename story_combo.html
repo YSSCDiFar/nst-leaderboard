@@ -17,8 +17,8 @@
             --cyan-core: #00d8e6;
             --cyan-glow: rgba(0, 216, 230, 0.35);
             --neon-green: #00e65c;
-            --neon-gold: #e6a800;
-            --neon-red: #e62237;
+            --neon-gold: #ffaa00;
+            --neon-red: #ff1a35;
             --text-dim: #506477;
             --tac-black: #05080c;
             --tac-plate: #0c1219;
@@ -234,6 +234,7 @@
             border: 1px solid #334455;
         }
 
+        /* 鋼板固定消光暗色，無打擊高亮與放大 */
         .tac-plate {
             background: #0c1219 !important;
             border: 1px solid #1d3345 !important;
@@ -493,7 +494,7 @@
             <span>⚡</span> 產生 IG Boomerang 動態戰報卡
         </button>
         <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 2px;">
-            比照靶機實體 60FPS 循環重現，支援一鍵分享與錄製 IG 動動！
+            真實打擊彈點 60FPS 循環重現，支援一鍵分享與錄製 IG 動動！
         </div>
     </div>
 
@@ -529,7 +530,9 @@
         const lane = params.get('lane') || "1";
         const recordedTimeSec = Math.max(0.4, parseFloat(params.get('time')) || 1.82);
         const rank = params.get('rank') || "MASTER";
-        const code = params.get('code') || "BBA";
+        const rawCode = (params.get('code') || "B-B-A").toUpperCase().replace(/\s+/g, '');
+        const code = rawCode.includes("-") ? rawCode : rawCode.split("").join("-");
+        const hitsParam = params.get('hits'); // 接收 LaneFor4Mode 傳入的真實打擊板塊 (例: "1,7,2")
 
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
@@ -540,6 +543,51 @@
         const now = new Date();
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+
+        // PLATE_MAP 對應關係 (比照 LaneFor4Mode.html)
+        const PLATE_MAP = {
+            1: { zone: 'B', color: '#ffaa00' },
+            2: { zone: 'A', color: '#ff1a35' },
+            3: { zone: 'A', color: '#ff1a35' },
+            4: { zone: 'C', color: '#00e65c' },
+            5: { zone: 'C', color: '#00e65c' },
+            6: { zone: 'C', color: '#00e65c' },
+            7: { zone: 'B', color: '#ffaa00' },
+            8: { zone: 'C', color: '#00e65c' }
+        };
+
+        // 🎯 解析實際命中的 3 塊鋼板與彈著位置 (LaneFor4Mode 打哪裡就亮哪裡)
+        function resolveActualShots() {
+            if (hitsParam) {
+                const plates = hitsParam.split(",").map(p => parseInt(p.trim())).filter(p => !isNaN(p));
+                if (plates.length === 3) {
+                    const plateCounts = {};
+                    return plates.map((plateId) => {
+                        plateCounts[plateId] = (plateCounts[plateId] || 0) + 1;
+                        const count = plateCounts[plateId];
+                        const info = PLATE_MAP[plateId] || { zone: 'B', color: '#ffaa00' };
+
+                        // 同塊板被多次命中時微調散佈點
+                        let rx = 50, ry = 50;
+                        if (count === 1) { rx = 44; ry = 46; }
+                        else if (count === 2) { rx = 56; ry = 54; }
+                        else { rx = 50; ry = 48; }
+
+                        return { plate: plateId, zone: info.zone, color: info.color, rx, ry };
+                    });
+                }
+            }
+
+            // 備援：若無 hits 參數，根據代碼 (例如 B-B-A) 分配
+            const zones = code.split("-");
+            return [
+                { plate: 1, zone: zones[0] || 'B', color: '#ffaa00', rx: 42, ry: 46 },
+                { plate: (zones[1] === 'B' ? 7 : 1), zone: zones[1] || 'B', color: '#ffaa00', rx: 54, ry: 52 },
+                { plate: 2, zone: zones[2] || 'A', color: '#ff1a35', rx: 50, ry: 48 }
+            ];
+        }
+
+        const shotConfigs = resolveActualShots();
 
         let activeTimers = [];
         function scheduleTimer(fn, delay) {
@@ -557,18 +605,18 @@
             document.documentElement.style.setProperty('--strip-opacity', opacity);
         }
 
-        function flashStripOnly(colorHex, duration = 140) {
-            setStrip(colorHex, 1);
+        function flashStripOnce(colorHex, duration = 120) {
+            setStrip(colorHex, 1.0);
             scheduleTimer(() => { setStrip('transparent', 0); }, duration);
         }
 
-        // 核心同步函式：同時注入主畫面與彈窗內克隆的鋼板
+        // 注入彈著點 (主畫面與彈窗同步)
         function createBulletHole(plateId, rx = 50, ry = 50) {
             const targets = [];
-            const mainPlate = document.querySelector(`#storyCaptureArea #${plateId}`);
+            const mainPlate = document.querySelector(`#storyCaptureArea #plt-${plateId}`);
             if (mainPlate) targets.push(mainPlate);
 
-            const clonePlate = document.querySelector(`#modalCloneSlot #${plateId}`);
+            const clonePlate = document.querySelector(`#modalCloneSlot #plt-${plateId}`);
             if (clonePlate) targets.push(clonePlate);
 
             targets.forEach(plate => {
@@ -591,38 +639,87 @@
         let replayLoopTimer = null;
         let strobeInterval = null;
 
+        // 比照 LaneFor4Mode.html triggerComboLightEffect 特效庫
+        function triggerComboStrobe(codeStr, callback) {
+            clearInterval(strobeInterval);
+
+            if (codeStr === "B-B-A") {
+                let step = 0;
+                strobeInterval = setInterval(() => {
+                    setStrip(step % 2 === 0 ? '#ff1a35' : '#0055ff', 1.0);
+                    step++;
+                    if (step > 12) {
+                        clearInterval(strobeInterval);
+                        setStrip('#ffaa00', 0.4);
+                        if (callback) callback();
+                    }
+                }, 70);
+            } else if (codeStr === "C-B-A") {
+                const colors = ['#ff1a35', '#ffaa00', '#00e65c', '#00e5ff', '#b026ff'];
+                let ci = 0;
+                strobeInterval = setInterval(() => {
+                    setStrip(colors[ci % colors.length], 1.0);
+                    ci++;
+                    if (ci > 15) {
+                        clearInterval(strobeInterval);
+                        setStrip('#ffffff', 0.4);
+                        if (callback) callback();
+                    }
+                }, 60);
+            } else if (codeStr === "A-A-A") {
+                runStrobeBurst('#ff1a35', 5, 60, callback);
+            } else if (codeStr === "B-B-B") {
+                runStrobeBurst('#ffaa00', 5, 60, callback);
+            } else if (codeStr === "C-C-C") {
+                runStrobeBurst('#00e65c', 5, 60, callback);
+            } else {
+                runStrobeBurst('#ff1a35', 4, 80, callback);
+            }
+        }
+
+        function runStrobeBurst(color, times, intervalMs, callback) {
+            let count = 0;
+            strobeInterval = setInterval(() => {
+                if (count % 2 === 0) setStrip(color, 1.0);
+                else setStrip('#000000', 0);
+                count++;
+                if (count >= times * 2) {
+                    clearInterval(strobeInterval);
+                    setStrip(color, 0.4);
+                    if (callback) callback();
+                }
+            }, intervalMs);
+        }
+
         function runReplayOnce() {
             clearAllBulletHoles();
             setStrip('transparent', 0);
 
-            // 第 1 發 (胸口 1 號板)
+            // 第 1 發: 純外圍邊條閃爍 + 實體打擊板烙印彈孔 (無板塊震盪與高亮)
             scheduleTimer(() => {
-                flashStripOnly('#ffaa00', 140);
-                createBulletHole('plt-1', 40, 45);
+                flashStripOnce(shotConfigs[0].color, 120);
+                createBulletHole(shotConfigs[0].plate, shotConfigs[0].rx, shotConfigs[0].ry);
             }, shotDelays[0]);
 
-            // 第 2 發 (胸口 1 號板)
+            // 第 2 發
             scheduleTimer(() => {
-                flashStripOnly('#ffaa00', 140);
-                createBulletHole('plt-1', 60, 52);
+                flashStripOnce(shotConfigs[1].color, 120);
+                createBulletHole(shotConfigs[1].plate, shotConfigs[1].rx, shotConfigs[1].ry);
             }, shotDelays[1]);
 
-            // 第 3 發 (頭部 2 號板)
+            // 第 3 發
             scheduleTimer(() => {
-                flashStripOnly('#ff1a35', 160);
-                createBulletHole('plt-2', 50, 45);
+                flashStripOnce(shotConfigs[2].color, 120);
+                createBulletHole(shotConfigs[2].plate, shotConfigs[2].rx, shotConfigs[2].ry);
             }, shotDelays[2]);
 
+            // 結尾跑馬燈
             const strobeStart = shotDelays[2] + 250;
             scheduleTimer(() => {
-                let step = 0;
-                strobeInterval = setInterval(() => {
-                    setStrip(step % 2 === 0 ? 'var(--neon-red)' : '#0055ff', 1);
-                    step++;
-                }, 85);
+                triggerComboStrobe(code);
             }, strobeStart);
 
-            return strobeStart + 1200;
+            return strobeStart + 1400;
         }
 
         function runOneShotReplayCycle() {
@@ -638,7 +735,6 @@
             runOneShotReplayCycle();
         };
 
-        // 開啟 Boomerang 彈窗：重置時序從 0 發開始，與主畫面同步播放動畫
         function openBoomerangModal() {
             const modal = document.getElementById("previewModal");
             const slot = document.getElementById("modalCloneSlot");
@@ -647,13 +743,11 @@
             const clone = document.getElementById("storyCaptureArea").cloneNode(true);
             clone.id = "storyCaptureAreaClone";
             clone.classList.add("modal-card-scale");
-            // 清理克隆體內部已有的彈孔殘影，由時序重新注入
             clone.querySelectorAll(".bullet-hole").forEach(h => h.remove());
             slot.appendChild(clone);
 
             modal.style.display = "flex";
 
-            // 重置動畫迴圈，讓使用者一打開彈窗就看到 0發 -> 1發 -> 2發 -> 3發 -> 跑馬燈
             clearAllActiveTimers();
             clearInterval(strobeInterval);
             runOneShotReplayCycle();
@@ -669,11 +763,11 @@
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
 
-            // 強制在主畫面上釘好完整的 3 發彈孔
+            // 保證 3 顆實體彈孔釘在靶板上
             clearAllBulletHoles();
-            createBulletHole('plt-1', 40, 45);
-            createBulletHole('plt-1', 60, 52);
-            createBulletHole('plt-2', 50, 45);
+            shotConfigs.forEach(s => {
+                createBulletHole(s.plate, s.rx, s.ry);
+            });
 
             try {
                 const target = document.getElementById("storyCaptureArea");
