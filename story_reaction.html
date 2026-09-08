@@ -47,7 +47,7 @@
             background: radial-gradient(circle at 50% 20%, #070c12 0%, #020406 85%);
             border: 1px solid #162433;
             border-radius: 8px;
-            padding: 16px 14px 12px 14px;
+            padding: 14px 14px 10px 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -58,7 +58,7 @@
 
         .header-brand {
             border-bottom: 1px solid #101a24;
-            padding-bottom: 6px;
+            padding-bottom: 5px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -67,16 +67,16 @@
 
         .brand-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.05rem;
+            font-size: 1.0rem;
             color: var(--cyan-core);
             letter-spacing: 2px;
             text-shadow: 0 0 10px var(--cyan-glow);
         }
 
-        .brand-sub { font-size: 0.58rem; color: var(--text-dim); letter-spacing: 1px; }
+        .brand-sub { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 1px; }
 
         .live-tag {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             color: var(--neon-gold);
             font-weight: bold;
             display: flex;
@@ -96,18 +96,18 @@
         }
 
         .hero-section {
-            margin: 4px 0 2px 0;
+            margin: 2px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
         }
 
-        .operator-tag .lbl { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 1.5px; }
+        .operator-tag .lbl { font-size: 0.52rem; color: var(--text-dim); letter-spacing: 1.5px; }
         .operator-tag .name {
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: #fff;
             letter-spacing: 1px;
         }
@@ -116,14 +116,14 @@
             text-align: center;
             background: #090e14;
             border: 2px solid var(--neon-gold);
-            padding: 2px 10px;
+            padding: 2px 8px;
             border-radius: 4px;
             box-shadow: 0 0 12px rgba(230, 168, 0, 0.4);
             transform: rotate(-2deg);
         }
         .grade-badge .grade {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.0rem;
+            font-size: 0.95rem;
             font-weight: 900;
             color: var(--neon-gold);
             letter-spacing: 1px;
@@ -133,80 +133,80 @@
             background: #04070a;
             border: 1px solid #101a24;
             border-radius: 6px;
-            padding: 6px 10px;
+            padding: 5px 8px;
             text-align: center;
             z-index: 10;
         }
-        .score-lbl { font-size: 0.52rem; color: var(--text-dim); letter-spacing: 2px; }
+        .score-lbl { font-size: 0.5rem; color: var(--text-dim); letter-spacing: 2px; }
         .score-val {
             font-family: 'Orbitron', monospace;
-            font-size: 2.4rem;
+            font-size: 2.1rem;
             font-weight: 900;
             color: var(--neon-gold);
-            text-shadow: 0 0 18px var(--gold-glow);
+            text-shadow: 0 0 16px var(--gold-glow);
             line-height: 1.05;
-            margin: 2px 0;
+            margin: 1px 0;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-top: 4px;
+            gap: 5px;
+            margin-top: 3px;
         }
         .stat-card {
             background: #06090d;
             border: 1px solid #0f1822;
-            padding: 4px 2px;
+            padding: 3px 2px;
             border-radius: 4px;
             text-align: center;
         }
-        .stat-card .lbl { font-size: 0.48rem; color: var(--text-dim); }
-        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: bold; color: #fff; margin-top: 2px; }
+        .stat-card .lbl { font-size: 0.46rem; color: var(--text-dim); }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.74rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* 鋼靶容器 */
+        /* ─── 修正：精準尺寸靶體，保證不超出版面 ─── */
         .target-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 24px 0 6px 0;
+            margin: 38px 0 4px 0;
             position: relative;
             z-index: 10;
         }
 
         .tac-steel-target {
-            width: 200px;
-            height: 260px;
+            width: 172px;
+            height: 220px;
             background: #05080c !important;
             border: 2px solid var(--tac-border);
-            border-radius: 0 0 10px 10px;
+            border-radius: 0 0 8px 8px;
             position: relative;
-            box-shadow: inset 0 0 25px #000000;
+            box-shadow: inset 0 0 20px #000000;
         }
 
         .led-edge-strip {
             position: absolute;
             inset: -4px;
-            border-radius: 0 0 14px 14px;
+            border-radius: 0 0 12px 12px;
             pointer-events: none;
             border: 2px solid var(--strip-color) !important;
             background: transparent !important;
-            box-shadow: 0 0 14px var(--strip-color) !important;
+            box-shadow: 0 0 12px var(--strip-color) !important;
             opacity: var(--strip-opacity);
             transition: opacity 0.08s ease, border-color 0.08s ease;
             z-index: 1;
         }
 
         .target-head {
-            width: 76px;
-            height: 52px;
+            width: 65px;
+            height: 44px;
             background: #05080c !important;
             border: 2px solid var(--tac-border);
             border-bottom: none;
-            border-radius: 12px 12px 0 0;
+            border-radius: 10px 10px 0 0;
             position: absolute;
-            top: -50px;
+            top: -42px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -215,22 +215,22 @@
         .head-led-strip {
             position: absolute;
             inset: -4px;
-            border-radius: 14px 14px 0 0;
+            border-radius: 12px 12px 0 0;
             pointer-events: none;
             border: 2px solid var(--strip-color) !important;
             background: transparent !important;
-            box-shadow: 0 0 14px var(--strip-color) !important;
+            box-shadow: 0 0 12px var(--strip-color) !important;
             opacity: var(--strip-opacity);
             transition: opacity 0.08s ease, border-color 0.08s ease;
         }
 
         .top-hang-hole {
             position: absolute;
-            top: 5px;
+            top: 4px;
             left: 50%;
             transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: #000;
             border: 1px solid #334455;
@@ -251,62 +251,62 @@
             overflow: visible;
         }
 
-        #plt-2 { width: 40px; height: 38px; border-radius: 4px; top: 6px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
-        #plt-3 { width: 78px; height: 26px; border-radius: 3px; top: 14px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
-        #plt-1 { width: 66px; height: 66px; border-radius: 50%; top: 72px; left: 50%; transform: translateX(-50%); font-size: 1.3rem; }
-        #plt-4 { width: 30px; height: 86px; border-radius: 3px; top: 40px; left: 8px; font-size: 0.85rem; }
-        #plt-5 { width: 30px; height: 86px; border-radius: 3px; top: 40px; right: 8px; font-size: 0.85rem; }
-        #plt-6 { width: 36px; height: 50px; border-radius: 3px; top: 175px; left: 16px; font-size: 0.85rem; }
-        #plt-7 { width: 42px; height: 54px; border-radius: 3px; top: 185px; left: 50%; transform: translateX(-50%); font-size: 0.95rem; }
-        #plt-8 { width: 36px; height: 50px; border-radius: 3px; top: 175px; right: 16px; font-size: 0.85rem; }
+        #plt-2 { width: 34px; height: 32px; border-radius: 4px; top: 5px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; }
+        #plt-3 { width: 66px; height: 22px; border-radius: 3px; top: 12px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; }
+        #plt-1 { width: 56px; height: 56px; border-radius: 50%; top: 60px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; }
+        #plt-4 { width: 26px; height: 72px; border-radius: 3px; top: 34px; left: 7px; font-size: 0.75rem; }
+        #plt-5 { width: 26px; height: 72px; border-radius: 3px; top: 34px; right: 7px; font-size: 0.75rem; }
+        #plt-6 { width: 30px; height: 42px; border-radius: 3px; top: 150px; left: 14px; font-size: 0.75rem; }
+        #plt-7 { width: 36px; height: 46px; border-radius: 3px; top: 156px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
+        #plt-8 { width: 30px; height: 42px; border-radius: 3px; top: 150px; right: 14px; font-size: 0.75rem; }
 
         .bullet-hole {
             position: absolute;
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: #ffffff !important;
-            box-shadow: 0 0 8px var(--neon-gold), inset 0 0 2px #000 !important;
-            border: 1.5px solid var(--neon-gold) !important;
+            box-shadow: 0 0 7px var(--neon-gold), inset 0 0 2px #000 !important;
+            border: 1px solid var(--neon-gold) !important;
             transform: translate(-50%, -50%);
             z-index: 50;
             pointer-events: none;
         }
 
         .brand-pedestal {
-            margin-top: 14px;
-            padding: 4px 12px;
+            margin-top: 10px;
+            padding: 3px 10px;
             background: #05080c;
             border: 1px solid #14202b;
             border-radius: 3px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             font-weight: 900;
-            letter-spacing: 2.5px;
+            letter-spacing: 2px;
         }
         .brand-pedestal .tag-p1 { color: #5a829e; }
         .brand-pedestal .tag-p2 { color: #9c8038; }
 
         .footer-stamp {
             border-top: 1px solid #101a24;
-            padding-top: 6px;
+            padding-top: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.52rem;
+            font-size: 0.5rem;
             color: var(--text-dim);
             z-index: 10;
         }
 
         .action-area {
             width: 360px;
-            margin-top: 12px;
+            margin-top: 10px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .btn-motion {
@@ -314,9 +314,9 @@
             background: linear-gradient(135deg, #180a0d 0%, #2a1014 100%);
             color: #ffaa00;
             border: 1px solid #4d1c24;
-            padding: 13px;
+            padding: 12px;
             font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 700;
             letter-spacing: 1.5px;
             cursor: pointer;
@@ -324,7 +324,7 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
             box-shadow: inset 0 0 12px rgba(255, 26, 53, 0.15), 0 4px 15px rgba(0,0,0,0.8);
         }
 
@@ -342,30 +342,30 @@
         }
 
         .modal-card-scale {
-            transform: scale(0.78);
+            transform: scale(0.82);
             transform-origin: top center;
             box-shadow: 0 0 45px rgba(230, 168, 0, 0.3);
             border-color: var(--neon-gold);
-            margin-bottom: -115px;
+            margin-bottom: -95px;
         }
 
         .modal-action-bar {
             width: 330px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             z-index: 1005;
         }
 
         .btn-action-primary {
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             background: linear-gradient(135deg, #1a1608 0%, #2e260c 100%);
             border: 1px solid var(--neon-gold);
             color: var(--neon-gold);
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             letter-spacing: 1px;
             border-radius: 6px;
             cursor: pointer;
@@ -374,13 +374,13 @@
 
         .btn-action-record {
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             background: linear-gradient(135deg, #200f13 0%, #36151a 100%);
             border: 1px solid var(--neon-red);
             color: #ffaa00;
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             letter-spacing: 1px;
             border-radius: 6px;
             cursor: pointer;
@@ -389,9 +389,9 @@
         .record-tip-box {
             background: rgba(14, 25, 36, 0.9);
             border: 1px dashed #20455e;
-            padding: 8px 10px;
+            padding: 7px 10px;
             border-radius: 6px;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: var(--text-dim);
             line-height: 1.4;
             text-align: center;
@@ -459,7 +459,7 @@
             </div>
         </div>
 
-        <!-- 鋼靶系統 (1~8 號活動鋼板配置) -->
+        <!-- 鋼靶配置 -->
         <div class="target-container">
             <div class="tac-steel-target">
                 <div class="led-edge-strip" id="ledEdgeStrip"></div>
@@ -532,8 +532,6 @@
         const lane = params.get('lane') || "1";
         const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 0.86);
         const rank = params.get('rank') || (recordedTimeSec < 1.0 ? "GODLIKE" : (recordedTimeSec <= 1.5 ? "ELITE" : (recordedTimeSec <= 2.0 ? "PASS" : "FAIL")));
-        
-        // 🎯 核心修復：精確接收大螢幕擊中的真實鋼板編號 (支援 hits, plate 或 target 參數)
         const hitPlateId = parseInt(params.get('hits') || params.get('plate') || params.get('target') || "1") || 1;
 
         document.getElementById("dispName").innerText = name.toUpperCase();
@@ -574,7 +572,6 @@
             document.documentElement.style.setProperty('--strip-opacity', opacity);
         }
 
-        // 雙向同步注入彈孔 (主畫面 + 彈窗)
         function createBulletHole(plateId, rx = 50, ry = 50) {
             const targets = [];
             const mainPlate = document.querySelector(`#storyCaptureArea #plt-${plateId}`);
@@ -601,22 +598,17 @@
 
         function runReplayOnce() {
             clearAllBulletHoles();
-            
-            // 階段 1：等待信號中（全滅）
             setStrip('#000000', 0);
 
-            // 階段 2：嗶聲起跑 (FIRE) -> 亮全白光
             scheduleTimer(() => {
                 setStrip('#ffffff', 1.0);
             }, 300);
 
-            // 階段 3：🎯 修正：在 hitPlateId 上烙印彈孔 (不再寫死 plt-1)
             const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
             scheduleTimer(() => {
                 createBulletHole(hitPlateId, 50, 50);
             }, shotTime);
 
-            // 階段 4：命中後結算爆閃
             const strobeStart = shotTime + 200;
             scheduleTimer(() => {
                 let count = 0;
@@ -685,7 +677,6 @@
 
             modal.style.display = "flex";
 
-            // 重設動畫循環，開窗立即同步從 0 開始播放
             clearAllActiveTimers();
             clearInterval(strobeInterval);
             runOneShotReplayCycle();
@@ -701,7 +692,6 @@
             clearInterval(strobeInterval);
             setStrip('transparent', 0);
 
-            // 🎯 修正：釘死 hitPlateId 彈孔，保證截圖存在 (不再寫死 plt-1)
             clearAllBulletHoles();
             createBulletHole(hitPlateId, 50, 50);
 
