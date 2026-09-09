@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEURONSTRIKE // KILLINGLANE GLOBAL LEADERBOARD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Orbitron:wght@600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #020407;
+      --panel-bg: rgba(6, 10, 16, 0.85);
+      --panel-card: #080f18;
+      --panel-border: #132334;
+      --panel-border-bright: #1c354e;
+      --cyan-core: #00e5ff;
+      --cyan-glow: rgba(0, 229, 255, 0.4);
+      --neon-gold: #ffaa00;
+      --gold-glow: rgba(255, 170, 0, 0.45);
+      --neon-silver: #d0e0f0;
+      --silver-glow: rgba(208, 224, 240, 0.3);
+      --neon-bronze: #cd7f32;
+      --bronze-glow: rgba(205, 127, 50, 0.3);
+      --neon-green: #00e65c;
+      --green-glow: rgba(0, 230, 92, 0.35);
+      --neon-red: #ff1a35;
+      --red-glow: rgba(255, 26, 53, 0.4);
+      --text-dim: #4d667d;
+      --text-main: #dce7f2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      /* 俐落高科技微型網格，完全無隨機雜訊或掃描線 */
+      background-image: 
+        linear-gradient(rgba(0, 229, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      position: relative;
+    }
+
+    /* 頂部科技發光光暈 */
+    body::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 頂部戰術狀態列 */
+    header {
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--panel-border);
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--cyan-core);
+      letter-spacing: 2px;
+      text-shadow: 0 0 14px var(--cyan-glow);
+    }
+
+    .brand-sub {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 1.5px;
+    }
+
+    .status-hud {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hud-badge {
+      background: var(--panel-card);
+      border: 1px solid var(--panel-border);
+      padding: 6px 14px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+    .hud-badge strong { color: #fff; }
+
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon-green);
+      box-shadow: 0 0 10px var(--neon-green);
+      animation: pulse 1.2s infinite alternate;
+    }
+    @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; transform: scale(1.1); } }
+
+    main {
+      flex: 1;
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 1;
+    }
+
+    /* 戰術情報橫幅 */
+    .banner-hud {
+      background: linear-gradient(90deg, rgba(8, 15, 24, 0.95) 0%, rgba(6, 10, 16, 0.7) 100%);
+      border: 1px solid var(--panel-border);
+      border-left: 4px solid var(--neon-gold);
+      padding: 16px 24px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .banner-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .banner-desc {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    /* TOP 3 階梯展台 (神殿架構) */
+    .podium-section {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr 1fr;
+      gap: 18px;
+      align-items: flex-end;
+      margin-top: 6px;
+    }
+
+    .podium-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      transition: all 0.2s ease;
+    }
+    .podium-card:hover { transform: translateY(-3px); }
+
+    .podium-card.rank-1 {
+      order: 2;
+      padding: 28px 18px;
+      border-color: var(--neon-gold);
+      box-shadow: 0 0 35px rgba(255, 170, 0, 0.25);
+      background: radial-gradient(circle at 50% 0%, #151107 0%, #060a10 85%);
+    }
+
+    .podium-card.rank-2 {
+      order: 1;
+      border-color: var(--neon-silver);
+      box-shadow: 0 0 25px var(--silver-glow);
+      background: radial-gradient(circle at 50% 0%, #0b141f 0%, #060a10 85%);
+    }
+
+    .podium-card.rank-3 {
+      order: 3;
+      border-color: var(--neon-bronze);
+      box-shadow: 0 0 25px var(--bronze-glow);
+      background: radial-gradient(circle at 50% 0%, #140e0a 0%, #060a10 85%);
+    }
+
+    .crown-tag {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      padding: 3px 12px;
+      border-radius: 3px;
+      margin-bottom: 14px;
+    }
+
+    .rank-1 .crown-tag { background: var(--neon-gold); color: #000; box-shadow: 0 0 14px var(--gold-glow); }
+    .rank-2 .crown-tag { background: var(--neon-silver); color: #000; }
+    .rank-3 .crown-tag { background: var(--neon-bronze); color: #000; }
+
+    .podium-callsign {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+    .rank-1 .podium-callsign { font-size: 1.75rem; color: var(--neon-gold); }
+
+    .podium-final-time {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+      margin: 6px 0;
+    }
+    .rank-1 .podium-final-time {
+      font-size: 3.4rem;
+      color: var(--cyan-core);
+      text-shadow: 0 0 25px var(--cyan-glow);
+    }
+
+    .podium-details {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .podium-details b { color: #fff; }
+
+    /* 戰術數據列表 (Pure High-Density HUD Table) */
+    .table-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+    }
+
+    .table-header-bar {
+      padding: 14px 24px;
+      background: var(--panel-card);
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-size: 0.95rem;
+      color: var(--cyan-core);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    thead th {
+      background: #080e16;
+      color: var(--text-dim);
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--panel-border);
+      font-size: 0.75rem;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #0d1722;
+      transition: background 0.12s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 229, 255, 0.035);
+    }
+
+    tbody td {
+      padding: 14px 20px;
+      vertical-align: middle;
+    }
+
+    .rank-col {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      width: 80px;
+    }
+
+    .op-col {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .time-val {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--cyan-core);
+      text-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
+    }
+
+    .modifier-chip {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      margin-right: 6px;
+    }
+    .modifier-chip.penalty {
+      background: rgba(0, 230, 92, 0.12);
+      color: var(--neon-green);
+      border: 1px solid rgba(0, 230, 92, 0.35);
+    }
+    .modifier-chip.buff {
+      background: rgba(255, 170, 0, 0.12);
+      color: var(--neon-gold);
+      border: 1px solid rgba(255, 170, 0, 0.35);
+    }
+
+    .date-stamp {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state {
+      padding: 70px 20px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-group">
+      <div>
+        <div class="brand-title">NEURONSTRIKE // KILLINGLANE</div>
+        <div class="brand-sub">20M CQB GAUNTLET GLOBAL DIVISION // 全國殺戮靶道天梯</div>
+      </div>
+    </div>
+    <div class="status-hud">
+      <div class="hud-badge">
+        <div class="status-pulse"></div>
+        <span>TELEMETRY: <strong>ONLINE</strong></span>
+      </div>
+      <div class="hud-badge">
+        <span>SORT: <strong>ASCENDING (FASTEST WIN)</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="banner-hud">
+      <div>
+        <div class="banner-title">
+          <span>⚡ 20M GAUNTLET OPERATIONAL RANKING</span>
+        </div>
+        <div class="banner-desc">
+          評定公式：實跑時間 (T_raw) ＋ 人質加罰 (+3.0s/發) － 彩虹重點獎勵 (-1.5s/發)｜4 敵殲滅自動停錶
+        </div>
+      </div>
+      <div style="font-family:'Orbitron'; font-size:1.15rem; color:var(--neon-gold); font-weight:bold;">
+        SEASON 2026-Q3
+      </div>
+    </div>
+
+    <!-- TOP 3 階梯台 -->
+    <div class="podium-section" id="podiumArea"></div>
+
+    <!-- 完整數據排行表 -->
+    <div class="table-container">
+      <div class="table-header-bar">
+        <div class="table-title">OPERATOR TIER CLASSIFICATION // 戰術階梯名次表</div>
+        <div style="font-size: 0.72rem; color: var(--text-dim);">DATA SOURCE: GHOSTSTEEL REALTIME CLOUD</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 80px;">RANK</th>
+            <th>OPERATOR // 射手呼號</th>
+            <th>LANE</th>
+            <th>RAW TIME (實跑)</th>
+            <th>MODIFIERS (加罰 / 獎勵)</th>
+            <th>FINAL TIME (結算成績)</th>
+            <th>TIMESTAMP</th>
+          </tr>
+        </thead>
+        <tbody id="rankingTableBody">
+          <tr>
+            <td colspan="7" class="empty-state">SYNCHRONIZING WITH GHOSTSTEEL CLOUD...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // --- [Firebase 初始化] ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyArJJA38NiEyQs1spfNSBDTOne_INJ7d5k",
+      authDomain: "nst-killhouse.firebaseapp.com",
+      databaseURL: "https://nst-killhouse-default-rtdb.firebaseio.com",
+      projectId: "nst-killhouse",
+      storageBucket: "nst-killhouse.firebasestorage.app",
+      messagingSenderId: "637304240805",
+      appId: "1:637304240805:web:37a2b7cdfdc9fb46596b4c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function initKillingLaneLeaderboard() {
+      const tbody = document.getElementById("rankingTableBody");
+
+      // 嚴格監聽 KillingLane 成績節點
+      db.ref("GhostSteel/Leaderboard/killinglane")
+        .orderByChild("final_time")
+        .limitToFirst(50)
+        .on('value', (snapshot) => {
+          const val = snapshot.val();
+          if (!val) {
+            document.getElementById("podiumArea").innerHTML = "";
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-state">NO COMBAT RECORDS FOUND IN KILLINGLANE SECTOR</td></tr>`;
+            return;
+          }
+
+          const records = Object.keys(val).map(key => val[key]);
+          records.sort((a, b) => a.final_time - b.final_time);
+
+          renderPodium(records.slice(0, 3));
+          renderTable(records);
+        });
+    }
+
+    function renderPodium(top3) {
+      const podium = document.getElementById("podiumArea");
+      podium.innerHTML = "";
+
+      if (top3.length === 0) return;
+
+      const configs = [
+        { rank: 1, class: 'rank-1', label: 'TOP 1 // APEX OPERATOR' },
+        { rank: 2, class: 'rank-2', label: 'TOP 2 // ELITE OPERATOR' },
+        { rank: 3, class: 'rank-3', label: 'TOP 3 // VANGUARD' }
+      ];
+
+      configs.forEach((cfg, idx) => {
+        const data = top3[idx];
+        if (!data) return;
+
+        const hPenalty = `+${((data.hostage_hits || 0) * 3.0).toFixed(1)}s`;
+        const pBuff = `-${((data.priority_hits || 0) * 1.5).toFixed(1)}s`;
+
+        const card = document.createElement("div");
+        card.className = `podium-card ${cfg.class}`;
+        card.innerHTML = `
+          <div class="crown-tag">${cfg.label}</div>
+          <div class="podium-callsign">${data.operator ? data.operator.toUpperCase() : 'OPERATOR'}</div>
+          <div class="podium-final-time">${data.final_time.toFixed(2)}s</div>
+          <div class="podium-details">
+            <span>實跑: <b>${data.raw_time ? data.raw_time.toFixed(2) : '--'}s</b></span>
+            <span>人質: <b style="color:var(--neon-green);">${hPenalty}</b></span>
+            <span>重點: <b style="color:var(--neon-gold);">${pBuff}</b></span>
+          </div>
+        `;
+        podium.appendChild(card);
+      });
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById("rankingTableBody");
+      tbody.innerHTML = "";
+
+      list.forEach((item, idx) => {
+        const rank = idx + 1;
+        const tr = document.createElement("tr");
+
+        const hPenalty = `+${((item.hostage_hits || 0) * 3.0).toFixed(1)}s`;
+        const pBuff = `-${((item.priority_hits || 0) * 1.5).toFixed(1)}s`;
+        const dateStr = item.timestamp ? new Date(item.timestamp).toLocaleDateString() : '2026.09.09';
+
+        tr.innerHTML = `
+          <td class="rank-col">${rank < 10 ? '0' + rank : rank}</td>
+          <td>
+            <div class="op-col">
+              <span>${item.operator ? item.operator.toUpperCase() : 'OPERATOR'}</span>
+            </div>
+          </td>
+          <td><span style="color:var(--neon-gold);">LANE 0${item.lane_id || 1}</span></td>
+          <td>${item.raw_time ? item.raw_time.toFixed(2) + 's' : '--'}</td>
+          <td>
+            <span class="modifier-chip penalty">人質 ${hPenalty}</span>
+            <span class="modifier-chip buff">重點 ${pBuff}</span>
+          </td>
+          <td><span class="time-val">${item.final_time.toFixed(2)}s</span></td>
+          <td class="date-stamp">${dateStr}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.addEventListener('load', initKillingLaneLeaderboard);
+  </script>
+</body>
+</html>
