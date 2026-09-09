@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NST // TACTICAL APEX LEADERBOARD</title>
+    <title>NST // KILLINGLANE TACTICAL LEADERBOARD</title>
     <!-- 戰術電競字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,17 +18,19 @@
 
     <style>
         :root {
-            --bg-deep: #05080c;
-            --panel-bg: rgba(10, 16, 26, 0.85);
+            --bg-deep: #03060a;
+            --panel-bg: rgba(8, 14, 22, 0.95);
+            --panel-card: #0b1420;
             --cyan-core: #00f0ff;
             --cyan-glow: rgba(0, 240, 255, 0.4);
             --neon-green: #00ff66;
-            --neon-gold: #ffb700;
-            --gold-glow: rgba(255, 183, 0, 0.5);
-            --neon-red: #ff003c;
-            --text-dim: #617d9d;
+            --neon-gold: #ffaa00;
+            --gold-glow: rgba(255, 170, 0, 0.45);
+            --neon-red: #ff1a35;
+            --text-dim: #55708d;
             --text-bright: #e2f1ff;
-            --border: #1a2a3e;
+            --border: #152538;
+            --border-bright: #1f3650;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,24 +41,21 @@
             font-family: 'Share Tech Mono', monospace;
             padding: 12px;
             min-height: 100vh;
+            max-width: 520px;
+            margin: 0 auto;
             position: relative;
-        }
-
-        /* 戰術掃描線背景 */
-        body::before {
-            content: "";
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
-            background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 99;
+            /* 純淨向量微網格，完全無 CRT 雜訊與掃描線 */
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+            background-size: 24px 24px;
         }
 
         .header {
             text-align: center;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .header h2 {
             font-family: 'Orbitron', sans-serif;
@@ -68,7 +67,18 @@
         .status-tag {
             font-size: 0.7rem;
             color: var(--text-dim);
-            margin-top: 3px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            box-shadow: 0 0 6px var(--neon-green);
         }
 
         /* 射手個人身分 HUD 卡片 */
@@ -76,78 +86,85 @@
             background: rgba(0, 240, 255, 0.04);
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 8px 12px;
-            margin-bottom: 10px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
         .profile-info { display: flex; align-items: center; gap: 10px; }
         .profile-avatar {
             width: 40px; height: 40px; border-radius: 50%;
-            border: 2px solid var(--cyan-core);
+            border: 1.5px solid var(--cyan-core);
             box-shadow: 0 0 8px var(--cyan-glow);
-            object-fit: cover; background: #111b27;
+            object-fit: cover; background: #0b1420;
         }
-        .profile-text .title { font-size: 0.65rem; color: var(--text-dim); }
-        .profile-text .name { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 0.95rem; color: #fff; }
+        .profile-text .title { font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1px; }
+        .profile-text .name { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 1rem; color: #fff; }
         .my-rank-tag { text-align: right; }
         .my-rank-tag .rank-label { font-size: 0.65rem; color: var(--text-dim); }
-        .my-rank-tag .rank-val { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--neon-gold); font-weight: 900; }
+        .my-rank-tag .rank-val { font-family: 'Orbitron', sans-serif; font-size: 1.15rem; color: var(--neon-gold); font-weight: 900; }
 
         /* 戰術三段切換標籤 (Tabs) */
         .tab-group {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px;
         }
         .tab-btn {
-            background: #0d1522; border: 1px solid var(--border); color: var(--text-dim);
+            background: #090f18; border: 1px solid var(--border); color: var(--text-dim);
             padding: 10px 4px; font-family: 'Chakra Petch', sans-serif; font-weight: 700;
             font-size: 0.85rem; letter-spacing: 1px; text-align: center;
-            cursor: pointer; border-radius: 4px; transition: all 0.25s;
+            cursor: pointer; border-radius: 4px; transition: all 0.2s ease;
         }
         .tab-btn.active {
-            background: rgba(0, 240, 255, 0.15); border-color: var(--cyan-core);
-            color: var(--cyan-core); box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            background: rgba(0, 240, 255, 0.12); border-color: var(--cyan-core);
+            color: var(--cyan-core); box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
         }
         .tab-btn.apex-tab.active {
-            background: rgba(255, 183, 0, 0.15); border-color: var(--neon-gold);
-            color: var(--neon-gold); box-shadow: 0 0 15px var(--gold-glow);
+            background: rgba(255, 170, 0, 0.12); border-color: var(--neon-gold);
+            color: var(--neon-gold); box-shadow: 0 0 14px var(--gold-glow);
         }
 
         /* 巔峰傳奇特寫展示區 (Apex Legend Stage) */
         .apex-hero-card {
-            background: radial-gradient(circle at top right, rgba(255, 183, 0, 0.15), rgba(10, 16, 26, 0.95) 70%);
-            border: 1px solid var(--neon-gold); border-radius: 6px; padding: 14px; margin-bottom: 12px;
+            background: radial-gradient(circle at top right, rgba(255, 170, 0, 0.12), rgba(9, 15, 24, 0.95) 75%);
+            border: 1px solid var(--neon-gold); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px;
             text-align: center; position: relative;
-            box-shadow: 0 0 25px rgba(255, 183, 0, 0.2); animation: glowPulse 2.5s infinite;
+            box-shadow: 0 0 25px rgba(255, 170, 0, 0.15);
         }
-        @keyframes glowPulse {
-            0%, 100% { border-color: rgba(255, 183, 0, 0.6); }
-            50% { border-color: rgba(255, 183, 0, 1); box-shadow: 0 0 30px rgba(255, 183, 0, 0.35); }
-        }
-        .apex-title { font-family: 'Chakra Petch', sans-serif; font-size: 0.75rem; letter-spacing: 3px; color: var(--neon-gold); font-weight: 700; margin-bottom: 2px; }
-        .apex-name { font-family: 'Orbitron', sans-serif; font-size: 1.35rem; font-weight: 900; color: #ffffff; margin-bottom: 4px; }
-        .apex-time { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; color: var(--neon-green); text-shadow: 0 0 20px rgba(0, 255, 102, 0.5); line-height: 1; }
-        .apex-meta { font-size: 0.75rem; color: #8da4be; margin-top: 6px; }
+        .apex-title { font-family: 'Chakra Petch', sans-serif; font-size: 0.72rem; letter-spacing: 2px; color: var(--neon-gold); font-weight: 700; margin-bottom: 4px; }
+        .apex-name { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 900; color: #ffffff; margin-bottom: 2px; }
+        .apex-time { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; color: var(--cyan-core); text-shadow: 0 0 18px var(--cyan-glow); line-height: 1.1; }
+        .apex-meta { font-size: 0.72rem; color: #8da4be; margin-top: 6px; display: flex; justify-content: center; gap: 10px; }
+        .apex-meta span { color: #fff; }
 
-        /* 排行榜表格容器 */
-        .table-container { background: var(--panel-bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; z-index: 100; position: relative; }
+        /* 排行榜表格容器 (純淨高對比) */
+        .table-container { 
+            background: var(--panel-bg); 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            overflow: hidden; 
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); 
+        }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 9px 8px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 0.85rem; }
-        th { font-family: 'Chakra Petch', sans-serif; color: var(--cyan-core); font-size: 0.78rem; letter-spacing: 1px; background: #091019; border-bottom: 1px solid var(--border); }
-        .score { font-family: 'Orbitron', monospace; font-weight: 900; color: var(--neon-green); }
+        th, td { padding: 10px 8px; text-align: center; border-bottom: 1px solid #101c2b; font-size: 0.85rem; }
+        th { font-family: 'Chakra Petch', sans-serif; color: var(--cyan-core); font-size: 0.75rem; letter-spacing: 1px; background: #080e16; border-bottom: 1px solid var(--border-bright); }
+        .score { font-family: 'Orbitron', monospace; font-weight: 900; color: var(--cyan-core); text-shadow: 0 0 8px rgba(0, 240, 255, 0.3); }
 
-        /* 金銀銅牌效果 */
+        .mod-tag { font-size: 0.65rem; color: var(--text-dim); }
+
+        /* 金銀銅牌高亮 */
         tr:nth-child(1) td { color: var(--neon-gold); font-weight: bold; }
+        tr:nth-child(1) .score { color: var(--neon-gold); text-shadow: 0 0 10px var(--gold-glow); }
         tr:nth-child(2) td { color: #d0e0f0; }
         tr:nth-child(3) td { color: #cd7f32; }
 
         /* 本人或跳轉高亮行 */
-        tr.my-record, tr.highlight-row {
-            background: rgba(0, 240, 255, 0.15) !important;
+        tr.highlight-row {
+            background: rgba(0, 240, 255, 0.12) !important;
             border-left: 3px solid var(--neon-green);
         }
-        tr.my-record td, tr.highlight-row td {
+        tr.highlight-row td {
             color: #fff !important; font-weight: bold;
         }
     </style>
@@ -156,7 +173,10 @@
 
     <div class="header">
         <h2>NEURONSTRIKE // LEADERBOARD</h2>
-        <div class="status-tag" id="statusTag">連線準備中...</div>
+        <div class="status-tag">
+            <div class="status-dot"></div>
+            <span id="statusTag">KILLINGLANE 20M 連線中...</span>
+        </div>
     </div>
 
     <!-- LINE 身分個人 HUD -->
@@ -181,24 +201,24 @@
     </div>
 
     <div class="apex-hero-card" id="apexHero" style="display: none;">
-        <div class="apex-title">⚡ ALL-TIME APEX LEGEND // 最速傳奇 ⚡</div>
-        <div class="apex-name" id="apexName">OPERATOR_GHOST</div>
+        <div class="apex-title">⚡ ALL-TIME APEX OPERATOR // 最速傳奇 ⚡</div>
+        <div class="apex-name" id="apexName">--</div>
         <div class="apex-time" id="apexTime">0.00s</div>
-        <div class="apex-meta" id="apexMeta">GRADE: -  //  ESTABLISHED: --</div>
+        <div class="apex-meta" id="apexMeta">實跑: --  //  人質加罰: --  //  重點獎勵: --</div>
     </div>
 
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 15%;">#</th>
-                    <th style="width: 45%;">OPERATOR</th>
-                    <th style="width: 25%;">TIME</th>
-                    <th style="width: 15%;">GRADE</th>
+                    <th style="width: 14%;">#</th>
+                    <th style="width: 44%; text-align: left; padding-left: 12px;">OPERATOR</th>
+                    <th style="width: 26%;">FINAL</th>
+                    <th style="width: 16%;">RAW</th>
                 </tr>
             </thead>
             <tbody id="boardData">
-                <tr><td colspan="4" style="padding: 20px; color: var(--text-dim);">讀取戰術數據中...</td></tr>
+                <tr><td colspan="4" style="padding: 24px; color: var(--text-dim);">讀取戰術數據中...</td></tr>
             </tbody>
         </table>
     </div>
@@ -227,7 +247,6 @@
         let allRecordsCache = [];
         let currentTab = "daily"; 
         
-        // 抓取網址中的 highlight 參數 (從手機戰報點過來時)
         const urlParams = new URLSearchParams(window.location.search);
         const highlightTarget = urlParams.get('highlight');
 
@@ -246,19 +265,18 @@
                     document.getElementById("operatorCard").style.display = "flex";
                 }
             } catch (err) {
-                console.warn("[LIFF] 訪客或非 LINE 模式運行");
+                console.warn("[LIFF] 訪客模式運行");
             }
         }
 
         // ==========================================
-        // 3. 啟動 Firebase 零延遲監聽引擎
+        // 3. 啟動 Firebase 監聽 (直連 KillingLane)
         // ==========================================
         function startLiveSync() {
-            document.getElementById("statusTag").innerText = "連線成功 // 監聽雲端訊號中...";
-            document.getElementById("statusTag").style.color = "var(--neon-green)";
+            document.getElementById("statusTag").innerText = "KILLINGLANE 雲端直連 // 監聽中";
 
-            // 監聽大螢幕寫入的 GhostSteel/Leaderboard 節點
-            db.ref('leaderboard/S1').on('value', (snapshot) => {
+            // 直連 killinglane 專用天梯節點
+            db.ref("GhostSteel/Leaderboard/killinglane").on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
                     allRecordsCache = [];
@@ -267,11 +285,9 @@
                 }
                 renderView();
                 
-                // 新資料到達時，狀態列產生呼吸燈回饋
                 const tag = document.getElementById("statusTag");
                 tag.innerText = "資料已同步 // " + new Date().toLocaleTimeString();
-                tag.style.textShadow = "0 0 10px rgba(0, 255, 102, 0.8)";
-                setTimeout(() => tag.style.textShadow = "none", 1000);
+                tag.style.color = "var(--neon-green)";
             });
         }
 
@@ -288,7 +304,7 @@
         // ==========================================
         function renderView() {
             if (allRecordsCache.length === 0) {
-                document.getElementById("boardData").innerHTML = "<tr><td colspan='4' style='padding: 20px;'>尚無戰術數據</td></tr>";
+                document.getElementById("boardData").innerHTML = "<tr><td colspan='4' style='padding: 24px; color: var(--text-dim);'>尚無特訓紀錄</td></tr>";
                 document.getElementById("apexHero").style.display = "none";
                 return;
             }
@@ -297,13 +313,17 @@
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
-            // 尋找全時期最速傳奇 (The Apex)
-            let apexRecord = [...allRecordsCache].sort((a, b) => Number(a.score) - Number(b.score))[0];
+            // 尋找全時期最速傳奇 (final_time 最小者)
+            let apexRecord = [...allRecordsCache].sort((a, b) => Number(a.final_time || a.time) - Number(b.final_time || b.time))[0];
             if (apexRecord) {
-                document.getElementById("apexName").innerText = (apexRecord.name || 'ANONYMOUS').toUpperCase();
-                document.getElementById("apexTime").innerText = `${Number(apexRecord.score).toFixed(2)}s`;
-                const dateStr = apexRecord.timestamp ? new Date(apexRecord.timestamp).toLocaleDateString() : "雲端認證";
-                document.getElementById("apexMeta").innerText = `GRADE: ${apexRecord.rank || 'S'}  //  ESTABLISHED: ${dateStr}`;
+                const finalScore = Number(apexRecord.final_time || apexRecord.time).toFixed(2);
+                const rawScore = Number(apexRecord.raw_time || apexRecord.time).toFixed(2);
+                const hPenalty = `+${((apexRecord.hostage_hits || 0) * 3.0).toFixed(1)}s`;
+                const pBuff = `-${((apexRecord.priority_hits || 0) * 1.5).toFixed(1)}s`;
+
+                document.getElementById("apexName").innerText = (apexRecord.operator || 'ANONYMOUS').toUpperCase();
+                document.getElementById("apexTime").innerText = `${finalScore}s`;
+                document.getElementById("apexMeta").innerHTML = `實跑: <span>${rawScore}s</span> // 人質: <span style="color:var(--neon-green);">${hPenalty}</span> // 重點: <span style="color:var(--neon-gold);">${pBuff}</span>`;
                 document.getElementById("apexHero").style.display = (currentTab === 'apex') ? "block" : "none";
             }
 
@@ -314,23 +334,24 @@
             } else if (currentTab === "monthly") {
                 filtered = allRecordsCache.filter(r => (r.timestamp || 0) >= startOfMonth);
             } else if (currentTab === "apex") {
+                // 巔峰模式：每位射手僅取最佳紀錄 (Personal Best)
                 const pbMap = new Map();
                 allRecordsCache.forEach(r => {
-                    const name = r.name || 'Anonymous';
-                    const score = Number(r.score);
+                    const name = (r.operator || 'Anonymous').trim();
+                    const score = Number(r.final_time || r.time);
                     if (!pbMap.has(name) || score < pbMap.get(name).score) {
-                        pbMap.set(name, r);
+                        pbMap.set(name, { ...r, calculatedScore: score });
                     }
                 });
                 filtered = Array.from(pbMap.values());
             }
 
-            // 依照秒數由小到大排序
-            filtered.sort((a, b) => Number(a.score) - Number(b.score));
+            // 依照結算秒數由小到大排序 (Ascending: 越小越強)
+            filtered.sort((a, b) => Number(a.final_time || a.time) - Number(b.final_time || b.time));
 
             let tbody = document.getElementById("boardData");
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan='4' style='padding: 20px; color: var(--text-dim);'>該時段尚無射擊數據</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan='4' style='padding: 24px; color: var(--text-dim);'>該時段尚無戰況數據</td></tr>`;
                 if (currentLineUser) document.getElementById("userBestRank").innerText = "--";
                 return;
             }
@@ -340,13 +361,14 @@
 
             filtered.forEach((r, idx) => {
                 let rankBadge = idx === 0 ? "🥇 1" : (idx === 1 ? "🥈 2" : (idx === 2 ? "🥉 3" : idx + 1));
-                let scoreNum = Number(r.score);
-                let displayScore = !isNaN(scoreNum) ? scoreNum.toFixed(2) + "s" : "--";
-                let opName = r.name || 'Anonymous';
+                let finalScoreNum = Number(r.final_time || r.time);
+                let rawScoreNum = Number(r.raw_time || r.time);
+                let displayFinal = !isNaN(finalScoreNum) ? finalScoreNum.toFixed(2) + "s" : "--";
+                let displayRaw = !isNaN(rawScoreNum) ? rawScoreNum.toFixed(2) + "s" : "--";
+                let opName = r.operator || 'Anonymous';
                 
-                // 判斷是否為本人 (LIFF登入) 或 從戰報網址點擊過來的高亮目標
-                let isMe = currentLineUser && (opName.trim() === currentLineUser.name.trim());
-                let isHighlight = highlightTarget && (opName.trim().toUpperCase() === highlightTarget.toUpperCase());
+                let isMe = currentLineUser && (opName.trim().toUpperCase() === currentLineUser.name.trim().toUpperCase());
+                let isHighlight = highlightTarget && (opName.trim().toUpperCase() === highlightTarget.trim().toUpperCase());
 
                 if (isMe && myRank === "--") {
                     myRank = `#${idx + 1}`;
@@ -354,18 +376,17 @@
 
                 html += `<tr class="${(isMe || isHighlight) ? 'highlight-row' : ''}">
                     <td>${rankBadge}</td>
-                    <td style="text-align: left; padding-left: 10px;">
-                        ${isMe ? '👤 ' : ''}${opName}
+                    <td style="text-align: left; padding-left: 12px;">
+                        ${isMe ? '👤 ' : ''}${opName.toUpperCase()}
                     </td>
-                    <td class="score">${displayScore}</td>
-                    <td style="font-weight:bold; color: ${r.rank === 'S' ? 'var(--neon-gold)' : (r.rank === 'A' ? 'var(--cyan-core)' : '#fff')}">${r.rank || '-'}</td>
+                    <td class="score">${displayFinal}</td>
+                    <td class="mod-tag">${displayRaw}</td>
                 </tr>`;
             });
 
             tbody.innerHTML = html;
             if (currentLineUser) document.getElementById("userBestRank").innerText = myRank;
 
-            // 若有跳轉高亮目標，自動捲動至該列
             if (highlightTarget) {
                 setTimeout(() => {
                     const targetRow = document.querySelector('.highlight-row');
@@ -374,7 +395,6 @@
             }
         }
 
-        // 初始化執行
         window.onload = async () => {
             await initLineLiff();
             startLiveSync();
