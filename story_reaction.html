@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEURONSTRIKE // REACTION DRAW AAR</title>
+    <title>NEURONSTRIKE // COMMAND RANDOM AAR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -18,8 +18,8 @@
             --cyan-glow: rgba(0, 216, 230, 0.35);
             --neon-green: #00e65c;
             --neon-gold: #e6a800;
-            --gold-glow: rgba(230, 168, 0, 0.4);
-            --neon-red: #e62237;
+            --neon-red: #ff1a35;
+            --red-glow: rgba(255, 26, 53, 0.45);
             --text-dim: #506477;
             --tac-black: #05080c;
             --tac-plate: #0c1219;
@@ -77,7 +77,7 @@
 
         .live-tag {
             font-size: 0.62rem;
-            color: var(--neon-gold);
+            color: var(--neon-green);
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -86,13 +86,13 @@
         .live-dot {
             width: 6px;
             height: 6px;
-            background: var(--neon-gold);
+            background: var(--neon-green);
             border-radius: 50%;
             animation: pulseDot 0.8s infinite alternate;
         }
         @keyframes pulseDot {
             from { opacity: 0.3; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-gold); }
+            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-green); }
         }
 
         .hero-section {
@@ -115,17 +115,18 @@
         .grade-badge {
             text-align: center;
             background: #090e14;
-            border: 2px solid var(--neon-gold);
-            padding: 2px 8px;
+            border: 2px solid var(--neon-green);
+            padding: 2px 10px;
             border-radius: 4px;
-            box-shadow: 0 0 12px rgba(230, 168, 0, 0.4);
+            box-shadow: 0 0 12px rgba(0, 230, 92, 0.3);
             transform: rotate(-2deg);
+            transition: all 0.2s ease;
         }
         .grade-badge .grade {
             font-family: 'Orbitron', sans-serif;
             font-size: 0.95rem;
             font-weight: 900;
-            color: var(--neon-gold);
+            color: var(--neon-green);
             letter-spacing: 1px;
         }
 
@@ -142,8 +143,8 @@
             font-family: 'Orbitron', monospace;
             font-size: 2.1rem;
             font-weight: 900;
-            color: var(--neon-gold);
-            text-shadow: 0 0 16px var(--gold-glow);
+            color: var(--neon-green);
+            text-shadow: 0 0 16px rgba(0, 230, 92, 0.4);
             line-height: 1.05;
             margin: 1px 0;
         }
@@ -164,101 +165,69 @@
         .stat-card .lbl { font-size: 0.46rem; color: var(--text-dim); }
         .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.74rem; font-weight: bold; color: #fff; margin-top: 2px; }
 
-        /* ─── 修正：精準尺寸靶體，保證不超出版面 ─── */
+        /* ─── IDPA 人形鋼靶（對齊現況 HUD） ─── */
         .target-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 38px 0 4px 0;
+            margin: 4px 0 2px 0;
             position: relative;
             z-index: 10;
         }
 
-        .tac-steel-target {
-            width: 172px;
-            height: 220px;
-            background: #05080c !important;
-            border: 2px solid var(--tac-border);
-            border-radius: 0 0 8px 8px;
+        .target-silhouette {
+            width: 168px;
+            height: 266px;
             position: relative;
-            box-shadow: inset 0 0 20px #000000;
+            background: transparent;
         }
 
-        .led-edge-strip {
+        .idpa-outline {
             position: absolute;
-            inset: -4px;
-            border-radius: 0 0 12px 12px;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            border: 2px solid var(--strip-color) !important;
-            background: transparent !important;
-            box-shadow: 0 0 12px var(--strip-color) !important;
-            opacity: var(--strip-opacity);
-            transition: opacity 0.08s ease, border-color 0.08s ease;
-            z-index: 1;
-        }
-
-        .target-head {
-            width: 65px;
-            height: 44px;
-            background: #05080c !important;
-            border: 2px solid var(--tac-border);
-            border-bottom: none;
-            border-radius: 10px 10px 0 0;
-            position: absolute;
-            top: -42px;
-            left: 50%;
-            transform: translateX(-50%);
             z-index: 2;
         }
-
-        .head-led-strip {
-            position: absolute;
-            inset: -4px;
-            border-radius: 12px 12px 0 0;
-            pointer-events: none;
-            border: 2px solid var(--strip-color) !important;
-            background: transparent !important;
-            box-shadow: 0 0 12px var(--strip-color) !important;
-            opacity: var(--strip-opacity);
-            transition: opacity 0.08s ease, border-color 0.08s ease;
+        .idpa-outline path.base {
+            fill: rgba(7, 13, 22, 0.94);
+            stroke: #1c3348;
+            stroke-width: 3;
         }
-
-        .top-hang-hole {
-            position: absolute;
-            top: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: #000;
-            border: 1px solid #334455;
+        .idpa-outline path.glow {
+            fill: none;
+            stroke: var(--strip-color, transparent);
+            stroke-width: 3.2;
+            opacity: var(--strip-opacity, 0);
+            filter: drop-shadow(0 0 7px var(--strip-color, transparent));
+            transition: opacity 0.08s ease, stroke 0.08s ease;
         }
 
         .tac-plate {
-            background: #0c1219 !important;
-            border: 1px solid #1d3345 !important;
-            box-shadow: none !important;
+            background: #0b1420;
+            border: 1.5px solid rgba(255, 255, 255, 0.28);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.55);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Share Tech Mono', sans-serif;
-            font-weight: 700;
-            color: #556c82;
+            font-family: 'Orbitron', 'Share Tech Mono', sans-serif;
+            font-weight: 900;
+            color: #8fa6be;
             position: absolute;
-            z-index: 3;
+            z-index: 5;
             overflow: visible;
         }
 
-        #plt-2 { width: 34px; height: 32px; border-radius: 4px; top: 5px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; }
-        #plt-3 { width: 66px; height: 22px; border-radius: 3px; top: 12px; left: 50%; transform: translateX(-50%); font-size: 0.75rem; }
-        #plt-1 { width: 56px; height: 56px; border-radius: 50%; top: 60px; left: 50%; transform: translateX(-50%); font-size: 1.1rem; }
-        #plt-4 { width: 26px; height: 72px; border-radius: 3px; top: 34px; left: 7px; font-size: 0.75rem; }
-        #plt-5 { width: 26px; height: 72px; border-radius: 3px; top: 34px; right: 7px; font-size: 0.75rem; }
-        #plt-6 { width: 30px; height: 42px; border-radius: 3px; top: 150px; left: 14px; font-size: 0.75rem; }
-        #plt-7 { width: 36px; height: 46px; border-radius: 3px; top: 156px; left: 50%; transform: translateX(-50%); font-size: 0.85rem; }
-        #plt-8 { width: 30px; height: 42px; border-radius: 3px; top: 150px; right: 14px; font-size: 0.75rem; }
+        #plt-2 { width: 34px; height: 34px; border-radius: 50%; top: 15px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; }
+        #plt-3 { width: 62px; height: 24px; border-radius: 6px; top: 59px; left: 50%; transform: translateX(-50%); font-size: 0.72rem; }
+        #plt-1 { width: 50px; height: 50px; border-radius: 50%; top: 95px; left: 50%; transform: translateX(-50%); font-size: 1.05rem; }
+        #plt-5 { width: 27px; height: 74px; border-radius: 6px; top: 71px; left: 7px; font-size: 0.78rem; }
+        #plt-4 { width: 27px; height: 74px; border-radius: 6px; top: 71px; right: 7px; font-size: 0.78rem; }
+        #plt-6 { width: 29px; height: 42px; border-radius: 6px; top: 165px; left: 14px; font-size: 0.78rem; }
+        #plt-7 { width: 29px; height: 42px; border-radius: 6px; top: 174px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; }
+        #plt-8 { width: 29px; height: 42px; border-radius: 6px; top: 165px; right: 14px; font-size: 0.78rem; }
 
         .bullet-hole {
             position: absolute;
@@ -266,8 +235,8 @@
             height: 8px;
             border-radius: 50%;
             background: #ffffff !important;
-            box-shadow: 0 0 7px var(--neon-gold), inset 0 0 2px #000 !important;
-            border: 1px solid var(--neon-gold) !important;
+            box-shadow: 0 0 7px var(--bullet-glow, var(--neon-green)), inset 0 0 2px #000 !important;
+            border: 1px solid var(--bullet-glow, var(--neon-green)) !important;
             transform: translate(-50%, -50%);
             z-index: 50;
             pointer-events: none;
@@ -344,8 +313,8 @@
         .modal-card-scale {
             transform: scale(0.82);
             transform-origin: top center;
-            box-shadow: 0 0 45px rgba(230, 168, 0, 0.3);
-            border-color: var(--neon-gold);
+            box-shadow: 0 0 45px rgba(0, 230, 92, 0.3);
+            border-color: var(--neon-green);
             margin-bottom: -95px;
         }
 
@@ -360,16 +329,16 @@
         .btn-action-primary {
             width: 100%;
             padding: 11px;
-            background: linear-gradient(135deg, #1a1608 0%, #2e260c 100%);
-            border: 1px solid var(--neon-gold);
-            color: var(--neon-gold);
+            background: linear-gradient(135deg, #062018 0%, #063a2a 100%);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
             font-family: 'Chakra Petch', sans-serif;
             font-weight: 700;
             font-size: 0.9rem;
             letter-spacing: 1px;
             border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 0 14px rgba(230, 168, 0, 0.2);
+            box-shadow: 0 0 14px rgba(0, 230, 92, 0.2);
         }
 
         .btn-action-record {
@@ -411,7 +380,7 @@
         .image-save-overlay img {
             max-width: 85%;
             max-height: 75vh;
-            border: 1px solid var(--neon-gold);
+            border: 1px solid var(--neon-green);
             border-radius: 6px;
         }
     </style>
@@ -424,9 +393,9 @@
                 <div class="brand-title">NEURONSTRIKE</div>
                 <div class="brand-sub">TACTICAL CQB // GHOSTSTEEL OS</div>
             </div>
-            <div class="live-tag">
-                <span class="live-dot"></span>
-                <span>REACTION DRAW</span>
+            <div class="live-tag" id="dispLiveTag">
+                <span class="live-dot" id="dispLiveDot"></span>
+                <span id="dispLiveText">COMMAND RANDOM</span>
             </div>
         </div>
 
@@ -435,22 +404,22 @@
                 <div class="lbl">CALLSIGN // 射手呼號</div>
                 <div class="name" id="dispName">OPERATOR_GHOST</div>
             </div>
-            <div class="grade-badge" id="dispRankBadge">
-                <div class="grade" id="dispRank">ELITE</div>
+            <div class="grade-badge" id="dispGradeBadge">
+                <div class="grade" id="dispRank">CONFIRMED</div>
             </div>
         </div>
 
         <div class="score-display">
-            <div class="score-lbl">FIRST-SHOT REACTION TIME</div>
+            <div class="score-lbl" id="dispScoreLbl">DECISION REACTION TIME</div>
             <div class="score-val" id="dispScore">0.00s</div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="lbl">特訓模式</div>
-                    <div class="val" style="color: var(--neon-gold);">REACTION</div>
+                    <div class="val" style="color: var(--cyan-core);">COMMAND</div>
                 </div>
                 <div class="stat-card">
-                    <div class="lbl">命中鋼板</div>
-                    <div class="val" id="dispAction" style="color: var(--neon-green);">--</div>
+                    <div class="lbl">判決狀態</div>
+                    <div class="val" id="dispVerdict" style="color: var(--neon-green);">命中</div>
                 </div>
                 <div class="stat-card">
                     <div class="lbl">靶道編號</div>
@@ -459,21 +428,17 @@
             </div>
         </div>
 
-        <!-- 鋼靶配置 -->
         <div class="target-container">
-            <div class="tac-steel-target">
-                <div class="led-edge-strip" id="ledEdgeStrip"></div>
-
-                <div class="target-head">
-                    <div class="head-led-strip" id="headLedStrip"></div>
-                    <div class="top-hang-hole"></div>
-                    <div class="tac-plate" id="plt-2">2</div>
-                </div>
-
+            <div class="target-silhouette">
+                <svg class="idpa-outline" viewBox="0 0 240 380" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="base" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
+                    <path class="glow" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
+                </svg>
+                <div class="tac-plate" id="plt-2">2</div>
                 <div class="tac-plate" id="plt-3">3</div>
+                <div class="tac-plate" id="plt-5">5</div>
                 <div class="tac-plate" id="plt-1">1</div>
                 <div class="tac-plate" id="plt-4">4</div>
-                <div class="tac-plate" id="plt-5">5</div>
                 <div class="tac-plate" id="plt-6">6</div>
                 <div class="tac-plate" id="plt-7">7</div>
                 <div class="tac-plate" id="plt-8">8</div>
@@ -496,7 +461,7 @@
             <span>⚡</span> 產生 IG Boomerang 動態戰報卡
         </button>
         <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 2px;">
-            拔槍首發瞬間 60FPS 循環重現，支援一鍵存圖與 IG 動動！
+            隨機指令命中瞬間 60FPS 循環重現，支援一鍵存圖與 IG 動動！
         </div>
     </div>
 
@@ -530,32 +495,110 @@
         const params = new URLSearchParams(window.location.search);
         const name = params.get('name') || "OPERATOR_GHOST";
         const lane = params.get('lane') || "1";
-        const recordedTimeSec = Math.max(0.2, parseFloat(params.get('time')) || 0.86);
-        const rank = params.get('rank') || (recordedTimeSec < 1.0 ? "GODLIKE" : (recordedTimeSec <= 1.5 ? "ELITE" : (recordedTimeSec <= 2.0 ? "PASS" : "FAIL")));
-        const hitPlateId = parseInt(params.get('hits') || params.get('plate') || params.get('target') || "1") || 1;
+        const recordedTimeSec = Math.max(0, parseFloat(params.get('time')) || 0);
+        const rawRank = (params.get('rank') || "").toUpperCase();
+        const rawZone = (params.get('zone') || "B").toUpperCase();
+        const hitsRaw = params.get('hits') || params.get('plate') || params.get('target');
 
+        // 🎯 1. 核心狀態機判定：打對 (HIT) / 超時 (TIMEOUT) / 打錯 (ERROR)
+        let battleStatus = "HIT"; // "HIT" | "TIMEOUT" | "ERROR"
+
+        if (rawRank === "TIMEOUT" || recordedTimeSec >= 2.00 && (!hitsRaw || hitsRaw === "0")) {
+            battleStatus = "TIMEOUT";
+        } else if (rawRank === "ERROR" || rawRank === "WRONG" || rawRank === "FAIL") {
+            battleStatus = "ERROR";
+        } else {
+            battleStatus = "HIT";
+        }
+
+        // 解析擊中板號
+        let hitPlateId = parseInt(hitsRaw || "0");
+        if (battleStatus !== "TIMEOUT" && (!hitPlateId || hitPlateId < 1 || hitPlateId > 8)) {
+            if (rawZone === 'A') hitPlateId = 2;
+            else if (rawZone === 'C') hitPlateId = 4;
+            else hitPlateId = 1;
+        }
+
+        // 指令顏色定義 (題目燈)
+        const zoneColorMap = {
+            A: { name: 'A區頭部 (紅燈)', hex: '#ff1a35' },
+            B: { name: 'B區軀幹 (橘燈)', hex: '#ffaa00' },
+            C: { name: 'C區外圍 (綠燈)', hex: '#00e65c' }
+        };
+        const cmdColor = zoneColorMap[rawZone] ? zoneColorMap[rawZone].hex : '#ffaa00';
+
+        // 綁定基礎資訊
         document.getElementById("dispName").innerText = name.toUpperCase();
         document.getElementById("dispLane").innerText = `LANE 0${lane}`;
-        document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
-        document.getElementById("dispRank").innerText = rank;
-        document.getElementById("dispAction").innerText = `#${hitPlateId}號鋼板`;
-
-        const rankBadge = document.getElementById("dispRankBadge");
-        const rankColors = {
-            GODLIKE: 'var(--neon-gold)',
-            ELITE: '#ffffff',
-            PASS: 'var(--cyan-core)',
-            FAIL: 'var(--neon-red)'
-        };
-        if (rankBadge && rankColors[rank]) {
-            rankBadge.style.borderColor = rankColors[rank];
-            document.getElementById("dispRank").style.color = rankColors[rank];
-        }
 
         const now = new Date();
         document.getElementById("dispDate").innerText = 
             `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} // ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
 
+        // 🎯 2. 依照判決動態渲染戰報 UI
+        const badgeElem = document.getElementById("dispGradeBadge");
+        const rankText = document.getElementById("dispRank");
+        const scoreVal = document.getElementById("dispScore");
+        const verdictElem = document.getElementById("dispVerdict");
+        const liveDot = document.getElementById("dispLiveDot");
+        const liveTag = document.getElementById("dispLiveTag");
+
+        if (battleStatus === "TIMEOUT") {
+            // 🔴 狀態一：超時未打
+            rankText.innerText = "超時";
+            badgeElem.style.borderColor = "var(--neon-red)";
+            badgeElem.style.boxShadow = "0 0 15px var(--red-glow)";
+            rankText.style.color = "var(--neon-red)";
+
+            scoreVal.innerText = ">2.00s";
+            scoreVal.style.color = "var(--neon-red)";
+            scoreVal.style.textShadow = "0 0 16px var(--red-glow)";
+
+            verdictElem.innerText = "超時未擊發";
+            verdictElem.style.color = "var(--neon-red)";
+
+            liveDot.style.background = "var(--neon-red)";
+            liveTag.style.color = "var(--neon-red)";
+            document.documentElement.style.setProperty('--bullet-glow', 'var(--neon-red)');
+
+        } else if (battleStatus === "ERROR") {
+            // 🚨 狀態二：打錯部位
+            rankText.innerText = "打錯";
+            badgeElem.style.borderColor = "var(--neon-red)";
+            badgeElem.style.boxShadow = "0 0 15px var(--red-glow)";
+            rankText.style.color = "var(--neon-red)";
+
+            scoreVal.innerText = `${recordedTimeSec.toFixed(2)}s`;
+            scoreVal.style.color = "var(--neon-red)";
+            scoreVal.style.textShadow = "0 0 16px var(--red-glow)";
+
+            verdictElem.innerText = `誤擊 #${hitPlateId} 板`;
+            verdictElem.style.color = "var(--neon-red)";
+
+            liveDot.style.background = "var(--neon-red)";
+            liveTag.style.color = "var(--neon-red)";
+            document.documentElement.style.setProperty('--bullet-glow', 'var(--neon-red)');
+
+        } else {
+            // 🟢 狀態三：命中目標
+            rankText.innerText = "CONFIRMED";
+            badgeElem.style.borderColor = "var(--neon-green)";
+            badgeElem.style.boxShadow = "0 0 12px rgba(0, 230, 92, 0.3)";
+            rankText.style.color = "var(--neon-green)";
+
+            scoreVal.innerText = `${recordedTimeSec.toFixed(2)}s`;
+            scoreVal.style.color = "var(--neon-green)";
+            scoreVal.style.textShadow = "0 0 16px rgba(0, 230, 92, 0.4)";
+
+            verdictElem.innerText = `命中 #${hitPlateId} 板`;
+            verdictElem.style.color = "var(--neon-green)";
+
+            liveDot.style.background = "var(--neon-green)";
+            liveTag.style.color = "var(--neon-green)";
+            document.documentElement.style.setProperty('--bullet-glow', 'var(--neon-green)');
+        }
+
+        // ─── 動畫重放引擎 ───
         let activeTimers = [];
         function scheduleTimer(fn, delay) {
             const id = setTimeout(fn, delay);
@@ -573,6 +616,8 @@
         }
 
         function createBulletHole(plateId, rx = 50, ry = 50) {
+            if (battleStatus === "TIMEOUT") return; // 超時不畫彈著孔
+
             const targets = [];
             const mainPlate = document.querySelector(`#storyCaptureArea #plt-${plateId}`);
             if (mainPlate) targets.push(mainPlate);
@@ -600,55 +645,72 @@
             clearAllBulletHoles();
             setStrip('#000000', 0);
 
+            // 階段 1：題目燈號亮起
             scheduleTimer(() => {
-                setStrip('#ffffff', 1.0);
+                setStrip(cmdColor, 1.0);
             }, 300);
 
-            const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
-            scheduleTimer(() => {
-                createBulletHole(hitPlateId, 50, 50);
-            }, shotTime);
+            if (battleStatus === "TIMEOUT") {
+                // 🔴 超時動態：等待 1.5 秒無擊發，直接爆發警戒紅燈急閃
+                const timeoutAlertTime = 1200;
+                scheduleTimer(() => {
+                    let count = 0;
+                    strobeInterval = setInterval(() => {
+                        if (count % 2 === 0) setStrip('#ff1a35', 1.0);
+                        else setStrip('#000000', 0);
+                        count++;
+                        if (count >= 12) {
+                            clearInterval(strobeInterval);
+                            setStrip('#ff1a35', 0.4);
+                        }
+                    }, 60);
+                }, timeoutAlertTime);
+                return timeoutAlertTime + 1200;
 
-            const strobeStart = shotTime + 200;
-            scheduleTimer(() => {
-                let count = 0;
-                let strobeColor = '#ffffff';
-                let flashCount = 5;
-                let flashSpeed = 50;
+            } else if (battleStatus === "ERROR") {
+                // 🚨 打錯部位動態：烙印誤擊彈孔，接著觸發紅色錯誤急閃
+                const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
+                scheduleTimer(() => {
+                    createBulletHole(hitPlateId, 50, 50);
+                }, shotTime);
 
-                if (rank === "GODLIKE" || recordedTimeSec < 1.00) {
-                    strobeColor = 'var(--neon-gold)';
-                    flashCount = 5;
-                    flashSpeed = 50;
-                } else if (rank === "ELITE" || recordedTimeSec <= 1.50) {
-                    strobeColor = '#ffffff';
-                    flashCount = 5;
-                    flashSpeed = 50;
-                } else if (rank === "PASS" || recordedTimeSec <= 2.00) {
-                    strobeColor = '#0055ff';
-                    flashCount = 4;
-                    flashSpeed = 60;
-                } else {
-                    strobeColor = '#ff1a35';
-                    flashCount = 3;
-                    flashSpeed = 150;
-                }
+                const strobeStart = shotTime + 200;
+                scheduleTimer(() => {
+                    let count = 0;
+                    strobeInterval = setInterval(() => {
+                        if (count % 2 === 0) setStrip('#ff1a35', 1.0);
+                        else setStrip('#000000', 0);
+                        count++;
+                        if (count >= 12) {
+                            clearInterval(strobeInterval);
+                            setStrip('#ff1a35', 0.4);
+                        }
+                    }, 60);
+                }, strobeStart);
+                return strobeStart + 1200;
 
-                strobeInterval = setInterval(() => {
-                    if (count % 2 === 0) {
-                        setStrip(strobeColor, 1.0);
-                    } else {
-                        setStrip('#000000', 0);
-                    }
-                    count++;
-                    if (count >= flashCount * 2) {
-                        clearInterval(strobeInterval);
-                        setStrip(strobeColor, 0.4);
-                    }
-                }, flashSpeed);
-            }, strobeStart);
+            } else {
+                // 🟢 打對目標動態：烙印綠色戰術彈孔，綠色爆閃 4 次
+                const shotTime = Math.min(900, 300 + recordedTimeSec * 1000);
+                scheduleTimer(() => {
+                    createBulletHole(hitPlateId, 50, 50);
+                }, shotTime);
 
-            return strobeStart + 1200;
+                const strobeStart = shotTime + 200;
+                scheduleTimer(() => {
+                    let count = 0;
+                    strobeInterval = setInterval(() => {
+                        if (count % 2 === 0) setStrip('#00e65c', 1.0);
+                        else setStrip('#000000', 0);
+                        count++;
+                        if (count >= 8) {
+                            clearInterval(strobeInterval);
+                            setStrip('#00e65c', 0.4);
+                        }
+                    }, 60);
+                }, strobeStart);
+                return strobeStart + 1200;
+            }
         }
 
         function runOneShotReplayCycle() {
@@ -693,7 +755,9 @@
             setStrip('transparent', 0);
 
             clearAllBulletHoles();
-            createBulletHole(hitPlateId, 50, 50);
+            if (battleStatus !== "TIMEOUT") {
+                createBulletHole(hitPlateId, 50, 50);
+            }
 
             try {
                 const target = document.getElementById("storyCaptureArea");
