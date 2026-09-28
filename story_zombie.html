@@ -124,16 +124,29 @@ document.getElementById('dispKind').innerText=kinds;
 if(rank==='FAIL')document.getElementById('rankBadge').classList.add('fail');
 const now=new Date();
 document.getElementById('dispDate').innerText=now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
-function jitter(i){return{rx:42+(i%5)*4+(i*7)%9,ry:42+(i*11)%16}}
+const ZONE_COLOR={A:'#ff1a35',B:'#ffaa00',C:'#00e65c'};
+const STACK=[{rx:50,ry:50},{rx:38,ry:42},{rx:62,ry:44},{rx:44,ry:60},{rx:58,ry:58}];
+function parseHitToken(tok){
+  tok=String(tok||'').trim().toUpperCase();
+  if(!tok)return null;
+  const m=tok.match(/^([1-8])([ABC])?$/);
+  if(!m)return null;
+  const plate=parseInt(m[1],10);
+  const zone=m[2]||(PLATE_MAP[plate]||PLATE_MAP[1]).zone;
+  return{plate,zone};
+}
 function resolveShots(){
-  let plates=hitsParam.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>=1&&n<=8);
-  if(!plates.length){
-    const need=Math.max(3,Math.ceil((Z_HP[kinds]||24)/5));
-    const cycle=kinds==='H'?[1]:[1,7,2,1,5];
-    plates=[];
-    for(let i=0;i<Math.min(need,16);i++)plates.push(cycle[i%cycle.length]);
+  let parsed=hitsParam.split(/[,\s]+/).map(parseHitToken).filter(Boolean);
+  if(!parsed.length){
+    hitsParam.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>=1&&n<=8).forEach(n=>parsed.push({plate:n,zone:(PLATE_MAP[n]||PLATE_MAP[1]).zone}));
   }
-  return plates.map((plate,i)=>{const info=PLATE_MAP[plate]||PLATE_MAP[1];const j=jitter(i);return{plate,zone:info.zone,color:info.color,rx:j.rx,ry:j.ry}});
+  const countOn={};
+  return parsed.map(h=>{
+    countOn[h.plate]=(countOn[h.plate]||0)+1;
+    const stack=STACK[(countOn[h.plate]-1)%STACK.length];
+    const color=ZONE_COLOR[h.zone]||'#ffaa00';
+    return{plate:h.plate,zone:h.zone,color,rx:stack.rx,ry:stack.ry};
+  });
 }
 const shotConfigs=resolveShots();
 document.getElementById('dispShots').innerText=String(shotConfigs.length);
