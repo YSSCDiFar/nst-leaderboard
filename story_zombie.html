@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEURONSTRIKE // ZOMBIE REPLAY</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--cyan-core:#b026ff;--neon-green:#00e65c;--neon-gold:#ffaa00;--neon-red:#ff1a35;--text-dim:#6a5a78;--strip-color:transparent;--strip-opacity:0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#010104;color:#f3e9ff;font-family:'Share Tech Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:10px 8px;min-height:100vh}
+.story-wrapper{width:360px;height:640px;border-radius:8px;padding:14px 14px 10px;background:radial-gradient(circle at 50% 18%,#1a0b24 0%,#07040c 82%);border:1px solid #3a1858;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(176,38,255,.18)}
+.header-brand{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #2a1838;padding-bottom:5px}
+.brand-title{font-family:Orbitron,sans-serif;font-size:1rem;color:var(--cyan-core);letter-spacing:2px}
+.brand-sub{font-size:.55rem;color:var(--text-dim)}
+.live-tag{font-size:.62rem;color:var(--neon-red);font-weight:700;display:flex;align-items:center;gap:5px}
+.live-dot{width:6px;height:6px;background:var(--neon-red);border-radius:50%;animation:pulseDot .8s infinite alternate}
+@keyframes pulseDot{from{opacity:.3}to{opacity:1;box-shadow:0 0 8px var(--neon-red)}}
+.hero-section{display:flex;justify-content:space-between;align-items:center;margin:4px 0}
+.operator-tag .lbl{font-size:.52rem;color:var(--text-dim)}
+.operator-tag .name{font-family:'Chakra Petch',sans-serif;font-size:1.1rem;font-weight:700}
+.grade-badge{border:2px solid var(--neon-gold);padding:2px 8px;border-radius:4px;transform:rotate(-2deg);background:#120818}
+.grade-badge.fail{border-color:var(--neon-red)}
+.grade{font-family:Orbitron,sans-serif;font-size:.92rem;color:var(--neon-gold)}
+.grade-badge.fail .grade{color:var(--neon-red)}
+.score-display{background:#0a0610;border:1px solid #2a1838;border-radius:6px;padding:5px 8px;text-align:center}
+.score-lbl{font-size:.5rem;color:var(--text-dim);letter-spacing:2px}
+.score-val{font-family:Orbitron,monospace;font-size:2.05rem;font-weight:900;color:var(--cyan-core);line-height:1.05}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:3px}
+.stat-card{background:#0c0812;border:1px solid #2a1838;padding:3px 2px;border-radius:4px;text-align:center}
+.stat-card .lbl{font-size:.46rem;color:var(--text-dim)}
+.stat-card .val{font-family:Orbitron,monospace;font-size:.74rem;font-weight:700;margin-top:2px}
+.target-container{display:flex;flex-direction:column;align-items:center;margin:4px 0 2px}
+.target-silhouette{width:168px;height:266px;position:relative}
+.idpa-outline{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.idpa-outline path.base{fill:rgba(7,13,22,.94);stroke:#3a1858;stroke-width:3}
+.idpa-outline path.glow{fill:none;stroke:var(--strip-color,transparent);stroke-width:3.2;opacity:var(--strip-opacity,0);filter:drop-shadow(0 0 7px var(--strip-color))}
+.tac-plate{background:#0b1420;border:1.5px solid rgba(255,255,255,.28);display:flex;justify-content:center;align-items:center;font-family:Orbitron,sans-serif;font-weight:900;color:#8fa6be;position:absolute;z-index:5;overflow:visible}
+#plt-2{width:34px;height:34px;border-radius:50%;top:15px;left:50%;transform:translateX(-50%);font-size:.78rem}
+#plt-3{width:62px;height:24px;border-radius:6px;top:59px;left:50%;transform:translateX(-50%);font-size:.72rem}
+#plt-1{width:50px;height:50px;border-radius:50%;top:95px;left:50%;transform:translateX(-50%);font-size:1.05rem}
+#plt-5{width:27px;height:74px;border-radius:6px;top:71px;left:7px;font-size:.78rem}
+#plt-4{width:27px;height:74px;border-radius:6px;top:71px;right:7px;font-size:.78rem}
+#plt-6{width:29px;height:42px;border-radius:6px;top:165px;left:14px;font-size:.78rem}
+#plt-7{width:29px;height:42px;border-radius:6px;top:174px;left:50%;transform:translateX(-50%);font-size:.78rem}
+#plt-8{width:29px;height:42px;border-radius:6px;top:165px;right:14px;font-size:.78rem}
+.bullet-hole{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;border:1px solid var(--neon-green);box-shadow:0 0 7px var(--neon-green),inset 0 0 2px #000;transform:translate(-50%,-50%);z-index:50;pointer-events:none}
+.brand-pedestal{margin-top:10px;padding:3px 10px;background:#05080c;border:1px solid #2a1838;border-radius:3px;font-family:Orbitron,sans-serif;font-size:.62rem;letter-spacing:2px}
+.footer-stamp{border-top:1px solid #2a1838;padding-top:5px;display:flex;justify-content:space-between;font-size:.5rem;color:var(--text-dim)}
+.action-area{width:360px;margin-top:10px}
+.btn-motion{width:100%;background:linear-gradient(135deg,#180a24,#2a1050);color:#e0b3ff;border:1px solid #6a12a8;padding:12px;font-family:'Chakra Petch',sans-serif;font-weight:700;cursor:pointer}
+.preview-modal{display:none;position:fixed;inset:0;background:rgba(1,2,4,.97);z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.modal-action-bar{width:330px;display:flex;flex-direction:column;gap:8px}
+.btn-action-primary,.btn-action-record{width:100%;padding:11px;border-radius:6px;font-family:'Chakra Petch',sans-serif;font-weight:700;cursor:pointer}
+.btn-action-primary{background:#120818;border:1px solid var(--cyan-core);color:var(--cyan-core)}
+.btn-action-record{background:#200f13;border:1px solid var(--neon-red);color:var(--neon-gold)}
+.image-save-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1010;flex-direction:column;align-items:center;justify-content:center}
+.image-save-overlay img{max-width:85%;max-height:75vh;border:1px solid var(--cyan-core)}
+</style>
+</head>
+<body>
+<div class="story-wrapper" id="storyCaptureArea">
+  <div class="header-brand">
+    <div><div class="brand-title">NEURONSTRIKE</div><div class="brand-sub">ZOMBIE LANE // HIT REPLAY</div></div>
+    <div class="live-tag"><span class="live-dot"></span><span>ZOMBIE REPLAY</span></div>
+  </div>
+  <div class="hero-section">
+    <div class="operator-tag"><div class="lbl">CALLSIGN // 射手呼號</div><div class="name" id="dispName">OPERATOR</div></div>
+    <div class="grade-badge" id="rankBadge"><div class="grade" id="dispRank">CLEAR</div></div>
+  </div>
+  <div class="score-display">
+    <div class="score-lbl">ZOMBIE CLEAR TIME</div>
+    <div class="score-val" id="dispScore">0.00s</div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="lbl">等級</div><div class="val" id="dispKind">S</div></div>
+      <div class="stat-card"><div class="lbl">發數</div><div class="val" id="dispShots">0</div></div>
+      <div class="stat-card"><div class="lbl">靶道</div><div class="val" id="dispLane">LANE 1</div></div>
+    </div>
+  </div>
+  <div class="target-container">
+    <div class="target-silhouette">
+      <svg class="idpa-outline" viewBox="0 0 240 380" preserveAspectRatio="none">
+        <path class="base" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
+        <path class="glow" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
+      </svg>
+      <div class="tac-plate" id="plt-2">2</div>
+      <div class="tac-plate" id="plt-3">3</div>
+      <div class="tac-plate" id="plt-5">5</div>
+      <div class="tac-plate" id="plt-1">1</div>
+      <div class="tac-plate" id="plt-4">4</div>
+      <div class="tac-plate" id="plt-6">6</div>
+      <div class="tac-plate" id="plt-7">7</div>
+      <div class="tac-plate" id="plt-8">8</div>
+    </div>
+    <div class="brand-pedestal"><span style="color:#8a6aaa">GHOSTSTEEL</span> <span style="color:#c9a24a">ZOMBIE</span></div>
+  </div>
+  <div class="footer-stamp"><span id="dispDate"></span><span>IDPA STEEL // REPLAY</span></div>
+</div>
+<div class="action-area"><button class="btn-motion" type="button" onclick="openBoomerangModal()">產生打擊回放戰報卡</button></div>
+<div class="preview-modal" id="previewModal" onclick="if(event.target.id==='previewModal')this.style.display='none'">
+  <div id="modalCloneSlot" onclick="event.stopPropagation()"></div>
+  <div class="modal-action-bar" onclick="event.stopPropagation()">
+    <button class="btn-action-primary" type="button" onclick="handleSaveOrShareCard()">儲存戰報圖卡</button>
+    <button class="btn-action-record" type="button" onclick="triggerRestartForRecording()">重設循環 螢幕錄影</button>
+  </div>
+</div>
+<div class="image-save-overlay" id="imageSaveOverlay" onclick="this.style.display='none'"><img id="savedCardImg" alt="card"></div>
+<script>
+const params=new URLSearchParams(location.search);
+const name=params.get('name')||'OPERATOR';
+const lane=params.get('lane')||'1';
+const recordedTimeSec=Math.max(0.4,parseFloat(params.get('time'))||4.2);
+const rank=(params.get('rank')||'CLEAR').toUpperCase();
+const kinds=(params.get('kinds')||'S').toUpperCase();
+const hitsParam=params.get('hits')||'';
+const PLATE_MAP={1:{zone:'B',color:'#ffaa00'},2:{zone:'A',color:'#ff1a35'},3:{zone:'A',color:'#ff1a35'},4:{zone:'C',color:'#00e65c'},5:{zone:'C',color:'#00e65c'},6:{zone:'C',color:'#00e65c'},7:{zone:'B',color:'#ffaa00'},8:{zone:'C',color:'#00e65c'}};
+const Z_HP={H:10,D:18,C:24,B:36,A:54,S:72};
+document.getElementById('dispName').innerText=name.toUpperCase();
+document.getElementById('dispLane').innerText='LANE '+lane;
+document.getElementById('dispScore').innerText=recordedTimeSec.toFixed(2)+'s';
+document.getElementById('dispRank').innerText=rank;
+document.getElementById('dispKind').innerText=kinds;
+if(rank==='FAIL')document.getElementById('rankBadge').classList.add('fail');
+const now=new Date();
+document.getElementById('dispDate').innerText=now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
+function jitter(i){return{rx:42+(i%5)*4+(i*7)%9,ry:42+(i*11)%16}}
+function resolveShots(){
+  let plates=hitsParam.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>=1&&n<=8);
+  if(!plates.length){
+    const need=Math.max(3,Math.ceil((Z_HP[kinds]||24)/5));
+    const cycle=kinds==='H'?[1]:[1,7,2,1,5];
+    plates=[];
+    for(let i=0;i<Math.min(need,16);i++)plates.push(cycle[i%cycle.length]);
+  }
+  return plates.map((plate,i)=>{const info=PLATE_MAP[plate]||PLATE_MAP[1];const j=jitter(i);return{plate,zone:info.zone,color:info.color,rx:j.rx,ry:j.ry}});
+}
+const shotConfigs=resolveShots();
+document.getElementById('dispShots').innerText=String(shotConfigs.length);
+const totalMs=Math.max(900,recordedTimeSec*1000);
+const gap=Math.max(90,Math.min(280,totalMs/Math.max(shotConfigs.length,1)));
+const shotDelays=shotConfigs.map((_,i)=>280+i*gap);
+let activeTimers=[];
+function scheduleTimer(fn,delay){const id=setTimeout(fn,delay);activeTimers.push(id);return id}
+function clearAllActiveTimers(){activeTimers.forEach(clearTimeout);activeTimers=[]}
+function setStrip(color,opacity){document.documentElement.style.setProperty('--strip-color',color);document.documentElement.style.setProperty('--strip-opacity',opacity)}
+function flashStripOnce(colorHex,duration){setStrip(colorHex,1);scheduleTimer(()=>setStrip('transparent',0),duration)}
+function createBulletHole(plateId,rx,ry){document.querySelectorAll('#plt-'+plateId).forEach(plate=>{const hole=document.createElement('div');hole.className='bullet-hole';hole.style.left=rx+'%';hole.style.top=ry+'%';plate.appendChild(hole)})}
+function clearAllBulletHoles(){document.querySelectorAll('.bullet-hole').forEach(h=>h.remove())}
+function finaleColor(){return rank==='FAIL'?'#ff1a35':'#b026ff'}
+function runReplayOnce(){
+  clearAllBulletHoles();setStrip('transparent',0);
+  shotConfigs.forEach((s,i)=>scheduleTimer(()=>{flashStripOnce(s.color,120);createBulletHole(s.plate,s.rx,s.ry)},shotDelays[i]));
+  const end=(shotDelays[shotDelays.length-1]||400)+280;
+  scheduleTimer(()=>setStrip(finaleColor(),rank==='FAIL'?1:0.55),end);
+  return end+900;
+}
+function runOneShotReplayCycle(){const total=runReplayOnce();scheduleTimer(()=>{setStrip('transparent',0);runOneShotReplayCycle()},total)}
+window.onload=()=>runOneShotReplayCycle();
+function openBoomerangModal(){
+  const modal=document.getElementById('previewModal');const slot=document.getElementById('modalCloneSlot');
+  slot.innerHTML='';const clone=document.getElementById('storyCaptureArea').cloneNode(true);
+  clone.querySelectorAll('.bullet-hole').forEach(h=>h.remove());slot.appendChild(clone);
+  modal.style.display='flex';clearAllActiveTimers();runOneShotReplayCycle();
+}
+async function handleSaveOrShareCard(){
+  clearAllActiveTimers();clearAllBulletHoles();
+  shotConfigs.forEach(s=>createBulletHole(s.plate,s.rx,s.ry));setStrip(finaleColor(),0.5);
+  try{const canvas=await html2canvas(document.getElementById('storyCaptureArea'),{scale:2,backgroundColor:'#010104'});document.getElementById('savedCardImg').src=canvas.toDataURL('image/png');document.getElementById('imageSaveOverlay').style.display='flex'}catch(e){alert('請手動截圖')}
+  runOneShotReplayCycle();
+}
+function triggerRestartForRecording(){clearAllActiveTimers();clearAllBulletHoles();runOneShotReplayCycle()}
+</script>
+</body>
+</html>
