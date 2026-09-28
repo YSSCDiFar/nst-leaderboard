@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NST // KILLINGLANE TACTICAL LEADERBOARD</title>
+    <title>NST // ZOMBIE LANE LEADERBOARD</title>
     <!-- 戰術電競字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -175,7 +175,7 @@
         <h2>NEURONSTRIKE // LEADERBOARD</h2>
         <div class="status-tag">
             <div class="status-dot"></div>
-            <span id="statusTag">KILLINGLANE 20M 連線中...</span>
+            <span id="statusTag">ZOMBIE LANE 連線中...</span>
         </div>
     </div>
 
@@ -273,10 +273,10 @@
         // 3. 啟動 Firebase 監聽 (直連 KillingLane)
         // ==========================================
         function startLiveSync() {
-            document.getElementById("statusTag").innerText = "KILLINGLANE 雲端直連 // 監聽中";
+            document.getElementById("statusTag").innerText = "ZOMBIE LANE 雲端直連 // 監聽中";
 
             // 直連 killinglane 專用天梯節點
-            db.ref("GhostSteel/Leaderboard/killinglane").on('value', (snapshot) => {
+            db.ref("GhostSteel/Leaderboard/zombie").on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) {
                     allRecordsCache = [];
@@ -313,8 +313,8 @@
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
-            // 尋找全時期最速傳奇 (final_time 最小者)
-            let apexRecord = [...allRecordsCache].sort((a, b) => Number(a.final_time || a.time) - Number(b.final_time || b.time))[0];
+            const usable = allRecordsCache.filter(r => String(r.result || '').toUpperCase() !== 'FAIL');
+            let apexRecord = [...usable].sort((a, b) => Number(a.final_time || a.time) - Number(b.final_time || b.time))[0];
             if (apexRecord) {
                 const finalScore = Number(apexRecord.final_time || apexRecord.time).toFixed(2);
                 const rawScore = Number(apexRecord.raw_time || apexRecord.time).toFixed(2);
@@ -337,6 +337,7 @@
                 // 巔峰模式：每位射手僅取最佳紀錄 (Personal Best)
                 const pbMap = new Map();
                 allRecordsCache.forEach(r => {
+                    if (String(r.result || '').toUpperCase() === 'FAIL') return;
                     const name = (r.operator || 'Anonymous').trim();
                     const score = Number(r.final_time || r.time);
                     if (!pbMap.has(name) || score < pbMap.get(name).score) {
