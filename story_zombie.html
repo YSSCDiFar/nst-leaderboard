@@ -1,188 +1,678 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEURONSTRIKE // ZOMBIE REPLAY</title>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-:root{--cyan-core:#b026ff;--neon-green:#00e65c;--neon-gold:#ffaa00;--neon-red:#ff1a35;--text-dim:#6a5a78;--strip-color:transparent;--strip-opacity:0}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:#010104;color:#f3e9ff;font-family:'Share Tech Mono',monospace;display:flex;flex-direction:column;align-items:center;padding:10px 8px;min-height:100vh}
-.story-wrapper{width:360px;height:640px;border-radius:8px;padding:14px 14px 10px;background:radial-gradient(circle at 50% 18%,#1a0b24 0%,#07040c 82%);border:1px solid #3a1858;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(176,38,255,.18)}
-.header-brand{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid #2a1838;padding-bottom:5px}
-.brand-title{font-family:Orbitron,sans-serif;font-size:1rem;color:var(--cyan-core);letter-spacing:2px}
-.brand-sub{font-size:.55rem;color:var(--text-dim)}
-.live-tag{font-size:.62rem;color:var(--neon-red);font-weight:700;display:flex;align-items:center;gap:5px}
-.live-dot{width:6px;height:6px;background:var(--neon-red);border-radius:50%;animation:pulseDot .8s infinite alternate}
-@keyframes pulseDot{from{opacity:.3}to{opacity:1;box-shadow:0 0 8px var(--neon-red)}}
-.hero-section{display:flex;justify-content:space-between;align-items:center;margin:4px 0}
-.operator-tag .lbl{font-size:.52rem;color:var(--text-dim)}
-.operator-tag .name{font-family:'Chakra Petch',sans-serif;font-size:1.1rem;font-weight:700}
-.grade-badge{border:2px solid var(--neon-gold);padding:2px 8px;border-radius:4px;transform:rotate(-2deg);background:#120818}
-.grade-badge.fail{border-color:var(--neon-red)}
-.grade{font-family:Orbitron,sans-serif;font-size:.92rem;color:var(--neon-gold)}
-.grade-badge.fail .grade{color:var(--neon-red)}
-.score-display{background:#0a0610;border:1px solid #2a1838;border-radius:6px;padding:5px 8px;text-align:center}
-.score-lbl{font-size:.5rem;color:var(--text-dim);letter-spacing:2px}
-.score-val{font-family:Orbitron,monospace;font-size:2.05rem;font-weight:900;color:var(--cyan-core);line-height:1.05}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:3px}
-.stat-card{background:#0c0812;border:1px solid #2a1838;padding:3px 2px;border-radius:4px;text-align:center}
-.stat-card .lbl{font-size:.46rem;color:var(--text-dim)}
-.stat-card .val{font-family:Orbitron,monospace;font-size:.74rem;font-weight:700;margin-top:2px}
-.target-container{display:flex;flex-direction:column;align-items:center;margin:4px 0 2px}
-.target-silhouette{width:168px;height:266px;position:relative}
-.idpa-outline{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
-.idpa-outline path.base{fill:rgba(7,13,22,.94);stroke:#3a1858;stroke-width:3}
-.idpa-outline path.glow{fill:none;stroke:var(--strip-color,transparent);stroke-width:3.2;opacity:var(--strip-opacity,0);filter:drop-shadow(0 0 7px var(--strip-color))}
-.tac-plate{background:#0b1420;border:1.5px solid rgba(255,255,255,.28);display:flex;justify-content:center;align-items:center;font-family:Orbitron,sans-serif;font-weight:900;color:#8fa6be;position:absolute;z-index:5;overflow:visible}
-#plt-2{width:34px;height:34px;border-radius:50%;top:15px;left:50%;transform:translateX(-50%);font-size:.78rem}
-#plt-3{width:62px;height:24px;border-radius:6px;top:59px;left:50%;transform:translateX(-50%);font-size:.72rem}
-#plt-1{width:50px;height:50px;border-radius:50%;top:95px;left:50%;transform:translateX(-50%);font-size:1.05rem}
-#plt-5{width:27px;height:74px;border-radius:6px;top:71px;left:7px;font-size:.78rem}
-#plt-4{width:27px;height:74px;border-radius:6px;top:71px;right:7px;font-size:.78rem}
-#plt-6{width:29px;height:42px;border-radius:6px;top:165px;left:14px;font-size:.78rem}
-#plt-7{width:29px;height:42px;border-radius:6px;top:174px;left:50%;transform:translateX(-50%);font-size:.78rem}
-#plt-8{width:29px;height:42px;border-radius:6px;top:165px;right:14px;font-size:.78rem}
-.bullet-hole{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;border:1px solid var(--neon-green);box-shadow:0 0 7px var(--neon-green),inset 0 0 2px #000;transform:translate(-50%,-50%);z-index:50;pointer-events:none}
-.brand-pedestal{margin-top:10px;padding:3px 10px;background:#05080c;border:1px solid #2a1838;border-radius:3px;font-family:Orbitron,sans-serif;font-size:.62rem;letter-spacing:2px}
-.footer-stamp{border-top:1px solid #2a1838;padding-top:5px;display:flex;justify-content:space-between;font-size:.5rem;color:var(--text-dim)}
-.action-area{width:360px;margin-top:10px}
-.btn-motion{width:100%;background:linear-gradient(135deg,#180a24,#2a1050);color:#e0b3ff;border:1px solid #6a12a8;padding:12px;font-family:'Chakra Petch',sans-serif;font-weight:700;cursor:pointer}
-.preview-modal{display:none;position:fixed;inset:0;background:rgba(1,2,4,.97);z-index:999;flex-direction:column;align-items:center;justify-content:center;padding:10px}
-.modal-action-bar{width:330px;display:flex;flex-direction:column;gap:8px}
-.btn-action-primary,.btn-action-record{width:100%;padding:11px;border-radius:6px;font-family:'Chakra Petch',sans-serif;font-weight:700;cursor:pointer}
-.btn-action-primary{background:#120818;border:1px solid var(--cyan-core);color:var(--cyan-core)}
-.btn-action-record{background:#200f13;border:1px solid var(--neon-red);color:var(--neon-gold)}
-.image-save-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1010;flex-direction:column;align-items:center;justify-content:center}
-.image-save-overlay img{max-width:85%;max-height:75vh;border:1px solid var(--cyan-core)}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEURONSTRIKE // GHOSTSTEEL ZOMBIE REPLAY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #030508;
+            --panel-bg: #06090e;
+            --cyan-core: #00d8e6;
+            --cyan-glow: rgba(0, 216, 230, 0.35);
+            --neon-green: #00e65c;
+            --neon-gold: #ffaa00;
+            --neon-red: #ff1a35;
+            --text-dim: #506477;
+            --tac-black: #05080c;
+            --tac-plate: #0c1219;
+            --tac-border: #141f2b;
+            --strip-color: transparent;
+            --strip-opacity: 0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: #010204;
+            color: #dce7f2;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px;
+            min-height: 100vh;
+        }
+
+        .story-wrapper {
+            width: 360px;
+            height: 640px;
+            background: radial-gradient(circle at 50% 20%, #070c12 0%, #020406 85%);
+            border: 1px solid #162433;
+            border-radius: 8px;
+            padding: 14px 14px 10px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.95);
+        }
+
+        .header-brand {
+            border-bottom: 1px solid #101a24;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 10;
+        }
+
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.0rem;
+            color: var(--cyan-core);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .brand-sub { font-size: 0.55rem; color: var(--text-dim); letter-spacing: 1px; }
+
+        .live-tag {
+            font-size: 0.62rem;
+            color: var(--neon-red);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-red);
+            border-radius: 50%;
+            animation: pulseDot 0.8s infinite alternate;
+        }
+        @keyframes pulseDot {
+            from { opacity: 0.3; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px var(--neon-red); }
+        }
+
+        .hero-section {
+            margin: 2px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .operator-tag .lbl { font-size: 0.52rem; color: var(--text-dim); letter-spacing: 1.5px; }
+        .operator-tag .name {
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .grade-badge {
+            text-align: center;
+            background: #090e14;
+            border: 2px solid var(--neon-gold);
+            padding: 2px 8px;
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(230, 168, 0, 0.4);
+            transform: rotate(-2deg);
+        }
+        .grade-badge .grade {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--neon-gold);
+            letter-spacing: 1px;
+        }
+
+        .score-display {
+            background: #04070a;
+            border: 1px solid #101a24;
+            border-radius: 6px;
+            padding: 5px 8px;
+            text-align: center;
+            z-index: 10;
+        }
+        .score-lbl { font-size: 0.5rem; color: var(--text-dim); letter-spacing: 2px; }
+        .score-val {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: var(--cyan-core);
+            text-shadow: 0 0 16px var(--cyan-glow);
+            line-height: 1.05;
+            margin: 1px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 3px;
+        }
+        .stat-card {
+            background: #06090d;
+            border: 1px solid #0f1822;
+            padding: 3px 2px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-card .lbl { font-size: 0.46rem; color: var(--text-dim); }
+        .stat-card .val { font-family: 'Orbitron', monospace; font-size: 0.74rem; font-weight: bold; color: #fff; margin-top: 2px; }
+
+        .target-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 4px 0 2px 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .target-silhouette {
+            width: 168px;
+            height: 266px;
+            position: relative;
+            background: transparent;
+        }
+
+        .idpa-outline {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .idpa-outline path.base {
+            fill: rgba(7, 13, 22, 0.94);
+            stroke: #1c3348;
+            stroke-width: 3;
+        }
+        .idpa-outline path.glow {
+            fill: none;
+            stroke: var(--strip-color, transparent);
+            stroke-width: 3.2;
+            opacity: var(--strip-opacity, 0);
+            filter: drop-shadow(0 0 7px var(--strip-color, transparent));
+            transition: opacity 0.08s ease, stroke 0.08s ease;
+        }
+
+        .tac-plate {
+            background: #0b1420;
+            border: 1.5px solid rgba(255, 255, 255, 0.28);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.85), 0 2px 6px rgba(0, 0, 0, 0.55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Orbitron', 'Share Tech Mono', sans-serif;
+            font-weight: 900;
+            color: #8fa6be;
+            position: absolute;
+            z-index: 5;
+            overflow: visible;
+        }
+
+        #plt-2 { width: 34px; height: 34px; border-radius: 50%; top: 15px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; }
+        #plt-3 { width: 62px; height: 24px; border-radius: 6px; top: 59px; left: 50%; transform: translateX(-50%); font-size: 0.72rem; }
+        #plt-1 { width: 50px; height: 50px; border-radius: 50%; top: 95px; left: 50%; transform: translateX(-50%); font-size: 1.05rem; }
+        #plt-5 { width: 27px; height: 74px; border-radius: 6px; top: 71px; left: 7px; font-size: 0.78rem; }
+        #plt-4 { width: 27px; height: 74px; border-radius: 6px; top: 71px; right: 7px; font-size: 0.78rem; }
+        #plt-6 { width: 29px; height: 42px; border-radius: 6px; top: 165px; left: 14px; font-size: 0.78rem; }
+        #plt-7 { width: 29px; height: 42px; border-radius: 6px; top: 174px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; }
+        #plt-8 { width: 29px; height: 42px; border-radius: 6px; top: 165px; right: 14px; font-size: 0.78rem; }
+
+        .tac-plate.shot-now { filter: brightness(1.85); }
+        .grade-badge.fail { border-color: var(--neon-red); }
+        .grade-badge.fail .grade { color: var(--neon-red); }
+        .bullet-hole {
+
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: #061018 !important;
+            box-shadow: 0 0 7px var(--neon-green), inset 0 0 2px #000 !important;
+            border: 1px solid var(--neon-green) !important;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 7px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .brand-pedestal {
+            margin-top: 10px;
+            padding: 3px 10px;
+            background: #05080c;
+            border: 1px solid #14202b;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.62rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        .brand-pedestal .tag-p1 { color: #5a829e; }
+        .brand-pedestal .tag-p2 { color: #9c8038; }
+
+        .footer-stamp {
+            border-top: 1px solid #101a24;
+            padding-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.5rem;
+            color: var(--text-dim);
+            z-index: 10;
+        }
+
+        .action-area {
+            width: 360px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .btn-motion {
+            width: 100%;
+            background: linear-gradient(135deg, #180a0d 0%, #2a1014 100%);
+            color: #ffaa00;
+            border: 1px solid #4d1c24;
+            padding: 12px;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            box-shadow: inset 0 0 12px rgba(255, 26, 53, 0.15), 0 4px 15px rgba(0,0,0,0.8);
+        }
+
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(1, 2, 4, 0.97);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .modal-card-scale {
+            transform: scale(0.82);
+            transform-origin: top center;
+            box-shadow: 0 0 45px rgba(0, 216, 230, 0.3);
+            border-color: var(--cyan-core);
+            margin-bottom: -95px;
+        }
+
+        .modal-action-bar {
+            width: 330px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1005;
+        }
+
+        .btn-action-primary {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #0d1a24 0%, #172a3a 100%);
+            border: 1px solid var(--cyan-core);
+            color: var(--cyan-core);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 14px rgba(0, 216, 230, 0.2);
+        }
+
+        .btn-action-record {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #200f13 0%, #36151a 100%);
+            border: 1px solid var(--neon-red);
+            color: #ffaa00;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .record-tip-box {
+            background: rgba(14, 25, 36, 0.9);
+            border: 1px dashed #20455e;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .image-save-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1010;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .image-save-overlay img {
+            max-width: 85%;
+            max-height: 75vh;
+            border: 1px solid var(--cyan-core);
+            border-radius: 6px;
+        }
+    </style>
 </head>
 <body>
-<div class="story-wrapper" id="storyCaptureArea">
-  <div class="header-brand">
-    <div><div class="brand-title">NEURONSTRIKE</div><div class="brand-sub">ZOMBIE LANE // HIT REPLAY</div></div>
-    <div class="live-tag"><span class="live-dot"></span><span>ZOMBIE REPLAY</span></div>
-  </div>
-  <div class="hero-section">
-    <div class="operator-tag"><div class="lbl">CALLSIGN // 射手呼號</div><div class="name" id="dispName">OPERATOR</div></div>
-    <div class="grade-badge" id="rankBadge"><div class="grade" id="dispRank">CLEAR</div></div>
-  </div>
-  <div class="score-display">
-    <div class="score-lbl">ZOMBIE CLEAR TIME</div>
-    <div class="score-val" id="dispScore">0.00s</div>
-    <div class="stats-grid">
-      <div class="stat-card"><div class="lbl">等級</div><div class="val" id="dispKind">S</div></div>
-      <div class="stat-card"><div class="lbl">發數</div><div class="val" id="dispShots">0</div></div>
-      <div class="stat-card"><div class="lbl">靶道</div><div class="val" id="dispLane">LANE 1</div></div>
+
+    <div class="story-wrapper" id="storyCaptureArea">
+        <div class="header-brand">
+            <div>
+                <div class="brand-title">NEURONSTRIKE</div>
+                <div class="brand-sub">TACTICAL CQB // GHOSTSTEEL OS</div>
+            </div>
+            <div class="live-tag">
+                <span class="live-dot"></span>
+                <span>ZOMBIE REPLAY</span>
+            </div>
+        </div>
+
+        <div class="hero-section">
+            <div class="operator-tag">
+                <div class="lbl">CALLSIGN // 射手呼號</div>
+                <div class="name" id="dispName">OPERATOR_GHOST</div>
+            </div>
+            <div class="grade-badge">
+                <div class="grade" id="dispRank">MASTER</div>
+            </div>
+        </div>
+
+        <div class="score-display">
+            <div class="score-lbl">ZOMBIE CLEAR TIME</div>
+            <div class="score-val" id="dispScore">0.00s</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="lbl">特訓模式</div>
+                    <div class="val" style="color: var(--neon-red);">ZOMBIE</div>
+                </div>
+                <div class="stat-card">
+                    <div class="lbl">等級 / 發數</div>
+                    <div class="val" id="dispAction" style="font-size:0.75rem; color: var(--neon-green);">B-B-A</div>
+                </div>
+                <div class="stat-card">
+                    <div class="lbl">靶道編號</div>
+                    <div class="val" id="dispLane">LANE 1</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="target-container">
+            <div class="target-silhouette">
+                <svg class="idpa-outline" viewBox="0 0 240 380" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="base" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
+                    <path class="glow" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
+                </svg>
+                <div class="tac-plate" id="plt-2">2</div>
+                <div class="tac-plate" id="plt-3">3</div>
+                <div class="tac-plate" id="plt-5">5</div>
+                <div class="tac-plate" id="plt-1">1</div>
+                <div class="tac-plate" id="plt-4">4</div>
+                <div class="tac-plate" id="plt-6">6</div>
+                <div class="tac-plate" id="plt-7">7</div>
+                <div class="tac-plate" id="plt-8">8</div>
+            </div>
+
+            <div class="brand-pedestal">
+                <span class="tag-p1">NEURONSTRIKE</span>
+                <span class="tag-p2">TACTICAL</span>
+            </div>
+        </div>
+
+        <div class="footer-stamp">
+            <span id="dispDate">2026.09.05 // TACTICAL LAB</span>
+            <span>IDPA ACCREDITED STEEL</span>
+        </div>
     </div>
-  </div>
-  <div class="target-container">
-    <div class="target-silhouette">
-      <svg class="idpa-outline" viewBox="0 0 240 380" preserveAspectRatio="none">
-        <path class="base" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
-        <path class="glow" d="M 80,10 H 160 A 6,6 0 0 1 166,16 V 72 H 214 A 16,16 0 0 1 230,88 V 324 A 48,48 0 0 1 182,372 H 58 A 48,48 0 0 1 10,324 V 88 A 16,16 0 0 1 26,72 H 74 V 16 A 6,6 0 0 1 80,10 Z"/>
-      </svg>
-      <div class="tac-plate" id="plt-2">2</div>
-      <div class="tac-plate" id="plt-3">3</div>
-      <div class="tac-plate" id="plt-5">5</div>
-      <div class="tac-plate" id="plt-1">1</div>
-      <div class="tac-plate" id="plt-4">4</div>
-      <div class="tac-plate" id="plt-6">6</div>
-      <div class="tac-plate" id="plt-7">7</div>
-      <div class="tac-plate" id="plt-8">8</div>
+
+    <div class="action-area">
+        <button class="btn-motion" onclick="openBoomerangModal()">
+            <span>⚡</span> 產生 IG Boomerang 動態戰報卡
+        </button>
+        <div style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 2px;">
+            真實打擊彈點 60FPS 循環重現，支援一鍵分享與錄製 IG 動動！
+        </div>
     </div>
-    <div class="brand-pedestal"><span style="color:#8a6aaa">GHOSTSTEEL</span> <span style="color:#c9a24a">ZOMBIE</span></div>
-  </div>
-  <div class="footer-stamp"><span id="dispDate"></span><span>IDPA STEEL // REPLAY</span></div>
-</div>
-<div class="action-area"><button class="btn-motion" type="button" onclick="openBoomerangModal()">產生打擊回放戰報卡</button></div>
-<div class="preview-modal" id="previewModal" onclick="if(event.target.id==='previewModal')this.style.display='none'">
-  <div id="modalCloneSlot" onclick="event.stopPropagation()"></div>
-  <div class="modal-action-bar" onclick="event.stopPropagation()">
-    <button class="btn-action-primary" type="button" onclick="handleSaveOrShareCard()">儲存戰報圖卡</button>
-    <button class="btn-action-record" type="button" onclick="triggerRestartForRecording()">重設循環 螢幕錄影</button>
-  </div>
-</div>
-<div class="image-save-overlay" id="imageSaveOverlay" onclick="this.style.display='none'"><img id="savedCardImg" alt="card"></div>
-<script>
-const params=new URLSearchParams(location.search);
-const name=params.get('name')||'OPERATOR';
-const lane=params.get('lane')||'1';
-const recordedTimeSec=Math.max(0.4,parseFloat(params.get('time'))||4.2);
-const rank=(params.get('rank')||'CLEAR').toUpperCase();
-const kinds=(params.get('kinds')||'S').toUpperCase();
-const hitsParam=params.get('hits')||'';
-const PLATE_MAP={1:{zone:'B',color:'#ffaa00'},2:{zone:'A',color:'#ff1a35'},3:{zone:'A',color:'#ff1a35'},4:{zone:'C',color:'#00e65c'},5:{zone:'C',color:'#00e65c'},6:{zone:'C',color:'#00e65c'},7:{zone:'B',color:'#ffaa00'},8:{zone:'C',color:'#00e65c'}};
-const Z_HP={H:10,D:18,C:24,B:36,A:54,S:72};
-document.getElementById('dispName').innerText=name.toUpperCase();
-document.getElementById('dispLane').innerText='LANE '+lane;
-document.getElementById('dispScore').innerText=recordedTimeSec.toFixed(2)+'s';
-document.getElementById('dispRank').innerText=rank;
-document.getElementById('dispKind').innerText=kinds;
-if(rank==='FAIL')document.getElementById('rankBadge').classList.add('fail');
-const now=new Date();
-document.getElementById('dispDate').innerText=now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
-const ZONE_COLOR={A:'#ff1a35',B:'#ffaa00',C:'#00e65c'};
-const STACK=[{rx:50,ry:50},{rx:38,ry:42},{rx:62,ry:44},{rx:44,ry:60},{rx:58,ry:58}];
-function parseHitToken(tok){
-  tok=String(tok||'').trim().toUpperCase();
-  if(!tok)return null;
-  const m=tok.match(/^([1-8])([ABC])?$/);
-  if(!m)return null;
-  const plate=parseInt(m[1],10);
-  const zone=m[2]||(PLATE_MAP[plate]||PLATE_MAP[1]).zone;
-  return{plate,zone};
-}
-function resolveShots(){
-  let parsed=hitsParam.split(/[,\s]+/).map(parseHitToken).filter(Boolean);
-  if(!parsed.length){
-    hitsParam.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>n>=1&&n<=8).forEach(n=>parsed.push({plate:n,zone:(PLATE_MAP[n]||PLATE_MAP[1]).zone}));
-  }
-  const countOn={};
-  return parsed.map(h=>{
-    countOn[h.plate]=(countOn[h.plate]||0)+1;
-    const stack=STACK[(countOn[h.plate]-1)%STACK.length];
-    const color=ZONE_COLOR[h.zone]||'#ffaa00';
-    return{plate:h.plate,zone:h.zone,color,rx:stack.rx,ry:stack.ry};
-  });
-}
-const shotConfigs=resolveShots();
-document.getElementById('dispShots').innerText=String(shotConfigs.length);
-const totalMs=Math.max(900,recordedTimeSec*1000);
-const gap=Math.max(90,Math.min(280,totalMs/Math.max(shotConfigs.length,1)));
-const shotDelays=shotConfigs.map((_,i)=>280+i*gap);
-let activeTimers=[];
-function scheduleTimer(fn,delay){const id=setTimeout(fn,delay);activeTimers.push(id);return id}
-function clearAllActiveTimers(){activeTimers.forEach(clearTimeout);activeTimers=[]}
-function setStrip(color,opacity){document.documentElement.style.setProperty('--strip-color',color);document.documentElement.style.setProperty('--strip-opacity',opacity)}
-function flashStripOnce(colorHex,duration){setStrip(colorHex,1);scheduleTimer(()=>setStrip('transparent',0),duration)}
-function createBulletHole(plateId,rx,ry){document.querySelectorAll('#plt-'+plateId).forEach(plate=>{const hole=document.createElement('div');hole.className='bullet-hole';hole.style.left=rx+'%';hole.style.top=ry+'%';plate.appendChild(hole)})}
-function clearAllBulletHoles(){document.querySelectorAll('.bullet-hole').forEach(h=>h.remove())}
-function finaleColor(){return rank==='FAIL'?'#ff1a35':'#b026ff'}
-function runReplayOnce(){
-  clearAllBulletHoles();setStrip('transparent',0);
-  shotConfigs.forEach((s,i)=>scheduleTimer(()=>{flashStripOnce(s.color,120);createBulletHole(s.plate,s.rx,s.ry)},shotDelays[i]));
-  const end=(shotDelays[shotDelays.length-1]||400)+280;
-  scheduleTimer(()=>setStrip(finaleColor(),rank==='FAIL'?1:0.55),end);
-  return end+900;
-}
-function runOneShotReplayCycle(){const total=runReplayOnce();scheduleTimer(()=>{setStrip('transparent',0);runOneShotReplayCycle()},total)}
-window.onload=()=>runOneShotReplayCycle();
-function openBoomerangModal(){
-  const modal=document.getElementById('previewModal');const slot=document.getElementById('modalCloneSlot');
-  slot.innerHTML='';const clone=document.getElementById('storyCaptureArea').cloneNode(true);
-  clone.querySelectorAll('.bullet-hole').forEach(h=>h.remove());slot.appendChild(clone);
-  modal.style.display='flex';clearAllActiveTimers();runOneShotReplayCycle();
-}
-async function handleSaveOrShareCard(){
-  clearAllActiveTimers();clearAllBulletHoles();
-  shotConfigs.forEach(s=>createBulletHole(s.plate,s.rx,s.ry));setStrip(finaleColor(),0.5);
-  try{const canvas=await html2canvas(document.getElementById('storyCaptureArea'),{scale:2,backgroundColor:'#010104'});document.getElementById('savedCardImg').src=canvas.toDataURL('image/png');document.getElementById('imageSaveOverlay').style.display='flex'}catch(e){alert('請手動截圖')}
-  runOneShotReplayCycle();
-}
-function triggerRestartForRecording(){clearAllActiveTimers();clearAllBulletHoles();runOneShotReplayCycle()}
-</script>
+
+    <div class="preview-modal" id="previewModal" onclick="closeModal(event)">
+        <div id="modalCloneSlot" onclick="event.stopPropagation()"></div>
+        <div class="modal-action-bar" onclick="event.stopPropagation()">
+            <button class="btn-action-primary" id="btnSaveCard" onclick="handleSaveOrShareCard()">
+                <span>📲</span> 儲存戰報圖卡
+            </button>
+            <button class="btn-action-record" onclick="triggerRestartForRecording()">
+                <span>🎥</span> 重設循環 ➔ 啟動螢幕錄影 3 秒
+            </button>
+            <div class="record-tip-box">
+                💡 <strong>IG 限動秘訣</strong>：點擊重設後開啟手機「螢幕錄影」錄 3 秒，發 IG 限動即可無損呈現 60FPS Boomerang！
+            </div>
+            <div style="font-size: 0.65rem; color: #506477; text-align:center; cursor:pointer;" onclick="closeModal(event)">
+                [ 點擊此處或空白區關閉 ]
+            </div>
+        </div>
+    </div>
+
+    <div class="image-save-overlay" id="imageSaveOverlay" onclick="closeImageOverlay()">
+        <img id="savedCardImg" src="" alt="Tactical Report" onclick="event.stopPropagation()">
+        <div style="color: var(--neon-gold); font-family: 'Chakra Petch', sans-serif; font-size: 0.88rem; font-weight: bold; margin-top: 14px; text-align:center;">
+            👆 長按上方圖片 ➜ 加入「照片」！
+        </div>
+        <div style="font-size: 0.65rem; color: #506477; margin-top: 8px;">(點擊任意處返回動態彈窗)</div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name') || "OPERATOR_GHOST";
+        const lane = params.get('lane') || "1";
+        const recordedTimeSec = Math.max(0.4, parseFloat(params.get('time')) || 1.82);
+        const rank = (params.get('rank') || "CLEAR").toUpperCase();
+        const kinds = (params.get('kinds') || "S").toUpperCase();
+        const hitsParam = params.get('hits') || "";
+
+        document.getElementById("dispName").innerText = name.toUpperCase();
+        document.getElementById("dispLane").innerText = `LANE 0${lane}`.replace('LANE 0','LANE ');
+        document.getElementById("dispScore").innerText = `${recordedTimeSec.toFixed(2)}s`;
+        document.getElementById("dispRank").innerText = rank;
+        const action = document.getElementById("dispAction");
+        if (action) action.innerText = kinds + " / " + (hitsParam ? hitsParam.split(/[,|\s]+/).filter(Boolean).length : 0);
+        if (rank === "FAIL") {
+            const badge = document.querySelector(".grade-badge");
+            if (badge) badge.classList.add("fail");
+        }
+        const now = new Date();
+        document.getElementById("dispDate").innerText =
+            `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,"0")}.${String(now.getDate()).padStart(2,"0")} // ${now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})}`;
+
+        const PLATE_MAP = {
+            1: { zone: "B", color: "#ffaa00" },
+            2: { zone: "A", color: "#ff1a35" },
+            3: { zone: "A", color: "#ff1a35" },
+            4: { zone: "C", color: "#00e65c" },
+            5: { zone: "C", color: "#00e65c" },
+            6: { zone: "C", color: "#00e65c" },
+            7: { zone: "B", color: "#ffaa00" },
+            8: { zone: "C", color: "#00e65c" }
+        };
+        const ZONE_COLOR = { A: "#ff1a35", B: "#ffaa00", C: "#00e65c" };
+        const STACK = { 1: {rx:50,ry:48}, 2: {rx:36,ry:40}, 3: {rx:64,ry:40}, 4: {rx:36,ry:62}, 5: {rx:64,ry:62} };
+
+        function parseHitToken(tok) {
+            tok = String(tok || "").trim().toUpperCase().replace(/^P/, "");
+            const m = tok.match(/^([1-8])[-_:]?([ABC])?$/);
+            if (!m) return null;
+            const plate = parseInt(m[1], 10);
+            const zone = m[2] || (PLATE_MAP[plate] || PLATE_MAP[1]).zone;
+            return { plate, zone };
+        }
+        function resolveShots() {
+            const parsed = [];
+            String(hitsParam).split(/[,|\s]+/).forEach(tok => {
+                const h = parseHitToken(tok);
+                if (h) parsed.push(h);
+            });
+            const countOn = {};
+            return parsed.map(h => {
+                countOn[h.plate] = (countOn[h.plate] || 0) + 1;
+                const stack = STACK[Math.min(countOn[h.plate], 5)];
+                return { plate: h.plate, zone: h.zone, color: ZONE_COLOR[h.zone] || "#ffaa00", rx: stack.rx, ry: stack.ry };
+            });
+        }
+        const shotConfigs = resolveShots();
+        if (action) action.innerText = kinds + " / " + shotConfigs.length;
+
+        const STEP_MS = 220;
+        let activeTimers = [];
+        let replayGen = 0;
+        function scheduleTimer(fn, delay) {
+            const id = setTimeout(fn, delay);
+            activeTimers.push(id);
+            return id;
+        }
+        function clearAllActiveTimers() {
+            activeTimers.forEach(id => clearTimeout(id));
+            activeTimers = [];
+        }
+        function setStrip(color, opacity = 1) {
+            document.documentElement.style.setProperty("--strip-color", color);
+            document.documentElement.style.setProperty("--strip-opacity", opacity);
+        }
+        function plateEls(plateId) {
+            return [
+                document.querySelector(`#storyCaptureArea #plt-${plateId}`),
+                document.querySelector(`#modalCloneSlot #plt-${plateId}`)
+            ].filter(Boolean);
+        }
+        function createBulletHole(shot, idx) {
+            plateEls(shot.plate).forEach(plate => {
+                const hole = document.createElement("div");
+                hole.className = "bullet-hole";
+                hole.style.left = shot.rx + "%";
+                hole.style.top = shot.ry + "%";
+                hole.style.borderColor = shot.color;
+                hole.style.boxShadow = "0 0 7px " + shot.color;
+                hole.textContent = String(idx + 1);
+                plate.appendChild(hole);
+            });
+        }
+        function clearAllBulletHoles() {
+            document.querySelectorAll(".bullet-hole").forEach(h => h.remove());
+        }
+        function clearPlateFlash() {
+            document.querySelectorAll(".tac-plate.shot-now").forEach(el => el.classList.remove("shot-now"));
+        }
+        function finaleColor() { return rank === "FAIL" ? "#ff1a35" : "#00d8e6"; }
+
+        function playShot(i, gen) {
+            if (gen !== replayGen) return;
+            if (i >= shotConfigs.length) {
+                clearPlateFlash();
+                setStrip(finaleColor(), rank === "FAIL" ? 1 : 0.45);
+                scheduleTimer(() => {
+                    if (gen !== replayGen) return;
+                    setStrip("transparent", 0);
+                    runOneShotReplayCycle();
+                }, 700);
+                return;
+            }
+            const s = shotConfigs[i];
+            setStrip(s.color, 1);
+            clearPlateFlash();
+            plateEls(s.plate).forEach(el => el.classList.add("shot-now"));
+            createBulletHole(s, i);
+            scheduleTimer(() => playShot(i + 1, gen), STEP_MS);
+        }
+        function runOneShotReplayCycle() {
+            replayGen++;
+            const gen = replayGen;
+            clearAllActiveTimers();
+            clearAllBulletHoles();
+            clearPlateFlash();
+            setStrip("transparent", 0);
+            if (!shotConfigs.length) return;
+            scheduleTimer(() => playShot(0, gen), 240);
+        }
+        window.onload = () => runOneShotReplayCycle();
+
+        function openBoomerangModal() {
+            const modal = document.getElementById("previewModal");
+            const slot = document.getElementById("modalCloneSlot");
+            slot.innerHTML = "";
+            const clone = document.getElementById("storyCaptureArea").cloneNode(true);
+            clone.id = "storyCaptureAreaClone";
+            clone.classList.add("modal-card-scale");
+            clone.querySelectorAll(".bullet-hole").forEach(h => h.remove());
+            slot.appendChild(clone);
+            modal.style.display = "flex";
+            runOneShotReplayCycle();
+        }
+        async function handleSaveOrShareCard() {
+            const btn = document.getElementById("btnSaveCard");
+            const orig = btn ? btn.innerHTML : "";
+            if (btn) { btn.innerHTML = "<span>⏳</span> 正在生成戰報..."; btn.disabled = true; }
+            replayGen++;
+            clearAllActiveTimers();
+            clearAllBulletHoles();
+            shotConfigs.forEach((s, i) => createBulletHole(s, i));
+            setStrip(finaleColor(), 0.45);
+            try {
+                const canvas = await html2canvas(document.getElementById("storyCaptureArea"), {
+                    scale: 2, backgroundColor: "#010204", logging: false
+                });
+                document.getElementById("savedCardImg").src = canvas.toDataURL("image/png");
+                document.getElementById("imageSaveOverlay").style.display = "flex";
+            } catch (e) {
+                alert("生成異常，請手動截圖！");
+            } finally {
+                if (btn) { btn.innerHTML = orig; btn.disabled = false; }
+                runOneShotReplayCycle();
+            }
+        }
+        function triggerRestartForRecording() { runOneShotReplayCycle(); }
+        function closeImageOverlay() { document.getElementById("imageSaveOverlay").style.display = "none"; }
+        function closeModal(e) {
+            if (e && e.target && e.target.id !== "previewModal" && !String(e.target.innerText||"").includes("關閉")) return;
+            document.getElementById("previewModal").style.display = "none";
+            document.getElementById("modalCloneSlot").innerHTML = "";
+        }
+    </script>
 </body>
 </html>
