@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#010204">
+  <title>NEURONSTRIKE // ZOMBIE LANE 戰報</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --bg:#010204;
+      --cyan:#00d8e6;
+      --gold:#ffaa00;
+      --red:#ff1a35;
+      --green:#00e65c;
+      --dim:#5c748e;
+      --txt:#e6eef6;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html, body { background:var(--bg); color:var(--txt); }
+    body {
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      font-family:"Share Tech Mono", ui-monospace, monospace;
+      padding:18px 12px 32px;
+      background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(0,216,230,.08), transparent 46%),
+        linear-gradient(rgba(0,216,230,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,216,230,.03) 1px, transparent 1px);
+      background-size:auto, 22px 22px, 22px 22px;
+    }
+    .stage { width:min(390px, 100%); display:flex; flex-direction:column; align-items:stretch; gap:12px; }
+    .card {
+      position:relative;
+      width:100%;
+      aspect-ratio:9 / 16;
+      min-height:640px;
+      padding:18px 16px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      overflow:hidden;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(0,216,230,.09), transparent 42%),
+        linear-gradient(180deg, #0c141d 0%, #070b11 55%, #05080c 100%);
+      border:1px solid #163041;
+      border-radius:16px;
+      box-shadow:0 18px 50px rgba(0,0,0,.55), inset 0 0 0 1px rgba(0,216,230,.05);
+    }
+    .card::before, .card::after {
+      content:"";
+      position:absolute;
+      width:18px; height:18px;
+      border:1.5px solid var(--cyan);
+      pointer-events:none;
+      opacity:.85;
+    }
+    .card::before { top:8px; left:8px; border-right:0; border-bottom:0; }
+    .card::after { top:8px; right:8px; border-left:0; border-bottom:0; }
+    .corner-b { position:absolute; left:8px; right:8px; bottom:8px; height:18px; pointer-events:none; }
+    .corner-b i { position:absolute; bottom:0; width:18px; height:18px; border:1.5px solid var(--cyan); opacity:.85; }
+    .corner-b i:first-child { left:0; border-right:0; border-top:0; }
+    .corner-b i:last-child { right:0; border-left:0; border-top:0; }
+    .sheen {
+      position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.05) 48%, transparent 60%);
+      background-size:220% 100%;
+      animation:sheen 9s linear infinite;
+    }
+    @keyframes sheen { from { background-position:120% 0; } to { background-position:-40% 0; } }
+    .top, .who, .grade-wrap, .hero, .chips, .zones, .armor, .stamp { position:relative; z-index:1; }
+    .top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding-bottom:8px; border-bottom:1px solid rgba(0,216,230,.18); }
+    .word {
+      font-family:Orbitron, sans-serif;
+      font-weight:900;
+      font-size:.92rem;
+      letter-spacing:1.5px;
+      color:var(--cyan);
+      text-shadow:0 0 12px rgba(0,216,230,.45);
+    }
+    .brand-sub { margin-top:3px; font-size:.58rem; letter-spacing:1.6px; color:var(--dim); }
+    .lane {
+      flex:0 0 auto;
+      background:var(--gold);
+      color:#140c00;
+      font-family:"Chakra Petch", sans-serif;
+      font-weight:700;
+      font-size:.72rem;
+      letter-spacing:1px;
+      padding:4px 8px;
+      border-radius:4px;
+    }
+    .who { display:flex; justify-content:space-between; align-items:flex-end; gap:8px; min-height:42px; }
+    .k { font-size:.56rem; letter-spacing:1.8px; color:var(--dim); }
+    .call {
+      font-family:"Chakra Petch", sans-serif;
+      font-weight:700;
+      font-size:1.35rem;
+      letter-spacing:.5px;
+      color:#fff;
+      line-height:1.1;
+      max-width:230px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .demo {
+      font-size:.58rem;
+      letter-spacing:1px;
+      color:var(--gold);
+      border:1px solid rgba(255,170,0,.45);
+      border-radius:999px;
+      padding:2px 7px;
+      white-space:nowrap;
+    }
+    .grade-wrap { text-align:center; padding:2px 0 0; }
+    .grade {
+      font-family:Orbitron, sans-serif;
+      font-weight:900;
+      font-size:clamp(5.2rem, 28vw, 7.1rem);
+      line-height:.82;
+      color:var(--gold);
+      text-shadow:0 0 22px rgba(255,170,0,.55), 0 0 48px rgba(255,170,0,.28);
+    }
+    .grade.g-S { color:var(--gold); text-shadow:0 0 22px rgba(255,170,0,.6), 0 0 54px rgba(255,170,0,.28); }
+    .grade.g-A { color:var(--cyan); text-shadow:0 0 22px rgba(0,216,230,.6), 0 0 54px rgba(0,216,230,.25); }
+    .grade.g-B { color:#d5ff6a; text-shadow:0 0 22px rgba(213,255,106,.4), 0 0 46px rgba(213,255,106,.18); }
+    .grade.g-C { color:#ff8c14; text-shadow:0 0 18px rgba(255,140,20,.4); }
+    .grade.g-D { color:var(--dim); text-shadow:none; }
+    .hero { text-align:center; }
+    .final {
+      font-family:Orbitron, sans-serif;
+      font-weight:900;
+      font-size:clamp(2.5rem, 12vw, 3.15rem);
+      color:#fff;
+      letter-spacing:1px;
+      line-height:1;
+      text-shadow:0 0 16px rgba(0,216,230,.28);
+    }
+    .final small { font-size:.42em; margin-left:2px; color:var(--cyan); }
+    .subtimes { display:flex; justify-content:center; gap:14px; margin-top:6px; font-size:.72rem; color:var(--dim); }
+    .subtimes .raw b { color:#d5e2ee; font-weight:400; }
+    .subtimes .pen b { color:var(--red); font-weight:400; }
+    .chips { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:4px; }
+    .chip {
+      display:grid;
+      grid-template-columns:auto 1fr;
+      grid-template-rows:auto auto;
+      column-gap:8px;
+      align-items:center;
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid #24384c;
+      background:rgba(6,10,16,.72);
+      min-width:0;
+    }
+    .chip .id { font-family:Orbitron, sans-serif; font-size:.72rem; color:#9fb4c6; grid-row:1 / span 2; }
+    .chip .tier { font-family:"Chakra Petch", sans-serif; font-weight:700; font-size:.95rem; letter-spacing:.5px; }
+    .chip .st { font-size:.62rem; letter-spacing:1px; color:var(--red); font-family:Orbitron, sans-serif; }
+    .chip .hp { grid-column:2; font-size:.58rem; color:var(--dim); }
+    .chip.t-D { border-color:#8ea0b3; }
+    .chip.t-D .tier { color:#d5dde6; }
+    .chip.t-C { border-color:#3d7cff; }
+    .chip.t-C .tier { color:#7eb0ff; }
+    .chip.t-B { border-color:#ffd000; }
+    .chip.t-B .tier { color:#ffd000; }
+    .chip.t-A { border-color:#ff8c14; box-shadow:0 0 10px rgba(255,140,20,.2); }
+    .chip.t-A .tier { color:#ff8c14; }
+    .chip.t-S { border-color:var(--gold); box-shadow:0 0 14px rgba(255,170,0,.32); background:rgba(255,170,0,.06); }
+    .chip.t-S .tier { color:var(--gold); text-shadow:0 0 8px rgba(255,170,0,.45); }
+    .chip.t-SS { border-color:var(--red); box-shadow:0 0 14px rgba(255,26,53,.38); background:rgba(255,26,53,.08); }
+    .chip.t-SS .tier { color:#ff6b7d; text-shadow:0 0 8px rgba(255,26,53,.55); }
+    .chip { position:relative; }
+    .chip .rb {
+      position:absolute; left:0; right:0; top:0; height:3px; border-radius:8px 8px 0 0;
+      background:linear-gradient(90deg, #ff1a35, #ffaa00, #00e65c, #00d8e6, #e070ff);
+    }
+    .chip.t-SSS {
+      border:1px solid transparent;
+      background-image:
+        linear-gradient(180deg, rgba(10,14,20,.94), rgba(8,10,16,.94)),
+        linear-gradient(100deg, #ff1a35, #ffaa00, #00e65c, #00d8e6, #e070ff);
+      background-origin:padding-box, border-box;
+      background-clip:padding-box, border-box;
+      box-shadow:0 0 16px rgba(224,112,255,.34);
+    }
+    .chip.t-SSS .tier {
+      background-image:linear-gradient(90deg, #ff5d73, #ffaa00 35%, #7dffb0 62%, #7af6ff 80%, #e39bff);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      -webkit-text-fill-color:transparent;
+    }
+    .chip.hostage {
+      border:1px dashed var(--green);
+      background:rgba(0,230,92,.07);
+      box-shadow:none;
+      animation:none;
+    }
+    .chip.hostage .tier {
+      color:var(--green);
+      background:none;
+      -webkit-text-fill-color:var(--green);
+      text-shadow:none;
+    }
+    .chip.hostage .st { color:#c8ffe0; font-family:"Chakra Petch", sans-serif; letter-spacing:1px; }
+    .chip.hostage .st.miss { color:var(--gold); }
+    .empty-note { grid-column:1 / -1; font-size:.68rem; color:var(--dim); text-align:center; padding:8px 0; }
+    .stamp { margin-top:auto; }
+    .bar { display:flex; height:9px; border-radius:99px; overflow:hidden; background:#121a24; border:1px solid #1c2c3c; }
+    .bar i { display:block; height:100%; min-width:0; }
+    .bar i.a { background:var(--red); }
+    .bar i.b { background:var(--gold); }
+    .bar i.c { background:var(--green); }
+    .zlabs { display:flex; justify-content:space-between; gap:6px; margin-top:4px; font-size:.62rem; }
+    .zlabs span { white-space:nowrap; }
+    .za { color:var(--red); } .zb { color:var(--gold); } .zc { color:var(--green); }
+    .armor {
+      font-size:.7rem;
+      color:#d7e4f0;
+      letter-spacing:.3px;
+      padding-top:2px;
+    }
+    .armor b { color:var(--gold); font-weight:400; }
+    .stamp {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      font-size:.58rem;
+      letter-spacing:.6px;
+      color:var(--dim);
+      border-top:1px solid rgba(255,255,255,.06);
+      padding-top:6px;
+    }
+    #btnSave {
+      font-family:"Chakra Petch", sans-serif;
+      font-weight:700;
+      font-size:.95rem;
+      letter-spacing:2px;
+      color:var(--cyan);
+      background:rgba(0,216,230,.06);
+      border:1px solid rgba(0,216,230,.55);
+      border-radius:10px;
+      padding:12px 14px;
+      cursor:pointer;
+    }
+    #btnSave:disabled { opacity:.55; cursor:wait; }
+    #btnSave:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .save-hint { text-align:center; font-size:.62rem; color:var(--dim); min-height:1em; }
+    @media (prefers-reduced-motion: reduce) {
+      .sheen { animation:none; }
+      .grade { text-shadow:0 0 14px color-mix(in srgb, currentColor 55%, transparent); }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <article class="card" id="storyCard">
+      <div class="sheen" aria-hidden="true"></div>
+      <div class="corner-b" aria-hidden="true"><i></i><i></i></div>
+      <header class="top">
+        <div>
+          <div class="word">NEURONSTRIKE</div>
+          <div class="brand-sub">GHOSTSTEEL · ZOMBIE LANE</div>
+        </div>
+        <div class="lane" id="laneBadge">LANE —</div>
+      </header>
+      <div class="who">
+        <div>
+          <div class="k">CALLSIGN // 呼號</div>
+          <div class="call" id="callsign">—</div>
+        </div>
+        <div class="demo" id="demoTag" hidden>示範資料</div>
+      </div>
+      <div class="grade-wrap">
+        <div class="k">GRADE // 評級</div>
+        <div class="grade" id="grade">—</div>
+      </div>
+      <div class="hero">
+        <div class="k">FINAL // 最終成績</div>
+        <div class="final" id="final">—</div>
+        <div class="subtimes">
+          <span class="raw" id="rawLine"></span>
+          <span class="pen" id="penLine"></span>
+        </div>
+      </div>
+      <div class="chips" id="chips"></div>
+      <section class="zones" id="zones" hidden>
+        <div class="k">ZONE // 命中分區</div>
+        <div class="bar" id="zoneBar"></div>
+        <div class="zlabs" id="zoneLabs"></div>
+      </section>
+      <div class="armor" id="armor" hidden></div>
+      <footer class="stamp">
+        <span id="stampDate"></span>
+        <span>ZOMBIE LANE</span>
+      </footer>
+    </article>
+    <button type="button" id="btnSave">儲存戰報圖</button>
+    <p class="save-hint" id="saveHint">按鈕在戰報卡外面，不會進到圖裡</p>
+  </main>
+  <script>
+    (function () {
+      var TIERS = { H:1, D:1, C:1, B:1, A:1, S:1, SS:1, SSS:1 };
+      var GRADES = { S:1, A:1, B:1, C:1, D:1 };
+      var params = new URLSearchParams(window.location.search);
+      var demo = params.toString() === "";
+
+      function num(key) {
+        if (!params.has(key)) return null;
+        var n = Number(params.get(key));
+        return Number.isFinite(n) ? n : null;
+      }
+      function el(tag, cls) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        return n;
+      }
+      function text(node, value) { node.textContent = value == null ? "" : String(value); }
+
+      function parseTg(raw) {
+        if (!raw) return [];
+        return String(raw).split(",").map(function (part) {
+          var bits = part.split(":");
+          if (bits.length < 2) return null;
+          var id = parseInt(bits[0], 10);
+          var tier = String(bits[1] || "").trim().toUpperCase();
+          if (!id || id < 0 || id > 999 || !TIERS[tier]) return null;
+          var flag = bits.length >= 3 ? String(bits[2]).trim() : "";
+          var hostage = flag === "1" || tier === "H";
+          var hp = null;
+          if (bits.length >= 4 && String(bits[3]).trim() !== "") {
+            var h = Number(bits[3]);
+            if (Number.isFinite(h)) hp = h;
+          }
+          return { id:id, tier:tier, hostage:hostage, hp:hp };
+        }).filter(Boolean);
+      }
+      function chipsFromKinds(raw) {
+        return String(raw || "").toUpperCase().split("+").filter(Boolean).map(function (tier, i) {
+          if (!TIERS[tier]) return null;
+          return { id:i + 1, tier:tier, hostage:tier === "H", hp:null };
+        }).filter(Boolean);
+      }
+      function zonesFromHits(raw) {
+        if (!raw) return null;
+        var z = { A:0, B:0, C:0 };
+        var any = false;
+        String(raw).split(/[,|\s]+/).forEach(function (tok) {
+          var m = String(tok).toUpperCase().match(/([ABC])$/);
+          if (m) { z[m[1]]++; any = true; }
+        });
+        return any ? z : null;
+      }
+      function pad(n) { return (n < 10 ? "0" : "") + n; }
+      function stampNow() {
+        var d = new Date();
+        return d.getFullYear() + "." + pad(d.getMonth() + 1) + "." + pad(d.getDate()) + "  " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+      }
+      function f2(n) { return Number(n).toFixed(2); }
+      function f1(n) { return Number(n).toFixed(1); }
+
+      var model;
+      if (demo) {
+        model = {
+          demo:true,
+          name:"GHOST-07",
+          lane:"2",
+          grade:"A",
+          raw:11.42,
+          penalty:5.0,
+          final:16.42,
+          hostage:1,
+          targets:[
+            { id:1, tier:"S", hostage:false, hp:0 },
+            { id:3, tier:"SS", hostage:false, hp:0 },
+            { id:4, tier:"SSS", hostage:false, hp:0 },
+            { id:6, tier:"C", hostage:false, hp:0 },
+            { id:8, tier:"H", hostage:true, hp:null }
+          ],
+          zones:{ A:3, B:5, C:8 },
+          br:2,
+          stk:3
+        };
+      } else {
+        var targets = parseTg(params.get("tg"));
+        if (!targets.length) targets = chipsFromKinds(params.get("kinds"));
+        var zones = null;
+        if (params.has("za") || params.has("zb") || params.has("zc")) {
+          zones = { A:num("za") || 0, B:num("zb") || 0, C:num("zc") || 0 };
+        } else {
+          zones = zonesFromHits(params.get("hits"));
+        }
+        var grade = String(params.get("rank") || "").trim().toUpperCase();
+        var finalSec = num("final");
+        if (finalSec == null) finalSec = num("time");
+        var name = String(params.get("name") || "").trim().slice(0, 24);
+        var lane = String(params.get("lane") || "").trim().slice(0, 12);
+        model = {
+          demo:false,
+          name:name || "—",
+          lane:lane || "—",
+          grade:grade || "—",
+          raw:num("raw"),
+          penalty:num("penalty") != null ? num("penalty") : (num("hostage") != null ? num("hostage") * 5 : null),
+          final:finalSec,
+          hostage:num("hostage"),
+          targets:targets,
+          zones:zones,
+          br:num("br"),
+          stk:num("stk")
+        };
+      }
+
+      var hostN = model.targets.filter(function (t) { return t.hostage; }).length;
+      model.targets.forEach(function (t) {
+        t.struck = !!(t.hostage && hostN === 1 && model.hostage != null && model.hostage >= 1);
+      });
+
+      text(document.getElementById("laneBadge"), "LANE " + model.lane);
+      text(document.getElementById("callsign"), model.name);
+      var demoTag = document.getElementById("demoTag");
+      if (model.demo) demoTag.hidden = false;
+
+      var gradeEl = document.getElementById("grade");
+      text(gradeEl, model.grade);
+      gradeEl.className = "grade" + (GRADES[model.grade] ? " g-" + model.grade : "");
+
+      var finalEl = document.getElementById("final");
+      finalEl.replaceChildren();
+      if (model.final == null) {
+        text(finalEl, "—");
+      } else {
+        finalEl.appendChild(document.createTextNode(f2(model.final)));
+        var unit = document.createElement("small");
+        text(unit, "s");
+        finalEl.appendChild(unit);
+      }
+      var rawLine = document.getElementById("rawLine");
+      var penLine = document.getElementById("penLine");
+      rawLine.replaceChildren();
+      penLine.replaceChildren();
+      if (model.raw != null) {
+        rawLine.appendChild(document.createTextNode("RAW "));
+        var rb = document.createElement("b");
+        text(rb, f2(model.raw) + "s");
+        rawLine.appendChild(rb);
+      }
+      if (model.penalty != null) {
+        penLine.appendChild(document.createTextNode("人質罰時 "));
+        var pb = document.createElement("b");
+        text(pb, "+" + f1(model.penalty) + "s");
+        penLine.appendChild(pb);
+      }
+
+      var chips = document.getElementById("chips");
+      chips.replaceChildren();
+      if (!model.targets.length) {
+        var note = el("div", "empty-note");
+        text(note, "這張連結沒有靶清單");
+        chips.appendChild(note);
+      }
+      model.targets.forEach(function (t) {
+        var cls = "chip";
+        if (TIERS[t.tier]) cls += " t-" + t.tier;
+        if (t.hostage) cls += " hostage";
+        var chip = el("div", cls);
+        var id = el("span", "id"); text(id, "T" + t.id); chip.appendChild(id);
+        var tier = el("span", "tier"); text(tier, t.tier); chip.appendChild(tier);
+        var st = el("span", "st" + (t.struck ? " miss" : ""));
+        text(st, t.hostage ? (t.struck ? "人質 · 誤擊" : "人質") : "DOWN");
+        chip.appendChild(st);
+        if (!t.hostage && t.hp != null) {
+          var hp = el("span", "hp");
+          text(hp, "HP " + t.hp);
+          chip.appendChild(hp);
+        }
+        if (t.tier === "SSS" && !t.hostage) chip.appendChild(el("i", "rb"));
+        chips.appendChild(chip);
+      });
+      if (model.targets.some(function (t) { return t.tier === "SSS" && !t.hostage; })) {
+        document.getElementById("storyCard").classList.add("boss");
+      }
+
+      var zonesEl = document.getElementById("zones");
+      if (model.zones) {
+        zonesEl.hidden = false;
+        var total = model.zones.A + model.zones.B + model.zones.C;
+        var bar = document.getElementById("zoneBar");
+        bar.replaceChildren();
+        ["A","B","C"].forEach(function (z) {
+          var i = document.createElement("i");
+          i.className = z.toLowerCase();
+          var pct = total > 0 ? (model.zones[z] / total * 100) : (100 / 3);
+          i.style.width = pct + "%";
+          bar.appendChild(i);
+        });
+        var labs = document.getElementById("zoneLabs");
+        labs.replaceChildren();
+        [["A","za"],["B","zb"],["C","zc"]].forEach(function (pair) {
+          var s = el("span", pair[1]);
+          var count = model.zones[pair[0]];
+          var pct = total > 0 ? Math.round(count / total * 100) : 0;
+          text(s, "ZONE " + pair[0] + "  " + count + " · " + pct + "%");
+          labs.appendChild(s);
+        });
+      }
+
+      var armor = document.getElementById("armor");
+      if (model.br != null || model.stk != null) {
+        armor.hidden = false;
+        armor.replaceChildren();
+        var bits = [];
+        if (model.br != null) bits.push(["破防 ", String(model.br), " 次"]);
+        if (model.stk != null) bits.push(["最大疊加 ×", String(model.stk), ""]);
+        bits.forEach(function (b, idx) {
+          if (idx) armor.appendChild(document.createTextNode(" · "));
+          armor.appendChild(document.createTextNode(b[0]));
+          var strong = document.createElement("b");
+          text(strong, b[1]);
+          armor.appendChild(strong);
+          if (b[2]) armor.appendChild(document.createTextNode(b[2]));
+        });
+      }
+      text(document.getElementById("stampDate"), stampNow());
+
+      var btn = document.getElementById("btnSave");
+      var hint = document.getElementById("saveHint");
+      btn.addEventListener("click", function () {
+        if (!window.html2canvas) {
+          text(hint, "截圖元件沒載入，請直接截圖");
+          return;
+        }
+        var label = btn.textContent;
+        btn.disabled = true;
+        text(btn, "產生中…");
+        html2canvas(document.getElementById("storyCard"), {
+          scale:2,
+          backgroundColor:"#070b11",
+          logging:false,
+          useCORS:true
+        }).then(function (canvas) {
+          var safe = String(model.name).replace(/[^\w\-]+/g, "").slice(0, 24) || "report";
+          var lane = String(model.lane).replace(/[^\w\-]+/g, "").slice(0, 8) || "L";
+          var a = document.createElement("a");
+          a.href = canvas.toDataURL("image/png");
+          a.download = "NeuronStrike_ZombieLane_L" + lane + "_" + safe + ".png";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          text(hint, "已下載 PNG");
+        }).catch(function () {
+          text(hint, "無法產生圖片，請直接截圖");
+        }).then(function () {
+          btn.disabled = false;
+          text(btn, label);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
