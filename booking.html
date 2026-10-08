@@ -1057,16 +1057,18 @@
             const modal = document.getElementById("successModal");
             const summary = document.getElementById("modalSummaryText");
 
+            // auth-fix 2026-10-09: 所有插入 HTML 的值都先跳脫（射手名稱 = LINE 顯示名稱，可由使用者自訂）
+            const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
             const laneDisplay = data.assignedLane === 'AUTO' ? '現場教官安排' : `指定 LANE ${data.assignedLane}`;
 
             summary.innerHTML = `
-                <div>預約射手：<b>${data.operator}</b></div>
-                <div>預約日期：<b>${data.date} (${data.dayType === 'WEEKEND' ? '假日' : '平日'})</b></div>
-                <div>抵達時段：<b style="color:var(--accent-green);">${data.slot} (體驗 ${data.durationMinutes} 分鐘)</b></div>
-                <div>靶位席次：<b>${laneDisplay}</b></div>
-                <div>體驗方案：<b style="color:var(--accent-gold);">${data.plan}</b></div>
-                <div>結算金額：<b style="color:var(--accent-gold);">$${data.price.toLocaleString()}</b></div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">預約單號：${resKey}</div>
+                <div>預約射手：<b>${esc(data.operator)}</b></div>
+                <div>預約日期：<b>${esc(data.date)} (${data.dayType === 'WEEKEND' ? '假日' : '平日'})</b></div>
+                <div>抵達時段：<b style="color:var(--accent-green);">${esc(data.slot)} (體驗 ${esc(Number(data.durationMinutes) || 60)} 分鐘)</b></div>
+                <div>靶位席次：<b>${esc(laneDisplay)}</b></div>
+                <div>體驗方案：<b style="color:var(--accent-gold);">${esc(data.plan)}</b></div>
+                <div>結算金額：<b style="color:var(--accent-gold);">$${esc(Number(data.price || 0).toLocaleString())}</b></div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">預約單號：${esc(resKey)}</div>
             `;
 
             const qrPayload = `NST_RES:${resKey}:${data.operator}`;
@@ -1094,5 +1096,403 @@
             }
         }
     </script>
+<!-- NST_MINE:BEGIN 我的預約 / My reservations (auth-fix 2026-10-09). Source: shared/nst-my-reservations.html, inlined by tools/build_mine.py — edit the source, not the page. -->
+<style id="nstMineStyle">
+    .nst-mine-btn { margin-left: auto; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 8px;
+        background: rgba(0, 229, 255, 0.08); border: 1px solid var(--primary-cyan, #00bcd4); color: var(--primary-cyan, #00bcd4);
+        font-family: 'Noto Sans TC', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px; cursor: pointer;
+        box-shadow: 0 0 12px rgba(0, 229, 255, 0.15) inset; position: relative; white-space: nowrap; }
+    .nst-mine-btn:active { transform: translateY(1px); }
+    .nst-mine-btn svg { width: 16px; height: 16px; }
+    .nst-mine-btn .nm-count { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent-green, #00c853); color: #000;
+        font-size: 0.7rem; line-height: 18px; text-align: center; font-family: 'Orbitron', sans-serif; display: none; }
+    .nst-mine-btn .nm-count.on { display: inline-block; }
+    .nst-mine-link { display: block; width: 100%; margin-top: 10px; padding: 10px; border-radius: 6px; background: transparent;
+        border: 1px dashed var(--primary-cyan, #00bcd4); color: var(--primary-cyan, #00bcd4); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    #nstMinePanel { display: none; position: fixed; inset: 0; z-index: 1100; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        background-color: #04070b;
+        background-image: linear-gradient(rgba(0, 229, 255, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.035) 1px, transparent 1px);
+        background-size: 24px 24px; padding: 14px 14px 40px; }
+    #nstMinePanel.on { display: block; }
+    #nstMinePanel .nm-wrap { max-width: 480px; margin: 0 auto; }
+    #nstMinePanel .nm-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0 12px;
+        border-bottom: 1px solid var(--border-subtle, #253347); margin-bottom: 12px; position: sticky; top: -14px; background: rgba(4, 7, 11, 0.96); z-index: 2; padding-top: 14px; }
+    #nstMinePanel .nm-title { font-size: 1.15rem; font-weight: 700; color: #fff; letter-spacing: 1px; }
+    #nstMinePanel .nm-title small { display: block; font-family: 'Orbitron', sans-serif; font-size: 0.62rem; color: var(--primary-cyan, #00bcd4); letter-spacing: 2px; font-weight: 600; }
+    #nstMinePanel .nm-close { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--border-subtle, #253347); background: var(--surface-sub, #1c2637);
+        color: #fff; font-size: 1.2rem; cursor: pointer; }
+    #nstMinePanel .nm-status { border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.8rem; line-height: 1.55; color: var(--text-body, #a9b9cb);
+        background: var(--surface-sub, #1c2637); border-left: 3px solid var(--primary-cyan, #00bcd4); }
+    #nstMinePanel .nm-status.ok { border-left-color: var(--accent-green, #00c853); }
+    #nstMinePanel .nm-status.offline, #nstMinePanel .nm-status.login { border-left-color: var(--accent-gold, #ffb300); }
+    #nstMinePanel .nm-status.error { border-left-color: #ff1a35; }
+    #nstMinePanel .nm-status b { color: #fff; }
+    #nstMinePanel .nm-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    #nstMinePanel .nm-act { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--primary-cyan, #00bcd4); background: transparent;
+        color: var(--primary-cyan, #00bcd4); font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    #nstMinePanel .nm-act.primary { background: var(--primary-cyan, #00bcd4); color: #000; }
+    #nstMinePanel .nm-act.line { background: #06c755; border-color: #06c755; color: #fff; }
+    .nm-card { position: relative; background: var(--surface-card, #151c28); border: 1px solid rgba(0, 229, 255, 0.35); border-radius: 12px;
+        padding: 14px; margin-bottom: 14px; box-shadow: 0 0 18px rgba(0, 229, 255, 0.07); }
+    .nm-card::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: var(--primary-cyan, #00bcd4); }
+    .nm-card.cancelled { opacity: 0.55; border-color: var(--border-subtle, #253347); }
+    .nm-card.cancelled::before { background: #ff1a35; }
+    .nm-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .nm-date { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .nm-date .nm-tag { margin-left: 6px; font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: var(--accent-gold, #ffb300); color: #000; vertical-align: 2px; }
+    .nm-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+    .nm-badge.s-pending { color: var(--accent-green, #00c853); }
+    .nm-badge.s-done { color: var(--primary-cyan, #00bcd4); }
+    .nm-badge.s-cancelled { color: #ff4d5e; }
+    .nm-badge.s-past { color: var(--text-muted, #5e738d); }
+    .nm-slot { font-family: 'Orbitron', sans-serif; font-size: 1.55rem; font-weight: 800; color: var(--primary-cyan, #00bcd4); margin: 4px 0 2px; letter-spacing: 1px; }
+    .nm-meta { font-size: 0.8rem; color: var(--text-body, #a9b9cb); line-height: 1.6; }
+    .nm-meta b { color: #fff; font-weight: 700; }
+    .nm-qr-wrap { display: flex; flex-direction: column; align-items: center; margin-top: 12px; }
+    .nm-qr { background: #fff; padding: 12px; border-radius: 10px; cursor: zoom-in; line-height: 0; border: 2px solid var(--primary-cyan, #00bcd4);
+        box-shadow: 0 0 22px rgba(0, 229, 255, 0.25); }
+    .nm-qr img, .nm-qr canvas { display: block; }
+    .nm-qr-fallback { color: #000; font-size: 0.8rem; line-height: 1.4; padding: 10px; max-width: 220px; word-break: break-all; text-align: center; }
+    .nm-hint { font-size: 0.72rem; color: var(--text-muted, #5e738d); margin-top: 8px; text-align: center; }
+    .nm-key { font-size: 0.68rem; color: var(--text-muted, #5e738d); margin-top: 6px; word-break: break-all; text-align: center; }
+    .nm-offline { display: inline-block; margin-top: 8px; font-size: 0.68rem; font-weight: 700; color: #000; background: var(--accent-gold, #ffb300); padding: 2px 8px; border-radius: 4px; }
+    .nm-empty { text-align: center; padding: 26px 12px; border: 1px dashed var(--border-subtle, #253347); border-radius: 12px; color: var(--text-body, #a9b9cb); font-size: 0.85rem; margin-bottom: 14px; }
+    .nm-sec { font-size: 0.78rem; font-weight: 700; color: var(--accent-gold, #ffb300); margin: 18px 0 8px; letter-spacing: 0.5px; }
+    .nm-hist { display: flex; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 8px; background: var(--surface-sub, #1c2637);
+        margin-bottom: 6px; font-size: 0.78rem; color: var(--text-body, #a9b9cb); }
+    .nm-hist b { color: #fff; }
+    #nstMineBig { display: none; position: fixed; inset: 0; z-index: 1200; background: #fff; color: #000; flex-direction: column; align-items: center; justify-content: center;
+        padding: 18px; text-align: center; cursor: zoom-out; }
+    #nstMineBig.on { display: flex; }
+    #nstMineBig .nb-qr { line-height: 0; }
+    #nstMineBig .nb-qr img, #nstMineBig .nb-qr canvas { display: block; }
+    #nstMineBig .nb-slot { font-family: 'Orbitron', 'Noto Sans TC', sans-serif; font-size: 1.35rem; white-space: nowrap; font-weight: 800; margin-top: 16px; }
+    #nstMineBig .nb-info { font-size: 0.95rem; margin-top: 4px; font-weight: 700; }
+    #nstMineBig .nb-key { font-size: 0.75rem; color: #555; margin-top: 6px; word-break: break-all; }
+    #nstMineBig .nb-tip { font-size: 0.8rem; color: #333; margin-top: 14px; padding: 6px 12px; border-radius: 6px; background: #f1f1f1; }
+    body.nst-mine-lock { overflow: hidden; }
+</style>
+<div id="nstMinePanel" role="dialog" aria-modal="true" aria-labelledby="nstMineTitle">
+    <div class="nm-wrap">
+        <div class="nm-head">
+            <div class="nm-title" id="nstMineTitle">我的預約<small>MY RESERVATIONS</small></div>
+            <button type="button" class="nm-close" id="nstMineClose" aria-label="關閉">✕</button>
+        </div>
+        <div class="nm-status" id="nstMineStatus">載入中…</div>
+        <div id="nstMineList"></div>
+        <div id="nstMineHist"></div>
+        <div class="nm-hint" style="margin-top:14px;">入場時請出示 QR，櫃台掃描即可報到。點 QR 可放大顯示。<br>QR 也會存在這支手機，沒有網路時一樣可以叫出。</div>
+    </div>
+</div>
+<div id="nstMineBig" role="dialog" aria-modal="true" aria-label="預約 QR 放大">
+    <div class="nb-qr" id="nstMineBigQr"></div>
+    <div class="nb-slot" id="nstMineBigSlot"></div>
+    <div class="nb-info" id="nstMineBigInfo"></div>
+    <div class="nb-key" id="nstMineBigKey"></div>
+    <div class="nb-tip">請把螢幕亮度調到最高 · 點任意處關閉</div>
+</div>
+<script>
+/* 我的預約：向預約後端 GET {NST_BOOKING_API}/mine 查自己的預約（LINE ID token 放在 Authorization 標頭，不放網址）。
+   本頁不讀 Firebase。成功預約與查詢結果會存在本機 localStorage（只存今天以後、未取消的預約），網路不通時顯示「離線快取」。
+   QR 內容與完成彈窗相同：NST_RES:<預約單號>:<預約射手>，櫃台掃描方式不變。 */
+(function () {
+    "use strict";
+    var CACHE_KEY = "nst_my_reservations_v1";
+    var DOW = ["日", "一", "二", "三", "四", "五", "六"];
+    var state = { open: false, seq: 0, wake: null, lastSync: 0, fromSuccess: false };
+    function $(id) { return document.getElementById(id); }
+    function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+    function apiBase() { try { return NST_BOOKING_API; } catch (e) { return "https://asia-east1-nst-killhouse.cloudfunctions.net/booking"; } }
+    function idToken() { try { return (typeof nstGetLineIdToken === "function" && nstGetLineIdToken()) || ""; } catch (e) { return ""; } }
+    function lineUid() { try { var u = currentOperator && currentOperator.uid; return (typeof u === "string" && /^U\w{4,}$/.test(u)) ? u : ""; } catch (e) { return ""; } }
+    function tpeToday() { return new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10); }
+    function slotStart(date, slot) { var p = String(date).split("-").map(Number); return Date.UTC(p[0], p[1] - 1, p[2], parseInt(slot, 10) || 0) - 8 * 3600e3; }
+    function qrText(r) { return "NST_RES:" + r.key + ":" + (r.operator || ""); }
+    function isExclusive(plan) { return /包場/.test(String(plan || "")); }
+
+    // ── 本機快取 ──
+    function readCache() { try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null"); return c && Array.isArray(c.items) ? c : { v: 1, owner: "", items: [] }; } catch (e) { return { v: 1, owner: "", items: [] }; } }
+    function writeCache(c) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch (e) { /* 私密模式 / 空間不足：略過 */ } }
+    function keepable(r) { return r && r.key && r.date && r.slot && r.date >= tpeToday() && r.status !== "cancelled"; }
+    function slim(r) {
+        return { key: String(r.key), date: String(r.date), slot: String(r.slot), endSlot: r.endSlot || "", durationMinutes: Number(r.durationMinutes) || 60,
+            plan: String(r.plan || ""), mode: r.mode || (isExclusive(r.plan) ? "EXCLUSIVE" : "LANE"), assignedLane: String(r.assignedLane || "AUTO"),
+            price: typeof r.price === "number" ? r.price : null, status: String(r.status || "pending"), operator: String(r.operator || ""), createdAt: r.createdAt || null };
+    }
+    /** 讀快取：清掉過期（日期早於今天）的；若已知目前 LINE 使用者且快取屬於別人 → 不顯示並清除。 */
+    function loadCache() {
+        var c = readCache(), me = lineUid();
+        if (me && c.owner && c.owner !== me) { c = { v: 1, owner: me, items: [] }; writeCache(c); return c; }
+        var kept = c.items.filter(keepable);
+        if (kept.length !== c.items.length) { c.items = kept; writeCache(c); }
+        return c;
+    }
+    function cacheAdd(r) {
+        var c = loadCache(), me = lineUid();
+        if (me) c.owner = me;
+        c.items = c.items.filter(function (x) { return x.key !== r.key; });
+        c.items.push(slim(r));
+        c.items = c.items.filter(keepable).slice(-30);
+        c.savedAt = Date.now(); writeCache(c);
+    }
+    function cacheReplace(list) {
+        var c = { v: 1, owner: lineUid() || readCache().owner || "", savedAt: Date.now(), items: list.filter(keepable).map(slim).slice(0, 30) };
+        writeCache(c);
+    }
+    function sortItems(a) { return a.slice().sort(function (x, y) { return slotStart(x.date, x.slot) - slotStart(y.date, y.slot); }); }
+
+    // ── 顯示 ──
+    function dateLabel(iso) {
+        var p = iso.split("-").map(Number), d = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+        var t = tpeToday(), tag = "";
+        if (iso === t) tag = "今天";
+        else { var n = new Date(Date.UTC(p[0], p[1] - 1, p[2] - 1)).toISOString().slice(0, 10); if (n === t) tag = "明天"; }
+        return p[1] + "/" + p[2] + "（" + DOW[d.getUTCDay()] + "）" + (tag ? '<span class="nm-tag">' + tag + "</span>" : "");
+    }
+    function endOf(r) {
+        if (r.endSlot) return r.endSlot;
+        var h = (parseInt(r.slot, 10) || 0) + Math.ceil((Number(r.durationMinutes) || 60) / 60);
+        return (h <= 24 ? String(h) : "0" + (h - 24)).padStart(2, "0") + ":00";
+    }
+    function laneText(r) {
+        if (r.mode === "EXCLUSIVE" || isExclusive(r.plan)) return "包場 · 全館 4 道";
+        return r.assignedLane && r.assignedLane !== "AUTO" ? "單靶道 · LANE " + esc(r.assignedLane) : "單靶道 · 現場教官安排";
+    }
+    function statusBadge(r, past) {
+        var s = String(r.status || "pending");
+        if (s === "cancelled") return '<span class="nm-badge s-cancelled">已取消</span>';
+        if (/^(checked_?in|arrived|used|done|finished|completed|playing)$/i.test(s)) return '<span class="nm-badge s-done">已報到</span>';
+        if (past) return '<span class="nm-badge s-past">已結束</span>';
+        if (s === "pending" || s === "confirmed") return '<span class="nm-badge s-pending">已預約 · 待報到</span>';
+        return '<span class="nm-badge s-pending">' + esc(s) + "</span>";
+    }
+    function drawQr(el, text, size) {
+        el.innerHTML = "";
+        if (typeof QRCode === "undefined") { el.innerHTML = '<div class="nm-qr-fallback">QR 元件載入失敗<br>請出示預約單號：<br><b>' + esc(text.split(":")[1] || "") + "</b></div>"; return false; }
+        new QRCode(el, { text: text, width: size, height: size, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+        return true;
+    }
+    function priceText(r) { return typeof r.price === "number" ? "$" + r.price.toLocaleString() : ""; }
+    function renderList(items, history, offline, known) {   // known = 伺服器已確認（才可說「沒有預約」）
+        var list = $("nstMineList"), hist = $("nstMineHist");
+        list.innerHTML = ""; hist.innerHTML = "";
+        var up = sortItems(items);
+        if (!up.length && known) {
+            list.innerHTML = '<div class="nm-empty">目前沒有即將到來的預約<div class="nm-actions" style="justify-content:center;"><button type="button" class="nm-act primary" data-nm="book">立即預約</button></div></div>';
+        }
+        up.forEach(function (r) {
+            var cancelled = r.status === "cancelled";
+            var card = document.createElement("div");
+            card.className = "nm-card" + (cancelled ? " cancelled" : "") + (offline ? " offline" : "");
+            card.setAttribute("data-key", r.key);
+            card.innerHTML =
+                '<div class="nm-top"><div class="nm-date">' + dateLabel(r.date) + "</div>" + statusBadge(r, false) + "</div>" +
+                '<div class="nm-slot">' + esc(r.slot) + " – " + esc(endOf(r)) + "</div>" +
+                '<div class="nm-meta"><b>' + esc(r.plan) + "</b><br>" + laneText(r) + (priceText(r) ? " · " + priceText(r) : "") + " · 射手 <b>" + esc(r.operator) + "</b></div>" +
+                (cancelled ? '<div class="nm-hint">此預約已取消，不需出示 QR。</div>' :
+                    '<div class="nm-qr-wrap"><div class="nm-qr" role="button" tabindex="0" aria-label="放大 QR" data-nm="big"></div>' +
+                    '<div class="nm-hint">點 QR 放大 · 櫃台掃描即可報到</div></div>') +
+                '<div class="nm-key">預約單號 ' + esc(r.key) + "</div>" +
+                (offline ? '<div style="text-align:center;"><span class="nm-offline">離線快取</span></div>' : "");
+            list.appendChild(card);
+            if (!cancelled) {
+                var q = card.querySelector(".nm-qr");
+                q.setAttribute("data-qr", qrText(r));
+                drawQr(q, qrText(r), 200);
+                q.__nmRow = r;
+            }
+        });
+        if (history && history.length) {
+            hist.innerHTML = '<div class="nm-sec">近 7 天紀錄</div>' + history.map(function (r) {
+                return '<div class="nm-hist"><span><b>' + dateLabel(r.date).replace(/<span[^>]*>.*?<\/span>/, "") + " " + esc(r.slot) + "</b> · " + esc(r.plan) + "</span>" + statusBadge(r, true) + "</div>";
+            }).join("");
+        }
+    }
+    function setStatus(kind, html, actions) {
+        var el = $("nstMineStatus");
+        el.className = "nm-status " + kind;
+        el.innerHTML = html + (actions && actions.length ? '<div class="nm-actions">' + actions.map(function (a) {
+            return '<button type="button" class="nm-act ' + (a.cls || "") + '" data-nm="' + a.act + '">' + esc(a.label) + "</button>"; }).join("") + "</div>" : "");
+    }
+    function hhmm(ms) { var d = new Date(ms + 8 * 3600e3); return d.toISOString().slice(11, 16); }
+    function updateCount() {
+        var b = $("nstMineCount"); if (!b) return;
+        var n = loadCache().items.length;
+        b.textContent = n > 9 ? "9+" : String(n);
+        b.classList.toggle("on", n > 0);
+    }
+
+    // ── 讀取 ──
+    function waitToken(ms) {
+        return new Promise(function (resolve) {
+            var t0 = Date.now();
+            (function poll() {
+                var tok = idToken();
+                var notLogged = false;
+                try { notLogged = typeof liff !== "undefined" && typeof liff.isLoggedIn === "function" && liff.id && !liff.isLoggedIn(); } catch (e) { /* LIFF 未初始化 */ }
+                var settled = false;   // LIFF 已完成（拿到 LINE 身分或進入訪客模式），不必再等
+                try { settled = !!lineUid() || /訪客|ANONYMOUS|DEMO/.test(String(currentOperator.uid)); } catch (e) { /* ignore */ }
+                if (tok || notLogged || settled || Date.now() - t0 > ms) return resolve(tok);
+                setTimeout(poll, 300);
+            })();
+        });
+    }
+    function fetchMine(tok) {
+        var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+        var timer = ctl ? setTimeout(function () { ctl.abort(); }, 10000) : null;
+        return fetch(apiBase() + "/mine", { method: "GET", headers: { Authorization: "Bearer " + tok }, cache: "no-store", signal: ctl ? ctl.signal : undefined })
+            .then(function (res) { return res.json().catch(function () { return {}; }).then(function (out) { return { status: res.status, out: out }; }); })
+            .finally(function () { if (timer) clearTimeout(timer); });
+    }
+    function refresh() {
+        var seq = ++state.seq;
+        var cached = loadCache().items;
+        renderList(cached, null, true);
+        setStatus("", "正在向預約系統查詢你的預約…" + (cached.length ? "（先顯示本機離線快取）" : ""));
+        return waitToken(6000).then(function (tok) {
+            if (seq !== state.seq) return;
+            if (!tok) {
+                setStatus("login", "<b>請先用 LINE 登入</b>，才能查詢你的預約。" + (cached.length ? "<br>以下是這支手機保存的預約（離線快取）。" : ""),
+                    [{ act: "login", label: "用 LINE 登入", cls: "line" }]);
+                return;
+            }
+            return fetchMine(tok).then(function (r) {
+                if (seq !== state.seq) return;
+                if (r.status === 200 && r.out && r.out.ok && Array.isArray(r.out.reservations)) {
+                    var all = r.out.reservations;
+                    var upcoming = all.filter(function (x) { return x.upcoming; });
+                    var history = all.filter(function (x) { return !x.upcoming; });
+                    cacheReplace(upcoming);
+                    state.lastSync = Date.now();
+                    renderList(upcoming, history, false, true);
+                    setStatus("ok", "已同步 " + hhmm(Date.now()) + " · 共 <b>" + upcoming.filter(function (x) { return x.status !== "cancelled"; }).length + "</b> 筆即將到來的預約");
+                    updateCount();
+                    return;
+                }
+                if (r.status === 401) {
+                    setStatus("login", "<b>LINE 登入已過期</b>，請重新登入後再查詢。" + (cached.length ? "<br>以下是這支手機保存的預約（離線快取）。" : ""),
+                        [{ act: "relogin", label: "重新登入 LINE", cls: "line" }]);
+                    return;
+                }
+                var msg = (r.out && r.out.message) ? esc(r.out.message) : "代碼 " + r.status;
+                setStatus(cached.length ? "offline" : "error", "<b>預約系統暫時無法查詢</b>（" + msg + "）。" + (cached.length ? "<br>以下為這支手機保存的預約（離線快取），QR 仍可使用。" : "<br>請稍後再試。"),
+                    [{ act: "retry", label: "重新整理" }]);
+            });
+        }).catch(function (e) {
+            if (seq !== state.seq) return;
+            console.warn("我的預約查詢失敗:", e);
+            setStatus(cached.length ? "offline" : "error", "<b>無法連線預約系統</b>（網路不穩或服務暫停）。" + (cached.length ? "<br>以下為這支手機保存的預約（離線快取），QR 仍可使用。" : "<br>這支手機也沒有保存的預約，請確認網路後再試。"),
+                [{ act: "retry", label: "重新整理" }]);
+        });
+    }
+
+    // ── 開關 ──
+    function openPanel() {
+        var sm = $("successModal");
+        state.fromSuccess = !!(sm && sm.style.display && sm.style.display !== "none");
+        if (sm) sm.style.display = "none";
+        $("nstMinePanel").classList.add("on");
+        document.body.classList.add("nst-mine-lock");
+        state.open = true;
+        refresh();
+    }
+    function closePanel() {
+        closeBig();
+        $("nstMinePanel").classList.remove("on");
+        document.body.classList.remove("nst-mine-lock");
+        state.open = false; state.seq++;
+        if (state.fromSuccess) {          // 從完成彈窗過來：回到可再預約的表單狀態
+            state.fromSuccess = false;
+            try { if (typeof submitting !== "undefined") submitting = false; } catch (e) { /* ignore */ }
+            try { var nb = $("bookNotes"); if (nb) nb.value = ""; } catch (e) { /* ignore */ }
+            try { if (typeof validateForm === "function") validateForm(); } catch (e) { /* ignore */ }
+            try { if (typeof nstRefreshAvailability === "function") nstRefreshAvailability(true); } catch (e) { /* ignore */ }
+        }
+    }
+    function openBig(row) {
+        var size = Math.max(160, Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.82) - 36);
+        size = Math.min(size, 560);
+        drawQr($("nstMineBigQr"), qrText(row), size);
+        $("nstMineBigSlot").textContent = dateLabel(row.date).replace(/<[^>]+>[^<]*<\/span>/, "") + " " + row.slot + "–" + endOf(row);
+        $("nstMineBigInfo").textContent = (row.operator || "") + " · " + (row.plan || "");
+        $("nstMineBigKey").textContent = "預約單號 " + row.key;
+        $("nstMineBig").classList.add("on");
+        try { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function (w) { state.wake = w; }).catch(function () {}); } catch (e) { /* 不支援 */ }
+    }
+    function closeBig() {
+        $("nstMineBig").classList.remove("on");
+        try { if (state.wake) state.wake.release(); } catch (e) { /* ignore */ }
+        state.wake = null;
+    }
+    function lineLogin(force) {
+        try { sessionStorage.setItem("nst_mine_reopen", "1"); } catch (e) { /* ignore */ }
+        try {
+            if (typeof liff === "undefined") { alert("請用 LINE 開啟預約頁並登入，才能查看我的預約。"); return; }
+            if (liff.isInClient && liff.isInClient()) { location.reload(); return; }
+            if (force && liff.isLoggedIn && liff.isLoggedIn()) liff.logout();
+            liff.login();
+        } catch (e) { alert("請用 LINE 開啟預約頁並登入，才能查看我的預約。"); }
+    }
+
+    // ── 安裝 ──
+    function install() {
+        var bar = document.querySelector(".operator-bar");
+        if (bar && !$("nstMineBtn")) {
+            var b = document.createElement("button");
+            b.type = "button"; b.id = "nstMineBtn"; b.className = "nst-mine-btn";
+            b.setAttribute("aria-label", "我的預約（再次顯示預約 QR）");
+            b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 17h4v4"/></svg>我的預約<span class="nm-count" id="nstMineCount"></span>';
+            b.addEventListener("click", openPanel);
+            bar.appendChild(b);
+        }
+        var modalBtn = document.querySelector("#successModal .modal-btn");
+        if (modalBtn && !$("nstMineFromSuccess")) {
+            var l = document.createElement("button");
+            l.type = "button"; l.id = "nstMineFromSuccess"; l.className = "nst-mine-link";
+            l.textContent = "之後可在「我的預約」再次叫出 QR →";
+            l.addEventListener("click", openPanel);
+            modalBtn.parentNode.insertBefore(l, modalBtn);
+        }
+        $("nstMineClose").addEventListener("click", closePanel);
+        $("nstMineBig").addEventListener("click", closeBig);
+        $("nstMinePanel").addEventListener("click", function (ev) {
+            var t = ev.target.closest ? ev.target.closest("[data-nm]") : null;
+            if (!t) return;
+            var a = t.getAttribute("data-nm");
+            if (a === "big" && t.__nmRow) openBig(t.__nmRow);
+            else if (a === "retry") refresh();
+            else if (a === "login") lineLogin(false);
+            else if (a === "relogin") lineLogin(true);
+            else if (a === "book") closePanel();
+        });
+        $("nstMinePanel").addEventListener("keydown", function (ev) {
+            if ((ev.key === "Enter" || ev.key === " ") && ev.target.__nmRow) { ev.preventDefault(); openBig(ev.target.__nmRow); }
+        });
+        document.addEventListener("keydown", function (ev) {
+            if (ev.key !== "Escape") return;
+            if ($("nstMineBig").classList.contains("on")) closeBig(); else if (state.open) closePanel();
+        });
+        // 預約成功：完成彈窗照舊，另外把這筆存進本機快取
+        if (typeof window.showSuccessModal === "function" && !window.showSuccessModal.__nstMine) {
+            var orig = window.showSuccessModal;
+            var wrapped = function (resKey, data) {
+                var r = orig.apply(this, arguments);
+                try { if (resKey && data) { cacheAdd(Object.assign({}, data, { key: resKey })); updateCount(); } } catch (e) { console.warn("我的預約快取失敗:", e); }
+                return r;
+            };
+            wrapped.__nstMine = true;
+            window.showSuccessModal = wrapped;
+        }
+        updateCount();
+        // LINE 圖文選單可直接連到 booking.html#mine（或 ?mine=1）；登入後回到本頁也會自動打開
+        var reopen = false;
+        try { reopen = sessionStorage.getItem("nst_mine_reopen") === "1"; sessionStorage.removeItem("nst_mine_reopen"); } catch (e) { /* ignore */ }
+        if (reopen || /(^|[#&])mine\b/.test(location.hash.slice(1)) || /[?&]mine=1\b/.test(location.search)) openPanel();
+    }
+    window.NSTMine = { open: openPanel, close: closePanel, refresh: refresh, cache: loadCache, _cacheKey: CACHE_KEY };
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", install); else install();
+})();
+</script>
+<!-- NST_MINE:END -->
 </body>
 </html>
